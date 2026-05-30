@@ -8,6 +8,8 @@ import redesignRoutes from "./routes/redesigns";
 import commentRoutes from "./routes/comments";
 import notificationRoutes from "./routes/notifications";
 import profileRoutes from "./routes/profiles";
+import followRoutes from "./routes/follows";
+import bookmarkRoutes from "./routes/bookmarks";
 
 const app = new Hono();
 
@@ -29,5 +31,7 @@ app.route("/api", redesignRoutes);
 app.route("/api", commentRoutes);
 app.route("/api", notificationRoutes);
 app.route("/api", profileRoutes);
+app.route("/api", followRoutes);
+app.route("/api", bookmarkRoutes);
 
 export default app;
