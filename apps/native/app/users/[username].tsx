@@ -8,8 +8,9 @@ import {
   Linking,
 } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
-import { ArrowLeft, ArrowUp } from "lucide-react-native";
+import { ArrowLeft, ArrowUp, UserPlus, UserMinus } from "lucide-react-native";
 import { useProfile, useUserRedesigns } from "@/hooks/use-profiles";
+import { useFollowStatus, useToggleFollow } from "@/hooks/use-follows";
 import { useAuth } from "@/contexts/auth-context";
 import type { Redesign } from "@/hooks/use-redesigns";
 import { env } from "@zimdesigns/env/native";
@@ -58,10 +59,12 @@ function RedesignCard({ item }: { item: Redesign }) {
 
 export default function ProfileScreen() {
   const { username } = useLocalSearchParams<{ username: string }>();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const { data: profile, isLoading: profileLoading, isError } = useProfile(username);
   const { data: redesigns, isLoading: redesignsLoading } = useUserRedesigns(username);
   const isOwnProfile = user?.username === username;
+  const { data: followStatus } = useFollowStatus(username);
+  const toggleFollow = useToggleFollow(username);
 
   if (profileLoading) {
     return (
@@ -94,6 +97,20 @@ export default function ProfileScreen() {
         {isOwnProfile && (
           <TouchableOpacity onPress={() => router.push("/profile/edit" as never)} activeOpacity={0.7}>
             <Text className="text-sm font-medium text-primary">Edit profile</Text>
+          </TouchableOpacity>
+        )}
+        {!isOwnProfile && isAuthenticated && (
+          <TouchableOpacity
+            onPress={() => toggleFollow.mutate()}
+            disabled={toggleFollow.isPending}
+            activeOpacity={0.8}
+            className={`flex-row items-center gap-1.5 px-3 py-1.5 rounded-xl border ${followStatus?.following ? "border-border bg-card" : "border-primary bg-primary"}`}
+          >
+            {followStatus?.following ? (
+              <><UserMinus size={13} color="#8A8278" /><Text className="text-xs font-semibold text-muted-foreground">Unfollow</Text></>
+            ) : (
+              <><UserPlus size={13} color="#fff" /><Text className="text-xs font-semibold text-white">Follow</Text></>
+            )}
           </TouchableOpacity>
         )}
       </View>
