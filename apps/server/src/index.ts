@@ -7,6 +7,9 @@ import { join } from "path";
 import authRoutes from "./routes/auth";
 import onboardingRoutes from "./routes/onboarding";
 import redesignRoutes from "./routes/redesigns";
+import commentRoutes from "./routes/comments";
+import notificationRoutes from "./routes/notifications";
+import profileRoutes from "./routes/profiles";
 
 const app = new Hono();
 
@@ -40,5 +43,8 @@ app.get("/uploads/:filename", async (c) => {
 app.route("/api/auth", authRoutes);
 app.route("/api", onboardingRoutes);
 app.route("/api", redesignRoutes);
+app.route("/api", commentRoutes);
+app.route("/api", notificationRoutes);
+app.route("/api", profileRoutes);
 
 export default app;
