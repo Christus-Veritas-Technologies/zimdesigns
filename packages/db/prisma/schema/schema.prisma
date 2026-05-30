@@ -27,7 +27,10 @@ model User {
   refreshTokens      RefreshToken[]
   redesigns          Redesign[]
   upvotes            Upvote[]
+  comments           Comment[]
+  notifications      Notification[]
 }
+
 
 model Redesign {
   id          String   @id @default(cuid())
@@ -42,9 +45,11 @@ model Redesign {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   upvotes     Upvote[]
+  comments    Comment[]
 }
+
 
 model Upvote {
   id         String   @id @default(cuid())
@@ -56,6 +61,30 @@ model Upvote {
   redesign   Redesign @relation(fields: [redesignId], references: [id], onDelete: Cascade)
 
   @@unique([userId, redesignId])
+}
+
+model Comment {
+  id         String   @id @default(cuid())
+  body       String
+  authorId   String
+  redesignId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  author     User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  redesign   Redesign @relation(fields: [redesignId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  body      String
+  refId     String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model RefreshToken {
