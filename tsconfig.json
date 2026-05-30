@@ -1,0 +1,3 @@
+{
+  "extends": "@zimdesigns/config/tsconfig.base.json"
+}

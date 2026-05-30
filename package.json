@@ -1,0 +1,33 @@
+{
+  "name": "zimdesigns",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "type": "module",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "check-types": "turbo check-types",
+    "dev:native": "turbo -F native dev",
+    "dev:web": "turbo -F web dev",
+    "dev:server": "turbo -F server dev",
+    "db:push": "turbo -F @zimdesigns/db db:push",
+    "db:studio": "turbo -F @zimdesigns/db db:studio",
+    "db:generate": "turbo -F @zimdesigns/db db:generate",
+    "db:migrate": "turbo -F @zimdesigns/db db:migrate"
+  },
+  "dependencies": {
+    "@zimdesigns/env": "workspace:*",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@types/bun": "catalog:",
+    "@zimdesigns/config": "workspace:*",
+    "turbo": "^2.8.12",
+    "typescript": "catalog:"
+  },
+  "packageManager": "pnpm@11.4.0"
+}
