@@ -10,11 +10,13 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  Share,
 } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
-import { ArrowLeft, ArrowUp, Trash2, Send, MessageCircle } from "lucide-react-native";
+import { ArrowLeft, ArrowUp, Trash2, Send, MessageCircle, Share2, Bookmark } from "lucide-react-native";
 import { useRedesign, useUpvoteRedesign, useDeleteRedesign } from "@/hooks/use-redesigns";
 import { useComments, useCreateComment, useDeleteComment } from "@/hooks/use-comments";
+import { useToggleBookmark } from "@/hooks/use-bookmarks";
 import { useAuth } from "@/contexts/auth-context";
 import { env } from "@zimdesigns/env/native";
 
@@ -55,6 +57,16 @@ export default function RedesignDetailScreen() {
   }
 
   const isOwner = user?.id === redesign.author.id;
+  const bookmark = useToggleBookmark(id);
+
+  const handleShare = async () => {
+    try {
+      await Share.share({
+        title: redesign.title,
+        message: `Check out this redesign: ${redesign.title} by @${redesign.author.username}`,
+      });
+    } catch {}
+  };
 
   const handleDelete = () => {
     Alert.alert("Delete redesign", "This cannot be undone.", [
@@ -112,16 +124,35 @@ export default function RedesignDetailScreen() {
             ))}
           </View>
 
-          {isOwner && (
+          <View className="absolute top-12 right-4 flex-row gap-2">
             <TouchableOpacity
-              onPress={handleDelete}
-              disabled={remove.isPending}
-              className="absolute top-12 right-4 w-9 h-9 rounded-full bg-black/50 items-center justify-center"
+              onPress={handleShare}
+              className="w-9 h-9 rounded-full bg-black/50 items-center justify-center"
               activeOpacity={0.8}
             >
-              <Trash2 size={15} color="#fff" />
+              <Share2 size={15} color="#fff" />
             </TouchableOpacity>
-          )}
+            {isAuthenticated && (
+              <TouchableOpacity
+                onPress={() => bookmark.mutate()}
+                disabled={bookmark.isPending}
+                className="w-9 h-9 rounded-full bg-black/50 items-center justify-center"
+                activeOpacity={0.8}
+              >
+                <Bookmark size={15} color="#fff" />
+              </TouchableOpacity>
+            )}
+            {isOwner && (
+              <TouchableOpacity
+                onPress={handleDelete}
+                disabled={remove.isPending}
+                className="w-9 h-9 rounded-full bg-black/50 items-center justify-center"
+                activeOpacity={0.8}
+              >
+                <Trash2 size={15} color="#fff" />
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
 
         <View className="px-5 pt-5 pb-6">
