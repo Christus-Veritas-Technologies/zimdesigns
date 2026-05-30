@@ -3,10 +3,15 @@ import { router } from "expo-router";
 import { api } from "@/lib/axios";
 import { useAuth, type AuthUser } from "@/contexts/auth-context";
 
-type SafeUser = AuthUser & {
+export type SafeUser = AuthUser & {
   bio: string | null;
   role: "designer" | "developer" | "both" | null;
   interests: string[];
+  linkedinUrl: string | null;
+  githubUrl: string | null;
+  dribbbleUrl: string | null;
+  twitterUrl: string | null;
+  websiteUrl: string | null;
 };
 
 export function useMe() {
@@ -21,15 +26,39 @@ export function useMe() {
 export function useUpdateProfile() {
   const { updateUser } = useAuth();
   return useMutation({
-    mutationFn: (data: {
+    mutationFn: (data: FormData | {
       name?: string;
       username?: string;
       bio?: string;
       role?: "designer" | "developer" | "both";
-    }) => api.patch<SafeUser>("/api/me", data).then((r) => r.data),
+    }) => {
+      if (data instanceof FormData) {
+        return api
+          .patch<SafeUser>("/api/me", data, {
+            headers: { "Content-Type": "multipart/form-data" },
+          })
+          .then((r) => r.data);
+      }
+      return api.patch<SafeUser>("/api/me", data).then((r) => r.data);
+    },
     onSuccess: async (user) => {
       await updateUser(user);
       router.push("/(onboarding)/step2");
+    },
+  });
+}
+
+export function useUpdateProfileSettings() {
+  const { updateUser } = useAuth();
+  return useMutation({
+    mutationFn: (data: FormData) =>
+      api
+        .patch<SafeUser>("/api/me", data, {
+          headers: { "Content-Type": "multipart/form-data" },
+        })
+        .then((r) => r.data),
+    onSuccess: async (user) => {
+      await updateUser(user);
     },
   });
 }

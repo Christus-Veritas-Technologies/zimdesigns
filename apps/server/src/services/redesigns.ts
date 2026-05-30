@@ -1,7 +1,5 @@
 import db from "@zimdesigns/db";
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
-import { randomUUID } from "crypto";
+import { uploadToR2 } from "../lib/r2";
 
 export interface RedesignInput {
   title: string;
@@ -17,17 +15,6 @@ export interface RedesignFilters {
   sort?: "recent" | "top";
   cursor?: string;
   limit?: number;
-}
-
-const UPLOADS_DIR = join(process.cwd(), "uploads");
-
-async function saveUpload(file: File, prefix: string): Promise<string> {
-  await mkdir(UPLOADS_DIR, { recursive: true });
-  const ext = file.name.split(".").pop() ?? "jpg";
-  const filename = `${prefix}-${randomUUID()}.${ext}`;
-  const buffer = await file.arrayBuffer();
-  await writeFile(join(UPLOADS_DIR, filename), Buffer.from(buffer));
-  return `/uploads/${filename}`;
 }
 
 function parseTags(raw: string): string[] {
@@ -102,8 +89,8 @@ export async function getRedesign(id: string, viewerId?: string) {
 
 export async function createRedesign(authorId: string, input: RedesignInput) {
   const [beforeUrl, afterUrl] = await Promise.all([
-    saveUpload(input.beforeFile, "before"),
-    saveUpload(input.afterFile, "after"),
+    uploadToR2(input.beforeFile, "redesigns/before"),
+    uploadToR2(input.afterFile, "redesigns/after"),
   ]);
 
   const r = await db.redesign.create({

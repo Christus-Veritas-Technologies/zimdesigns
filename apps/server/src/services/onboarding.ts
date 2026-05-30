@@ -1,11 +1,17 @@
 import db from "@zimdesigns/db";
+import { uploadToR2 } from "../lib/r2";
 
 export interface ProfileUpdate {
   name?: string;
   username?: string;
   bio?: string;
   role?: "designer" | "developer" | "both";
-  avatarUrl?: string;
+  avatarFile?: File;
+  linkedinUrl?: string;
+  githubUrl?: string;
+  dribbbleUrl?: string;
+  twitterUrl?: string;
+  websiteUrl?: string;
 }
 
 export async function getMe(userId: string) {
@@ -21,6 +27,11 @@ export async function updateProfile(userId: string, data: ProfileUpdate) {
     if (taken) throw new Error("USERNAME_TAKEN");
   }
 
+  let avatarUrl: string | undefined;
+  if (data.avatarFile) {
+    avatarUrl = await uploadToR2(data.avatarFile, "avatars");
+  }
+
   const user = await db.user.update({
     where: { id: userId },
     data: {
@@ -28,7 +39,12 @@ export async function updateProfile(userId: string, data: ProfileUpdate) {
       ...(data.username !== undefined && { username: data.username.toLowerCase().trim() }),
       ...(data.bio !== undefined && { bio: data.bio }),
       ...(data.role !== undefined && { role: data.role }),
-      ...(data.avatarUrl !== undefined && { avatarUrl: data.avatarUrl }),
+      ...(avatarUrl !== undefined && { avatarUrl }),
+      ...(data.linkedinUrl !== undefined && { linkedinUrl: data.linkedinUrl || null }),
+      ...(data.githubUrl !== undefined && { githubUrl: data.githubUrl || null }),
+      ...(data.dribbbleUrl !== undefined && { dribbbleUrl: data.dribbbleUrl || null }),
+      ...(data.twitterUrl !== undefined && { twitterUrl: data.twitterUrl || null }),
+      ...(data.websiteUrl !== undefined && { websiteUrl: data.websiteUrl || null }),
     },
   });
 
@@ -61,6 +77,11 @@ function sanitize(user: {
   role: string | null;
   interests: string;
   onboardingComplete: boolean;
+  linkedinUrl: string | null;
+  githubUrl: string | null;
+  dribbbleUrl: string | null;
+  twitterUrl: string | null;
+  websiteUrl: string | null;
   createdAt: Date;
 }) {
   return {
@@ -73,6 +94,11 @@ function sanitize(user: {
     role: user.role as "designer" | "developer" | "both" | null,
     interests: safeParseInterests(user.interests),
     onboardingComplete: user.onboardingComplete,
+    linkedinUrl: user.linkedinUrl,
+    githubUrl: user.githubUrl,
+    dribbbleUrl: user.dribbbleUrl,
+    twitterUrl: user.twitterUrl,
+    websiteUrl: user.websiteUrl,
     createdAt: user.createdAt,
   };
 }
