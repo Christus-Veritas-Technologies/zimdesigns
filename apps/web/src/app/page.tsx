@@ -12,7 +12,6 @@ import { useIsAuthenticated } from "@/hooks/use-auth";
 import { cn } from "@zimdesigns/ui/lib/utils";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 
 const SERVER_URL_SIDEBAR = process.env.NEXT_PUBLIC_SERVER_URL ?? "http://localhost:3001";
 function absoluteUrlSidebar(url: string) {
@@ -141,7 +140,7 @@ function BookmarkButton({ redesignId, onAuthRequired }: { redesignId: string; on
   );
 }
 
-function RedesignCard({ redesign, onAuthRequired }: { redesign: Redesign; onAuthRequired: () => void }) {
+function RedesignCard({ redesign, onAuthRequired, onTagClick }: { redesign: Redesign; onAuthRequired: () => void; onTagClick?: (tag: string) => void }) {
   const [hover, setHover] = useState<"before" | "after">("after");
   return (
     <Link href={`/redesigns/${redesign.id}`} className="group flex flex-col rounded-2xl border border-border bg-card overflow-hidden hover:shadow-md transition-shadow">
@@ -153,7 +152,17 @@ function RedesignCard({ redesign, onAuthRequired }: { redesign: Redesign; onAuth
         <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/50 to-transparent" />
         <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between">
           <span className="text-xs font-semibold text-white/90">{redesign.appName}</span>
-          <div className="flex gap-1">{redesign.tags.slice(0, 2).map((t) => <span key={t} className="text-[0.65rem] px-1.5 py-0.5 rounded-full bg-white/20 text-white">{t}</span>)}</div>
+          <div className="flex gap-1">
+            {redesign.tags.slice(0, 2).map((t) => (
+              <button
+                key={t}
+                onClick={(e) => { e.preventDefault(); onTagClick?.(t); }}
+                className="text-[0.65rem] px-1.5 py-0.5 rounded-full bg-white/20 text-white hover:bg-white/40 transition-colors"
+              >
+                {t}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
       <div className="flex items-start gap-3 p-3">
@@ -187,16 +196,18 @@ type Sort = "recent" | "top";
 export default function FeedPage() {
   const [tab, setTab] = useState<Tab>("foryou");
   const [sort, setSort] = useState<Sort>("recent");
+  const [tag, setTag] = useState<string | undefined>(undefined);
   const [authModal, setAuthModal] = useState<string | null>(null);
   const isAuthenticated = useIsAuthenticated();
 
-  const forYou = useRedesigns({ sort });
+  const forYou = useRedesigns({ sort, tag });
   const following = useFollowingFeed();
 
   const active = tab === "foryou" ? forYou : following;
   const redesigns = active.data?.pages.flatMap((p) => p.items) ?? [];
 
   const requireAuth = (action: string) => !isAuthenticated && setAuthModal(action);
+  const handleTagClick = (t: string) => { setTag(tag === t ? undefined : t); setTab("foryou"); };
 
   return (
     <div className="min-h-screen bg-background">
@@ -230,6 +241,19 @@ export default function FeedPage() {
         </div>
       </div>
 
+      {tag && (
+        <div className="max-w-6xl mx-auto px-4 py-2">
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">Filtering by tag:</span>
+            <button
+              onClick={() => setTag(undefined)}
+              className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold hover:bg-primary/20 transition-colors"
+            >
+              {tag} ×
+            </button>
+          </div>
+        </div>
+      )}
       <div className="max-w-6xl mx-auto px-4 py-6 flex gap-8">
         <div className="flex-1 min-w-0">
           {active.isLoading && <SkeletonGrid />}
@@ -249,7 +273,7 @@ export default function FeedPage() {
           {redesigns.length > 0 && (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {redesigns.map((r) => <RedesignCard key={r.id} redesign={r} onAuthRequired={requireAuth} />)}
+                {redesigns.map((r) => <RedesignCard key={r.id} redesign={r} onAuthRequired={requireAuth} onTagClick={handleTagClick} />)}
               </div>
               {active.hasNextPage && (
                 <div className="flex justify-center mt-8">
