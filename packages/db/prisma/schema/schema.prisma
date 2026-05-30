@@ -8,3 +8,31 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model User {
+  id                 String         @id @default(cuid())
+  email              String         @unique
+  name               String
+  username           String         @unique
+  passwordHash       String?
+  googleId           String?        @unique
+  avatarUrl          String?
+  bio                String?
+  role               String?
+  interests          String         @default("[]")
+  onboardingComplete Boolean        @default(false)
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+
+  refreshTokens      RefreshToken[]
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
