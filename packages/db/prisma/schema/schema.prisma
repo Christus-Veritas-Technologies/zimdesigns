@@ -34,6 +34,11 @@ model User {
   upvotes            Upvote[]
   comments           Comment[]
   notifications      Notification[]
+  bookmarks          Bookmark[]
+  following          Follow[]       @relation("Follower")
+  followers          Follow[]       @relation("Following")
+  appRequests        AppRequest[]
+  appRequestVotes    AppRequestVote[]
 }
 
 
@@ -53,6 +58,7 @@ model Redesign {
   author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   upvotes     Upvote[]
   comments    Comment[]
+  bookmarks   Bookmark[]
 }
 
 
@@ -90,6 +96,55 @@ model Notification {
   createdAt DateTime @default(now())
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Follow {
+  id          String   @id @default(cuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+
+  follower    User     @relation("Follower",  fields: [followerId],  references: [id], onDelete: Cascade)
+  following   User     @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+}
+
+model Bookmark {
+  id         String   @id @default(cuid())
+  userId     String
+  redesignId String
+  createdAt  DateTime @default(now())
+
+  user       User     @relation(fields: [userId],     references: [id], onDelete: Cascade)
+  redesign   Redesign @relation(fields: [redesignId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, redesignId])
+}
+
+model AppRequest {
+  id          String   @id @default(cuid())
+  appName     String
+  description String?
+  requesterId String
+  voteCount   Int      @default(0)
+  status      String   @default("open")
+  createdAt   DateTime @default(now())
+
+  requester   User             @relation(fields: [requesterId], references: [id], onDelete: Cascade)
+  votes       AppRequestVote[]
+}
+
+model AppRequestVote {
+  id           String   @id @default(cuid())
+  userId       String
+  appRequestId String
+  createdAt    DateTime @default(now())
+
+  user         User       @relation(fields: [userId],       references: [id], onDelete: Cascade)
+  appRequest   AppRequest @relation(fields: [appRequestId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, appRequestId])
 }
 
 model RefreshToken {
