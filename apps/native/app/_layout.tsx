@@ -48,6 +48,7 @@ function AuthGate() {
       <Stack.Screen name="search" />
       <Stack.Screen name="notifications" />
       <Stack.Screen name="users" />
+      <Stack.Screen name="profile" />
       <Stack.Screen name="modal" options={{ presentation: "modal", headerShown: true, title: "Modal" }} />
     </Stack>
   );

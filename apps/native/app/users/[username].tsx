@@ -5,10 +5,12 @@ import {
   TouchableOpacity,
   FlatList,
   ActivityIndicator,
+  Linking,
 } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import { ArrowLeft, ArrowUp } from "lucide-react-native";
 import { useProfile, useUserRedesigns } from "@/hooks/use-profiles";
+import { useAuth } from "@/contexts/auth-context";
 import type { Redesign } from "@/hooks/use-redesigns";
 import { env } from "@zimdesigns/env/native";
 
@@ -21,6 +23,14 @@ const ROLE_LABEL: Record<string, string> = {
   developer: "Developer",
   both: "Designer & Developer",
 };
+
+const SOCIAL_FIELDS = [
+  { key: "linkedinUrl", label: "LinkedIn", short: "in", color: "#0A66C2" },
+  { key: "githubUrl", label: "GitHub", short: "gh", color: "#24292f" },
+  { key: "dribbbleUrl", label: "Dribbble", short: "db", color: "#EA4C89" },
+  { key: "twitterUrl", label: "𝕏", short: "𝕏", color: "#000000" },
+  { key: "websiteUrl", label: "Website", short: "🌐", color: "#8A8278" },
+] as const;
 
 function RedesignCard({ item }: { item: Redesign }) {
   return (
@@ -48,8 +58,10 @@ function RedesignCard({ item }: { item: Redesign }) {
 
 export default function ProfileScreen() {
   const { username } = useLocalSearchParams<{ username: string }>();
+  const { user } = useAuth();
   const { data: profile, isLoading: profileLoading, isError } = useProfile(username);
   const { data: redesigns, isLoading: redesignsLoading } = useUserRedesigns(username);
+  const isOwnProfile = user?.username === username;
 
   if (profileLoading) {
     return (
@@ -70,18 +82,23 @@ export default function ProfileScreen() {
     );
   }
 
+  const socialLinks = SOCIAL_FIELDS.map((s) => ({ ...s, url: profile[s.key] })).filter((s) => s.url);
+
   const header = (
     <>
-      <TouchableOpacity
-        onPress={() => router.back()}
-        className="flex-row items-center gap-2 px-5 pt-14 pb-4"
-        activeOpacity={0.7}
-      >
-        <ArrowLeft size={16} color="#8A8278" />
-        <Text className="text-muted-foreground text-sm">Back</Text>
-      </TouchableOpacity>
+      <View className="flex-row items-center justify-between px-5 pt-14 pb-2">
+        <TouchableOpacity onPress={() => router.back()} activeOpacity={0.7} className="flex-row items-center gap-2">
+          <ArrowLeft size={16} color="#8A8278" />
+          <Text className="text-muted-foreground text-sm">Back</Text>
+        </TouchableOpacity>
+        {isOwnProfile && (
+          <TouchableOpacity onPress={() => router.push("/profile/edit" as never)} activeOpacity={0.7}>
+            <Text className="text-sm font-medium text-primary">Edit profile</Text>
+          </TouchableOpacity>
+        )}
+      </View>
 
-      <View className="mx-4 mb-5 p-4 rounded-2xl border border-border bg-card">
+      <View className="mx-4 mb-5 mt-3 p-4 rounded-2xl border border-border bg-card">
         <View className="flex-row gap-4 items-center mb-3">
           <View className="w-16 h-16 rounded-2xl bg-primary/20 items-center justify-center overflow-hidden flex-none">
             {profile.avatarUrl ? (
@@ -104,7 +121,24 @@ export default function ProfileScreen() {
         </View>
 
         {profile.bio && (
-          <Text className="text-sm text-foreground/80 leading-relaxed mb-2">{profile.bio}</Text>
+          <Text className="text-sm text-foreground/80 leading-relaxed mb-3">{profile.bio}</Text>
+        )}
+
+        {/* Social links */}
+        {socialLinks.length > 0 && (
+          <View className="flex-row flex-wrap gap-2 mb-3">
+            {socialLinks.map(({ key, label, short, color, url }) => (
+              <TouchableOpacity
+                key={key}
+                onPress={() => url && Linking.openURL(url)}
+                activeOpacity={0.7}
+                className="flex-row items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border bg-background"
+              >
+                <Text style={{ color, fontSize: 11, fontWeight: "700" }}>{short}</Text>
+                <Text className="text-xs font-medium text-foreground">{label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         )}
 
         <Text className="text-xs text-muted-foreground">
@@ -133,7 +167,6 @@ export default function ProfileScreen() {
           numColumns={2}
           ListHeaderComponent={header}
           contentContainerClassName="px-3 pb-8"
-          columnWrapperClassName="mb-0"
           renderItem={({ item }) => <RedesignCard item={item} />}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
