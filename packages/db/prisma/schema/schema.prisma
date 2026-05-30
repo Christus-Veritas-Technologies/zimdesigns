@@ -21,6 +21,11 @@ model User {
   role               String?
   interests          String         @default("[]")
   onboardingComplete Boolean        @default(false)
+  linkedinUrl        String?
+  githubUrl          String?
+  dribbbleUrl        String?
+  twitterUrl         String?
+  websiteUrl         String?
   createdAt          DateTime       @default(now())
   updatedAt          DateTime       @updatedAt
 

@@ -8,6 +8,11 @@ function sanitizeUser(u: {
   bio: string | null;
   role: string | null;
   createdAt: Date;
+  linkedinUrl: string | null;
+  githubUrl: string | null;
+  dribbbleUrl: string | null;
+  twitterUrl: string | null;
+  websiteUrl: string | null;
   _count: { redesigns: number };
 }) {
   return {
@@ -19,6 +24,11 @@ function sanitizeUser(u: {
     role: u.role,
     createdAt: u.createdAt,
     redesignCount: u._count.redesigns,
+    linkedinUrl: u.linkedinUrl,
+    githubUrl: u.githubUrl,
+    dribbbleUrl: u.dribbbleUrl,
+    twitterUrl: u.twitterUrl,
+    websiteUrl: u.websiteUrl,
   };
 }
 
@@ -33,6 +43,11 @@ export async function getProfile(username: string) {
       bio: true,
       role: true,
       createdAt: true,
+      linkedinUrl: true,
+      githubUrl: true,
+      dribbbleUrl: true,
+      twitterUrl: true,
+      websiteUrl: true,
       _count: { select: { redesigns: true } },
     },
   });
