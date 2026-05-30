@@ -25,6 +25,37 @@ model User {
   updatedAt          DateTime       @updatedAt
 
   refreshTokens      RefreshToken[]
+  redesigns          Redesign[]
+  upvotes            Upvote[]
+}
+
+model Redesign {
+  id          String   @id @default(cuid())
+  title       String
+  appName     String
+  description String?
+  beforeUrl   String
+  afterUrl    String
+  authorId    String
+  tags        String   @default("[]")
+  upvoteCount Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  upvotes     Upvote[]
+}
+
+model Upvote {
+  id         String   @id @default(cuid())
+  userId     String
+  redesignId String
+  createdAt  DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  redesign   Redesign @relation(fields: [redesignId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, redesignId])
 }
 
 model RefreshToken {
