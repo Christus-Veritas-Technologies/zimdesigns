@@ -157,11 +157,16 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
               </div>
             )}
 
-            <p className="text-xs text-muted-foreground mt-2">
-              {profile.redesignCount} redesign{profile.redesignCount !== 1 ? "s" : ""}
-              {typeof profile.followerCount === "number" && <> · {profile.followerCount} follower{profile.followerCount !== 1 ? "s" : ""}</>}
-              {" · "}Joined {new Date(profile.createdAt).toLocaleDateString(undefined, { month: "long", year: "numeric" })}
-            </p>
+            <div className="flex items-center gap-3 mt-2 flex-wrap">
+              <span className="text-xs text-muted-foreground">{profile.redesignCount} redesign{profile.redesignCount !== 1 ? "s" : ""}</span>
+              <Link href={`/users/${username}/followers`} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+                {profile.followerCount} follower{profile.followerCount !== 1 ? "s" : ""}
+              </Link>
+              <Link href={`/users/${username}/following`} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+                Following
+              </Link>
+              <span className="text-xs text-muted-foreground">Joined {new Date(profile.createdAt).toLocaleDateString(undefined, { month: "long", year: "numeric" })}</span>
+            </div>
           </div>
         </div>
 
