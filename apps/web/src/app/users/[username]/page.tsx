@@ -3,8 +3,9 @@
 import { use } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, ArrowUp } from "lucide-react";
+import { ArrowLeft, ArrowUp, Linkedin, Github, Globe, Twitter, Dribbble } from "lucide-react";
 import { useProfile, useUserRedesigns } from "@/hooks/use-profiles";
+import { useCurrentUser } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
 
 const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL ?? "http://localhost:3001";
@@ -18,11 +19,21 @@ const ROLE_LABEL: Record<string, string> = {
   both: "Designer & Developer",
 };
 
+const SOCIAL_LINKS = [
+  { key: "linkedinUrl", Icon: Linkedin, label: "LinkedIn", color: "#0A66C2" },
+  { key: "githubUrl", Icon: Github, label: "GitHub", color: "#24292f" },
+  { key: "dribbbleUrl", Icon: Dribbble, label: "Dribbble", color: "#EA4C89" },
+  { key: "twitterUrl", Icon: Twitter, label: "X", color: "#000000" },
+  { key: "websiteUrl", Icon: Globe, label: "Website", color: "#8A8278" },
+] as const;
+
 export default function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
   const { username } = use(params);
   const router = useRouter();
   const { data: profile, isLoading: profileLoading, isError } = useProfile(username);
   const { data: redesigns, isLoading: redesignsLoading } = useUserRedesigns(username);
+  const currentUser = useCurrentUser();
+  const isOwnProfile = currentUser?.username === username;
 
   if (profileLoading) {
     return (
@@ -48,16 +59,28 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
     );
   }
 
+  const socialLinks = SOCIAL_LINKS.map((s) => ({ ...s, url: profile[s.key] })).filter((s) => s.url);
+
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-3xl mx-auto px-4 py-8">
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
-        >
-          <ArrowLeft size={15} />
-          Back
-        </button>
+        <div className="flex items-center justify-between mb-6">
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft size={15} />
+            Back
+          </button>
+          {isOwnProfile && (
+            <Link
+              href="/profile/edit"
+              className="text-sm font-medium text-primary hover:underline"
+            >
+              Edit profile
+            </Link>
+          )}
+        </div>
 
         {/* Profile header */}
         <div className="flex gap-4 mb-8 p-5 rounded-2xl border border-border bg-card">
@@ -81,6 +104,26 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
             {profile.bio && (
               <p className="text-sm text-foreground/80 mt-2 leading-relaxed">{profile.bio}</p>
             )}
+
+            {/* Social links */}
+            {socialLinks.length > 0 && (
+              <div className="flex items-center gap-2 mt-3 flex-wrap">
+                {socialLinks.map(({ key, Icon, label, color, url }) => (
+                  <a
+                    key={key}
+                    href={url!}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={label}
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-border bg-background hover:border-primary/50 transition-colors text-xs font-medium text-muted-foreground hover:text-foreground"
+                  >
+                    <Icon size={13} style={{ color }} />
+                    {label}
+                  </a>
+                ))}
+              </div>
+            )}
+
             <p className="text-xs text-muted-foreground mt-2">
               {profile.redesignCount} redesign{profile.redesignCount !== 1 ? "s" : ""}
               {" · "}Joined {new Date(profile.createdAt).toLocaleDateString(undefined, { month: "long", year: "numeric" })}
@@ -88,7 +131,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
           </div>
         </div>
 
-        {/* Redesigns */}
+        {/* Redesigns grid */}
         <h2 className="font-semibold text-foreground mb-4">Redesigns</h2>
 
         {redesignsLoading && (

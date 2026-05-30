@@ -13,6 +13,11 @@ export interface UserProfile {
   role: string | null;
   createdAt: string;
   redesignCount: number;
+  linkedinUrl: string | null;
+  githubUrl: string | null;
+  dribbbleUrl: string | null;
+  twitterUrl: string | null;
+  websiteUrl: string | null;
 }
 
 export function useProfile(username: string) {
