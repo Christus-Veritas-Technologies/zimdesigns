@@ -10,6 +10,8 @@ import notificationRoutes from "./routes/notifications";
 import profileRoutes from "./routes/profiles";
 import followRoutes from "./routes/follows";
 import bookmarkRoutes from "./routes/bookmarks";
+import appRequestRoutes from "./routes/app-requests";
+import settingsRoutes from "./routes/settings";
 
 const app = new Hono();
 
@@ -33,5 +35,7 @@ app.route("/api", notificationRoutes);
 app.route("/api", profileRoutes);
 app.route("/api", followRoutes);
 app.route("/api", bookmarkRoutes);
+app.route("/api", appRequestRoutes);
+app.route("/api", settingsRoutes);
 
 export default app;
