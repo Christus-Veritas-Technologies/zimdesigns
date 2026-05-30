@@ -10,6 +10,7 @@
     "start": "bun run dist/index.mjs"
   },
   "dependencies": {
+    "@hono/zod-validator": "^0.4.3",
     "@zimdesigns/db": "workspace:*",
     "@zimdesigns/env": "workspace:*",
     "dotenv": "catalog:",
