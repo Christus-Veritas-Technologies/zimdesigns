@@ -1,0 +1,51 @@
+"use client";
+
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { api } from "@/lib/axios";
+import type { Redesign } from "./use-redesigns";
+
+interface FollowUser { id: string; name: string; username: string; avatarUrl: string | null; bio: string | null }
+interface ListResult { items: Redesign[]; nextCursor?: string }
+
+export function useFollowStatus(username: string) {
+  return useQuery<{ following: boolean }>({
+    queryKey: ["follow-status", username],
+    queryFn: () => api.get<{ following: boolean }>(`/api/users/${username}/follow-status`).then((r) => r.data),
+    enabled: !!username,
+  });
+}
+
+export function useToggleFollow(username: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => api.post<{ following: boolean }>(`/api/users/${username}/follow`).then((r) => r.data),
+    onSuccess: (data) => {
+      qc.setQueryData(["follow-status", username], data);
+      qc.invalidateQueries({ queryKey: ["profile", username] });
+    },
+  });
+}
+
+export function useFollowers(username: string) {
+  return useQuery<FollowUser[]>({
+    queryKey: ["followers", username],
+    queryFn: () => api.get<FollowUser[]>(`/api/users/${username}/followers`).then((r) => r.data),
+  });
+}
+
+export function useFollowing(username: string) {
+  return useQuery<FollowUser[]>({
+    queryKey: ["following", username],
+    queryFn: () => api.get<FollowUser[]>(`/api/users/${username}/following`).then((r) => r.data),
+  });
+}
+
+export function useFollowingFeed() {
+  return useInfiniteQuery<ListResult>({
+    queryKey: ["feed", "following"],
+    queryFn: ({ pageParam }) =>
+      api.get<ListResult>("/api/feed/following", { params: { cursor: pageParam } }).then((r) => r.data),
+    initialPageParam: undefined,
+    getNextPageParam: (last) => last.nextCursor,
+  });
+}

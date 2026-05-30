@@ -1,37 +1,5 @@
 import db from "@zimdesigns/db";
 
-function sanitizeUser(u: {
-  id: string;
-  name: string;
-  username: string;
-  avatarUrl: string | null;
-  bio: string | null;
-  role: string | null;
-  createdAt: Date;
-  linkedinUrl: string | null;
-  githubUrl: string | null;
-  dribbbleUrl: string | null;
-  twitterUrl: string | null;
-  websiteUrl: string | null;
-  _count: { redesigns: number };
-}) {
-  return {
-    id: u.id,
-    name: u.name,
-    username: u.username,
-    avatarUrl: u.avatarUrl,
-    bio: u.bio,
-    role: u.role,
-    createdAt: u.createdAt,
-    redesignCount: u._count.redesigns,
-    linkedinUrl: u.linkedinUrl,
-    githubUrl: u.githubUrl,
-    dribbbleUrl: u.dribbbleUrl,
-    twitterUrl: u.twitterUrl,
-    websiteUrl: u.websiteUrl,
-  };
-}
-
 export async function getProfile(username: string) {
   const user = await db.user.findUniqueOrThrow({
     where: { username },
@@ -48,10 +16,25 @@ export async function getProfile(username: string) {
       dribbbleUrl: true,
       twitterUrl: true,
       websiteUrl: true,
-      _count: { select: { redesigns: true } },
+      _count: { select: { redesigns: true, followers: true } },
     },
   });
-  return sanitizeUser(user);
+  return {
+    id: user.id,
+    name: user.name,
+    username: user.username,
+    avatarUrl: user.avatarUrl,
+    bio: user.bio,
+    role: user.role,
+    createdAt: user.createdAt,
+    redesignCount: user._count.redesigns,
+    followerCount: user._count.followers,
+    linkedinUrl: user.linkedinUrl,
+    githubUrl: user.githubUrl,
+    dribbbleUrl: user.dribbbleUrl,
+    twitterUrl: user.twitterUrl,
+    websiteUrl: user.websiteUrl,
+  };
 }
 
 export async function getUserRedesigns(username: string) {

@@ -1,11 +1,13 @@
 "use client";
 
-import { use } from "react";
+import { use, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, ArrowUp, Linkedin, Github, Globe, Twitter, Dribbble } from "lucide-react";
+import { ArrowLeft, ArrowUp, Linkedin, Github, Globe, Twitter, Dribbble, UserPlus, UserMinus, LogIn } from "lucide-react";
 import { useProfile, useUserRedesigns } from "@/hooks/use-profiles";
-import { useCurrentUser } from "@/hooks/use-auth";
+import { useCurrentUser, useIsAuthenticated } from "@/hooks/use-auth";
+import { useFollowStatus, useToggleFollow } from "@/hooks/use-follows";
+import { Button } from "@zimdesigns/ui/components/ui/button";
 import { useRouter } from "next/navigation";
 
 const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL ?? "http://localhost:3001";
@@ -27,13 +29,35 @@ const SOCIAL_LINKS = [
   { key: "websiteUrl", Icon: Globe, label: "Website", color: "#8A8278" },
 ] as const;
 
+function AuthGateModal({ action, onClose }: { action: string; onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
+      <div className="bg-card border border-border rounded-2xl p-6 max-w-sm w-full mx-4 shadow-xl" onClick={(e) => e.stopPropagation()}>
+        <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
+          <LogIn size={20} className="text-primary" />
+        </div>
+        <h2 className="font-extrabold text-lg text-foreground mb-1" style={{ fontFamily: "'Bricolage Grotesque', system-ui" }}>Sign in to {action}</h2>
+        <p className="text-sm text-muted-foreground mb-5">Join ZimDesigns to engage with the community.</p>
+        <div className="flex gap-2">
+          <Link href="/auth/login" className="flex-1"><Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">Sign in</Button></Link>
+          <Button variant="outline" onClick={onClose} className="flex-1">Maybe later</Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ProfilePage({ params }: { params: Promise<{ username: string }> }) {
   const { username } = use(params);
   const router = useRouter();
+  const [authModal, setAuthModal] = useState(false);
   const { data: profile, isLoading: profileLoading, isError } = useProfile(username);
   const { data: redesigns, isLoading: redesignsLoading } = useUserRedesigns(username);
   const currentUser = useCurrentUser();
+  const isAuthenticated = useIsAuthenticated();
   const isOwnProfile = currentUser?.username === username;
+  const { data: followStatus } = useFollowStatus(username);
+  const toggleFollow = useToggleFollow(username);
 
   if (profileLoading) {
     return (
@@ -63,6 +87,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
 
   return (
     <div className="min-h-screen bg-background">
+      {authModal && <AuthGateModal action="follow designers" onClose={() => setAuthModal(false)} />}
       <div className="max-w-3xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
           <button
@@ -73,12 +98,20 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
             Back
           </button>
           {isOwnProfile && (
-            <Link
-              href="/profile/edit"
-              className="text-sm font-medium text-primary hover:underline"
-            >
+            <Link href="/profile/edit" className="text-sm font-medium text-primary hover:underline">
               Edit profile
             </Link>
+          )}
+          {!isOwnProfile && (
+            <Button
+              size="sm"
+              variant={followStatus?.following ? "outline" : "default"}
+              onClick={() => isAuthenticated ? toggleFollow.mutate() : setAuthModal(true)}
+              disabled={toggleFollow.isPending}
+              className="gap-1.5"
+            >
+              {followStatus?.following ? <><UserMinus size={14} />Unfollow</> : <><UserPlus size={14} />Follow</>}
+            </Button>
           )}
         </div>
 
@@ -126,6 +159,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
 
             <p className="text-xs text-muted-foreground mt-2">
               {profile.redesignCount} redesign{profile.redesignCount !== 1 ? "s" : ""}
+              {typeof profile.followerCount === "number" && <> · {profile.followerCount} follower{profile.followerCount !== 1 ? "s" : ""}</>}
               {" · "}Joined {new Date(profile.createdAt).toLocaleDateString(undefined, { month: "long", year: "numeric" })}
             </p>
           </div>
