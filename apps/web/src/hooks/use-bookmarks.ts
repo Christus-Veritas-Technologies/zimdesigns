@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { api } from "@/lib/axios";
 import type { Redesign } from "./use-redesigns";
 import { useAuthStore } from "@/store/auth";
@@ -19,7 +20,10 @@ export function useToggleBookmark(redesignId: string) {
   return useMutation({
     mutationFn: () =>
       api.post<{ bookmarked: boolean }>(`/api/redesigns/${redesignId}/bookmark`).then((r) => r.data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["bookmarks"] }),
+    onSuccess: (data) => {
+      qc.invalidateQueries({ queryKey: ["bookmarks"] });
+      toast.success(data.bookmarked ? "Saved to bookmarks!" : "Removed from bookmarks.");
+    },
   });
 }
 
@@ -36,7 +40,11 @@ export function useCreateAppRequest() {
   return useMutation({
     mutationFn: (data: { appName: string; description?: string }) =>
       api.post("/api/app-requests", data).then((r) => r.data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["app-requests"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["app-requests"] });
+      toast.success("Request submitted! Others can now vote for it.");
+    },
+    onError: () => toast.error("Failed to submit request."),
   });
 }
 
@@ -44,7 +52,10 @@ export function useVoteAppRequest(id: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: () => api.post<{ voteCount: number; hasVoted: boolean }>(`/api/app-requests/${id}/vote`).then((r) => r.data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["app-requests"] }),
+    onSuccess: (data) => {
+      qc.invalidateQueries({ queryKey: ["app-requests"] });
+      if (data.hasVoted) toast.success("Vote counted!");
+    },
   });
 }
 

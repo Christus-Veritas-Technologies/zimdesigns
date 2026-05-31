@@ -96,9 +96,15 @@ export default function TrendingScreen() {
                 </View>
                 <View className="flex-1">
                   <Text className="font-semibold text-sm text-foreground" numberOfLines={1}>{d.name}</Text>
-                  <Text className="text-xs text-muted-foreground">
-                    {d.role ? ROLE_LABEL[d.role] ?? d.role : "@" + d.username} · {d.redesignCount} redesign{d.redesignCount !== 1 ? "s" : ""}
-                  </Text>
+                  <View className="flex-row items-center gap-2 mt-0.5 flex-wrap">
+                    <Text className="text-xs text-muted-foreground">@{d.username}</Text>
+                    {d.role && (
+                      <View className="px-1.5 py-0.5 rounded-full bg-primary/10">
+                        <Text className="text-[0.6rem] font-semibold text-primary">{ROLE_LABEL[d.role] ?? d.role}</Text>
+                      </View>
+                    )}
+                    <Text className="text-xs text-muted-foreground">{d.redesignCount} redesign{d.redesignCount !== 1 ? "s" : ""}</Text>
+                  </View>
                 </View>
               </TouchableOpacity>
             ))}

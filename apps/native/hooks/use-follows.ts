@@ -1,4 +1,5 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import * as Haptics from "expo-haptics";
 import { api } from "@/lib/axios";
 import type { Redesign } from "./use-redesigns";
 
@@ -19,6 +20,7 @@ export function useToggleFollow(username: string) {
     onSuccess: (data) => {
       qc.setQueryData(["follow-status", username], data);
       qc.invalidateQueries({ queryKey: ["profile", username] });
+      if (data.following) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     },
   });
 }

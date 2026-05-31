@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { api } from "@/lib/axios";
 
 export interface Comment {
@@ -22,7 +23,11 @@ export function useCreateComment(redesignId: string) {
   return useMutation({
     mutationFn: (body: string) =>
       api.post<Comment>(`/api/redesigns/${redesignId}/comments`, { body }).then((r) => r.data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["comments", redesignId] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["comments", redesignId] });
+      toast.success("Comment posted!");
+    },
+    onError: () => toast.error("Failed to post comment."),
   });
 }
 
@@ -30,6 +35,9 @@ export function useDeleteComment(redesignId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (commentId: string) => api.delete(`/api/comments/${commentId}`).then(() => undefined),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["comments", redesignId] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["comments", redesignId] });
+      toast.success("Comment deleted.");
+    },
   });
 }

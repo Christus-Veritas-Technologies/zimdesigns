@@ -14,6 +14,7 @@ export interface UserProfile {
   createdAt: string;
   redesignCount: number;
   followerCount: number;
+  followingCount: number;
   linkedinUrl: string | null;
   githubUrl: string | null;
   dribbbleUrl: string | null;

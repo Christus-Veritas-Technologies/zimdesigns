@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import * as Haptics from "expo-haptics";
 import { api } from "@/lib/axios";
 import type { Redesign } from "./use-redesigns";
 
@@ -15,7 +16,10 @@ export function useToggleBookmark(redesignId: string) {
   return useMutation({
     mutationFn: () =>
       api.post<{ bookmarked: boolean }>(`/api/redesigns/${redesignId}/bookmark`).then((r) => r.data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["bookmarks"] }),
+    onSuccess: (data) => {
+      qc.invalidateQueries({ queryKey: ["bookmarks"] });
+      if (data.bookmarked) Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    },
   });
 }
 

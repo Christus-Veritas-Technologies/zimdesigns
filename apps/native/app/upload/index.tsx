@@ -147,7 +147,10 @@ export default function UploadScreen() {
       <View className="gap-4 mb-6">
         {/* Title */}
         <View className="gap-1.5">
-          <Text className="text-[0.84rem] font-semibold text-foreground">Title</Text>
+          <View className="flex-row items-center justify-between">
+            <Text className="text-[0.84rem] font-semibold text-foreground">Title</Text>
+            <Text className={`text-xs font-mono ${title.length > 100 ? "text-destructive" : "text-muted-foreground"}`}>{title.length}/120</Text>
+          </View>
           <TextInput
             className="h-11 px-3.5 rounded-xl border border-input bg-card text-foreground"
             placeholder="EcoCash redesign — cleaner checkout"
@@ -160,7 +163,10 @@ export default function UploadScreen() {
 
         {/* App name */}
         <View className="gap-1.5">
-          <Text className="text-[0.84rem] font-semibold text-foreground">App name</Text>
+          <View className="flex-row items-center justify-between">
+            <Text className="text-[0.84rem] font-semibold text-foreground">App name</Text>
+            <Text className={`text-xs font-mono ${appName.length > 50 ? "text-destructive" : "text-muted-foreground"}`}>{appName.length}/60</Text>
+          </View>
           <TextInput
             className="h-11 px-3.5 rounded-xl border border-input bg-card text-foreground"
             placeholder="EcoCash"

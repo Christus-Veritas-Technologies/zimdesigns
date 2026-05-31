@@ -15,10 +15,10 @@ import {
   Dimensions,
 } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
-import { ArrowLeft, ArrowUp, Trash2, Send, MessageCircle, Share2, Bookmark } from "lucide-react-native";
+import { ArrowLeft, ArrowUp, Trash2, Send, MessageCircle, Share2, Bookmark, BookmarkCheck } from "lucide-react-native";
 import { useRedesign, useUpvoteRedesign, useDeleteRedesign } from "@/hooks/use-redesigns";
 import { useComments, useCreateComment, useDeleteComment } from "@/hooks/use-comments";
-import { useToggleBookmark } from "@/hooks/use-bookmarks";
+import { useToggleBookmark, useBookmarks } from "@/hooks/use-bookmarks";
 import { useAuth } from "@/contexts/auth-context";
 import { env } from "@zimdesigns/env/native";
 
@@ -59,6 +59,8 @@ export default function RedesignDetailScreen() {
 
   const isOwner = user?.id === redesign.author.id;
   const bookmark = useToggleBookmark(id);
+  const { data: bookmarks } = useBookmarks(isAuthenticated);
+  const isBookmarked = bookmarks?.some((b) => b.id === id) ?? false;
   const screenWidth = Dimensions.get("window").width;
   const [sliderPct, setSliderPct] = useState(50);
   const sliderX = useRef(0);
@@ -152,7 +154,9 @@ export default function RedesignDetailScreen() {
                 className="w-9 h-9 rounded-full bg-black/50 items-center justify-center"
                 activeOpacity={0.8}
               >
-                <Bookmark size={15} color="#fff" />
+                {isBookmarked
+                  ? <BookmarkCheck size={15} color="#E8A900" />
+                  : <Bookmark size={15} color="#fff" />}
               </TouchableOpacity>
             )}
             {isOwner && (

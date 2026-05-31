@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowUp, Plus, LogIn } from "lucide-react";
+import { ArrowLeft, ArrowUp, Plus, LogIn, TrendingUp, Clock } from "lucide-react";
 import { Button } from "@zimdesigns/ui/components/ui/button";
 import { useAppRequests, useCreateAppRequest, useVoteAppRequest } from "@/hooks/use-bookmarks";
 import { useIsAuthenticated } from "@/hooks/use-auth";
@@ -32,8 +32,14 @@ export default function AppRequestsPage() {
   const [showForm, setShowForm] = useState(false);
   const [appName, setAppName] = useState("");
   const [description, setDescription] = useState("");
+  const [sort, setSort] = useState<"votes" | "recent">("votes");
 
-  const { data: requests, isLoading } = useAppRequests();
+  const { data: rawRequests, isLoading } = useAppRequests();
+  const requests = rawRequests
+    ? [...rawRequests].sort((a, b) =>
+        sort === "votes" ? b.voteCount - a.voteCount : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      )
+    : undefined;
   const createRequest = useCreateAppRequest();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -99,9 +105,17 @@ export default function AppRequestsPage() {
           </form>
         )}
 
-        <p className="text-sm text-muted-foreground mb-5">
-          Vote for the apps you want designers to redesign next.
-        </p>
+        <div className="flex items-center justify-between mb-5">
+          <p className="text-sm text-muted-foreground">Vote for the apps you want designers to redesign next.</p>
+          <div className="flex items-center gap-1">
+            <button onClick={() => setSort("votes")} className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${sort === "votes" ? "bg-accent text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+              <TrendingUp size={11} /> Top
+            </button>
+            <button onClick={() => setSort("recent")} className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${sort === "recent" ? "bg-accent text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
+              <Clock size={11} /> Recent
+            </button>
+          </div>
+        </div>
 
         {isLoading && (
           <div className="space-y-3">

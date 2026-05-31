@@ -3,12 +3,12 @@
 import { use, useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, ArrowUp, Trash2, Send, MessageCircle, Share2, Bookmark, Check } from "lucide-react";
+import { ArrowLeft, ArrowUp, Trash2, Send, MessageCircle, Share2, Bookmark, BookmarkCheck, Check } from "lucide-react";
 import { cn } from "@zimdesigns/ui/lib/utils";
 import { useRedesign, useUpvoteRedesign, useDeleteRedesign } from "@/hooks/use-redesigns";
 import { useComments, useCreateComment, useDeleteComment } from "@/hooks/use-comments";
 import { useCurrentUser, useIsAuthenticated } from "@/hooks/use-auth";
-import { useToggleBookmark } from "@/hooks/use-bookmarks";
+import { useToggleBookmark, useBookmarks } from "@/hooks/use-bookmarks";
 import { useRouter } from "next/navigation";
 import ComparisonSlider from "@/components/comparison-slider";
 
@@ -146,6 +146,8 @@ export default function RedesignPage({ params }: { params: Promise<{ id: string 
   const isOwner = user?.id === redesign.author.id;
   const [copied, setCopied] = useState(false);
   const bookmark = useToggleBookmark(id);
+  const { data: bookmarks } = useBookmarks();
+  const isBookmarked = bookmarks?.some((b) => b.id === id) ?? false;
   // view state removed — replaced by ComparisonSlider
 
   const handleShare = async () => {
@@ -187,9 +189,10 @@ export default function RedesignPage({ params }: { params: Promise<{ id: string 
               <button
                 onClick={() => bookmark.mutate()}
                 disabled={bookmark.isPending}
-                className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-accent transition-colors"
+                className={`p-2 rounded-lg hover:bg-accent transition-colors ${isBookmarked ? "text-primary" : "text-muted-foreground hover:text-primary"}`}
+                title={isBookmarked ? "Remove bookmark" : "Save redesign"}
               >
-                <Bookmark size={15} />
+                {isBookmarked ? <BookmarkCheck size={15} /> : <Bookmark size={15} />}
               </button>
             )}
             {isOwner && (

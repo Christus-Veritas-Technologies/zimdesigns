@@ -2,15 +2,15 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowUp, Plus, Flame, Clock, ChevronDown, Bookmark, Users, LogIn, TrendingUp, ListChecks } from "lucide-react";
+import { ArrowUp, Plus, Flame, Clock, ChevronDown, Bookmark, BookmarkCheck, Users, LogIn, TrendingUp, ListChecks, ArrowUpToLine } from "lucide-react";
 import { Button } from "@zimdesigns/ui/components/ui/button";
 import { useRedesigns, useUpvoteRedesign, useDeleteRedesign, type Redesign } from "@/hooks/use-redesigns";
 import { useFollowingFeed } from "@/hooks/use-follows";
-import { useToggleBookmark } from "@/hooks/use-bookmarks";
+import { useToggleBookmark, useBookmarks } from "@/hooks/use-bookmarks";
 import { useTrending } from "@/hooks/use-bookmarks";
 import { useIsAuthenticated } from "@/hooks/use-auth";
 import { cn } from "@zimdesigns/ui/lib/utils";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 const SERVER_URL_SIDEBAR = process.env.NEXT_PUBLIC_SERVER_URL ?? "http://localhost:3001";
@@ -129,13 +129,15 @@ function UpvoteButton({ redesign, onAuthRequired }: { redesign: Redesign; onAuth
 function BookmarkButton({ redesignId, onAuthRequired }: { redesignId: string; onAuthRequired: () => void }) {
   const bookmark = useToggleBookmark(redesignId);
   const isAuthenticated = useIsAuthenticated();
+  const { data: bookmarks } = useBookmarks();
+  const isBookmarked = bookmarks?.some((b) => b.id === redesignId) ?? false;
   return (
     <button
       onClick={(e) => { e.preventDefault(); isAuthenticated ? bookmark.mutate() : onAuthRequired(); }}
       disabled={bookmark.isPending}
-      className="p-1.5 rounded-lg text-muted-foreground hover:text-primary transition-colors"
+      className={cn("p-1.5 rounded-lg transition-colors", isBookmarked ? "text-primary" : "text-muted-foreground hover:text-primary")}
     >
-      <Bookmark size={14} strokeWidth={2} />
+      {isBookmarked ? <BookmarkCheck size={14} strokeWidth={2} /> : <Bookmark size={14} strokeWidth={2} />}
     </button>
   );
 }
@@ -187,6 +189,25 @@ function SkeletonGrid() {
         </div>
       ))}
     </div>
+  );
+}
+
+function BackToTop() {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setVisible(window.scrollY > 600);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  if (!visible) return null;
+  return (
+    <button
+      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      className="fixed bottom-24 right-5 xl:bottom-8 xl:right-8 z-40 w-10 h-10 rounded-full bg-card border border-border shadow-md flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-colors"
+      aria-label="Back to top"
+    >
+      <ArrowUpToLine size={16} />
+    </button>
   );
 }
 
@@ -254,6 +275,7 @@ export default function FeedPage() {
           </div>
         </div>
       )}
+      <BackToTop />
       <div className="max-w-6xl mx-auto px-4 py-6 flex gap-8">
         <div className="flex-1 min-w-0">
           {active.isLoading && <SkeletonGrid />}

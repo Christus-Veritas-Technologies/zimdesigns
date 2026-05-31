@@ -158,7 +158,10 @@ export default function UploadPage() {
           {/* Fields */}
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-semibold text-foreground">Title</label>
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-semibold text-foreground">Title</label>
+                <span className={cn("text-xs font-mono", title.length > 100 ? "text-destructive" : "text-muted-foreground")}>{title.length}/120</span>
+              </div>
               <Input
                 placeholder="EcoCash redesign — cleaner checkout flow"
                 value={title}
@@ -169,7 +172,10 @@ export default function UploadPage() {
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm font-semibold text-foreground">App name</label>
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-semibold text-foreground">App name</label>
+                <span className={cn("text-xs font-mono", appName.length > 50 ? "text-destructive" : "text-muted-foreground")}>{appName.length}/60</span>
+              </div>
               <Input
                 placeholder="EcoCash"
                 value={appName}

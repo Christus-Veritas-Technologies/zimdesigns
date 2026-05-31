@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   View,
   Text,
@@ -40,6 +41,12 @@ export default function NotificationsScreen() {
   const markAll = useMarkAllRead();
 
   const unread = notifications?.filter((n) => !n.read).length ?? 0;
+
+  // Auto-mark all as read when page loads
+  useEffect(() => {
+    if (notifications?.some((n) => !n.read)) markAll.mutate();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [notifications]);
 
   return (
     <View className="flex-1 bg-background">
