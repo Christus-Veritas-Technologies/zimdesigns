@@ -13,6 +13,7 @@ export interface UserProfile {
   role: string | null;
   createdAt: string;
   redesignCount: number;
+  followerCount: number;
   linkedinUrl: string | null;
   githubUrl: string | null;
   dribbbleUrl: string | null;
