@@ -9,6 +9,7 @@ import { KeyboardProvider } from "react-native-keyboard-controller";
 import { AppThemeProvider } from "@/contexts/app-theme-context";
 import { AuthProvider, useAuth } from "@/contexts/auth-context";
 import { queryClient } from "@/lib/query-client";
+import { usePushNotifications } from "@/hooks/use-push-notifications";
 
 export const unstable_settings = {
   initialRouteName: "(drawer)",
@@ -20,6 +21,7 @@ function AuthGate() {
   const { isAuthenticated, isLoading, user } = useAuth();
   const segments = useSegments();
   const router = useRouter();
+  usePushNotifications();
 
   useEffect(() => {
     if (isLoading) return;

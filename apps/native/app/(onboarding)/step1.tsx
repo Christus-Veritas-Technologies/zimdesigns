@@ -5,13 +5,15 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
+  Image,
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from "react-native";
 import { useRouter } from "expo-router";
+import * as ImagePicker from "expo-image-picker";
 import { ArrowRight, Camera, Upload } from "lucide-react-native";
-import { Wordmark } from "@/components/brand/wordmark";
 import { useMe, useUpdateProfile } from "@/hooks/use-onboarding";
 import { useAuth } from "@/contexts/auth-context";
 
@@ -52,8 +54,39 @@ export default function Step1Screen() {
     bio: me?.bio ?? "",
     role: (me?.role ?? "designer") as Role,
   });
+  const [avatarUri, setAvatarUri] = useState<string | null>(me?.avatarUrl ?? null);
+  const [avatarAsset, setAvatarAsset] = useState<{ uri: string; name: string; type: string } | null>(null);
 
   const bioLen = form.bio.length;
+
+  const pickAvatar = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images"],
+      quality: 0.85,
+      allowsEditing: true,
+      aspect: [1, 1],
+    });
+    if (!result.canceled && result.assets[0]) {
+      const asset = result.assets[0];
+      if (asset.fileSize && asset.fileSize > 5 * 1024 * 1024) {
+        Alert.alert("File too large", "Please pick an image under 5 MB.");
+        return;
+      }
+      const ext = asset.uri.split(".").pop() ?? "jpg";
+      setAvatarUri(asset.uri);
+      setAvatarAsset({ uri: asset.uri, name: `avatar.${ext}`, type: asset.mimeType ?? `image/${ext}` });
+    }
+  };
+
+  const handleSubmit = () => {
+    const fd = new FormData();
+    fd.append("name", form.name);
+    fd.append("username", form.username);
+    if (form.bio) fd.append("bio", form.bio);
+    fd.append("role", form.role);
+    if (avatarAsset) fd.append("avatar", avatarAsset as never);
+    updateProfile.mutate(fd);
+  };
 
   return (
     <KeyboardAvoidingView
@@ -84,15 +117,29 @@ export default function Step1Screen() {
 
         {/* Avatar */}
         <View className="flex-row items-center gap-4 mb-5">
-          <View className="w-[72px] h-[72px] rounded-xl bg-muted border-2 border-dashed border-border items-center justify-center">
-            <Camera size={22} color="#8A8278" />
-          </View>
+          <TouchableOpacity
+            onPress={pickAvatar}
+            activeOpacity={0.8}
+            className="w-[72px] h-[72px] rounded-xl bg-muted border-2 border-dashed border-border items-center justify-center overflow-hidden"
+          >
+            {avatarUri ? (
+              <Image source={{ uri: avatarUri }} className="w-full h-full" resizeMode="cover" />
+            ) : (
+              <Camera size={22} color="#8A8278" />
+            )}
+          </TouchableOpacity>
           <View>
-            <TouchableOpacity className="flex-row items-center gap-2 h-9 px-3.5 rounded-xl border border-border bg-card">
+            <TouchableOpacity
+              onPress={pickAvatar}
+              activeOpacity={0.8}
+              className="flex-row items-center gap-2 h-9 px-3.5 rounded-xl border border-border bg-card"
+            >
               <Upload size={15} color="#8A8278" />
-              <Text className="text-sm font-semibold text-foreground">Upload photo</Text>
+              <Text className="text-sm font-semibold text-foreground">
+                {avatarUri ? "Change photo" : "Upload photo"}
+              </Text>
             </TouchableOpacity>
-            <Text className="text-xs text-muted-foreground mt-1.5">PNG or JPG, optional.</Text>
+            <Text className="text-xs text-muted-foreground mt-1.5">PNG or JPG, max 5 MB. Optional.</Text>
           </View>
         </View>
 
@@ -176,21 +223,31 @@ export default function Step1Screen() {
           </Text>
         )}
 
-        <TouchableOpacity
-          onPress={() => updateProfile.mutate(form)}
-          disabled={updateProfile.isPending}
-          className="h-12 mt-6 rounded-xl bg-primary flex-row-reverse items-center justify-center gap-2"
-          activeOpacity={0.85}
-        >
-          {updateProfile.isPending
-            ? <ActivityIndicator color="#2A2410" />
-            : (
-              <>
-                <ArrowRight size={18} color="#2A2410" />
-                <Text className="font-semibold text-base text-primary-foreground">Continue</Text>
-              </>
-            )}
-        </TouchableOpacity>
+        <View className="gap-3 mt-6">
+          <TouchableOpacity
+            onPress={handleSubmit}
+            disabled={updateProfile.isPending}
+            className="h-12 rounded-xl bg-primary flex-row-reverse items-center justify-center gap-2"
+            activeOpacity={0.85}
+          >
+            {updateProfile.isPending
+              ? <ActivityIndicator color="#2A2410" />
+              : (
+                <>
+                  <ArrowRight size={18} color="#2A2410" />
+                  <Text className="font-semibold text-base text-primary-foreground">Continue</Text>
+                </>
+              )}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => router.push("/(onboarding)/step2")}
+            className="h-11 items-center justify-center"
+            activeOpacity={0.7}
+          >
+            <Text className="text-muted-foreground font-medium">Skip for now</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );

@@ -1,4 +1,5 @@
 import db from "@zimdesigns/db";
+import { sendPushNotification } from "../lib/push";
 
 function sanitize(c: {
   id: string;
@@ -36,14 +37,23 @@ export async function createComment(redesignId: string, authorId: string, body: 
   });
 
   if (redesign.authorId !== authorId) {
-    const commenter = await db.user.findUniqueOrThrow({ where: { id: authorId }, select: { username: true } });
+    const [commenter, author] = await Promise.all([
+      db.user.findUniqueOrThrow({ where: { id: authorId }, select: { username: true } }),
+      db.user.findUniqueOrThrow({ where: { id: redesign.authorId }, select: { pushToken: true } }),
+    ]);
+    const notifBody = `@${commenter.username} commented on your redesign: "${body.slice(0, 60)}${body.length > 60 ? "…" : ""}"`;
     await db.notification.create({
       data: {
         userId: redesign.authorId,
         type: "comment",
-        body: `@${commenter.username} commented on your redesign: "${body.slice(0, 60)}${body.length > 60 ? "…" : ""}"`,
+        body: notifBody,
         refId: redesignId,
       },
+    });
+    await sendPushNotification(author.pushToken, {
+      title: "New comment",
+      body: notifBody,
+      data: { type: "comment", redesignId },
     });
   }
 

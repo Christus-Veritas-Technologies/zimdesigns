@@ -1,4 +1,5 @@
 import db from "@zimdesigns/db";
+import { sendPushNotification } from "../lib/push";
 
 export async function toggleFollow(followerId: string, followingId: string) {
   if (followerId === followingId) throw new Error("SELF_FOLLOW");
@@ -14,14 +15,23 @@ export async function toggleFollow(followerId: string, followingId: string) {
 
   await db.follow.create({ data: { followerId, followingId } });
 
-  const follower = await db.user.findUniqueOrThrow({ where: { id: followerId }, select: { username: true } });
+  const [follower, following] = await Promise.all([
+    db.user.findUniqueOrThrow({ where: { id: followerId }, select: { username: true } }),
+    db.user.findUniqueOrThrow({ where: { id: followingId }, select: { pushToken: true } }),
+  ]);
+  const notifBody = `@${follower.username} started following you.`;
   await db.notification.create({
     data: {
       userId: followingId,
       type: "follow",
-      body: `@${follower.username} started following you.`,
+      body: notifBody,
       refId: followerId,
     },
+  });
+  await sendPushNotification(following.pushToken, {
+    title: "New follower",
+    body: notifBody,
+    data: { type: "follow", userId: followerId },
   });
 
   return { following: true };

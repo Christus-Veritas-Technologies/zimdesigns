@@ -36,6 +36,13 @@ export const metadata: Metadata = {
     description: "Discover and share redesigns of apps used in Zimbabwe.",
   },
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://zimdesigns.com"),
+  manifest: "/manifest.webmanifest",
+  themeColor: "#E8A900",
+  appleWebApp: {
+    capable: true,
+    title: "ZimDesigns",
+    statusBarStyle: "default",
+  },
 };
 
 export default function RootLayout({

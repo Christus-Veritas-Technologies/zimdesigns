@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
+import { useState, useRef } from "react";
+import Image from "next/image";
 import { ArrowRight, Camera, Upload } from "lucide-react";
 import { Button } from "@zimdesigns/ui/components/button";
 import { Input } from "@zimdesigns/ui/components/input";
@@ -22,6 +22,7 @@ export default function Step1Page() {
   const { data: me } = useMe();
   const updateProfile = useUpdateProfile();
   const router = useRouter();
+  const avatarInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState({
     name: me?.name ?? "",
@@ -29,12 +30,28 @@ export default function Step1Page() {
     bio: me?.bio ?? "",
     role: (me?.role ?? "designer") as Role,
   });
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(me?.avatarUrl ?? null);
 
   const bioLen = form.bio.length;
 
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    if (f.size > 5 * 1024 * 1024) { alert("Avatar must be under 5 MB."); return; }
+    setAvatarFile(f);
+    setAvatarPreview(URL.createObjectURL(f));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    updateProfile.mutate(form, {
+    const fd = new FormData();
+    fd.append("name", form.name);
+    fd.append("username", form.username);
+    if (form.bio) fd.append("bio", form.bio);
+    fd.append("role", form.role);
+    if (avatarFile) fd.append("avatar", avatarFile);
+    updateProfile.mutate(fd, {
       onSuccess: () => router.push("/onboarding/step2"),
     });
   };
@@ -63,16 +80,25 @@ export default function Step1Page() {
         <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
           {/* Avatar */}
           <div className="flex items-center gap-4">
-            <div className="w-18 h-18 rounded-xl bg-muted border-2 border-dashed border-border flex items-center justify-center text-muted-foreground flex-none"
-              style={{ width: 72, height: 72 }}>
-              <Camera size={22} />
-            </div>
+            <button
+              type="button"
+              onClick={() => avatarInputRef.current?.click()}
+              className="w-[72px] h-[72px] rounded-xl bg-muted border-2 border-dashed border-border flex items-center justify-center text-muted-foreground flex-none overflow-hidden hover:border-primary/50 transition-colors relative"
+            >
+              {avatarPreview ? (
+                <Image src={avatarPreview} alt="Avatar" fill className="object-cover" unoptimized />
+              ) : (
+                <Camera size={22} />
+              )}
+            </button>
             <div>
               <Button type="button" variant="outline"
+                onClick={() => avatarInputRef.current?.click()}
                 className="h-9 text-sm rounded-xl gap-2 border-border">
-                <Upload size={15} /> Upload photo
+                <Upload size={15} /> {avatarPreview ? "Change photo" : "Upload photo"}
               </Button>
-              <p className="text-xs text-muted-foreground mt-1.5">PNG or JPG, optional.</p>
+              <p className="text-xs text-muted-foreground mt-1.5">PNG or JPG, max 5 MB. Optional.</p>
+              <input ref={avatarInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleAvatarChange} />
             </div>
           </div>
 
@@ -142,14 +168,25 @@ export default function Step1Page() {
             </p>
           )}
 
-          <Button
-            type="submit"
-            disabled={updateProfile.isPending}
-            className="h-12 text-base font-semibold bg-[var(--zd-gold)] hover:bg-[var(--zd-gold-hover)] text-[var(--zd-gold-fg)] rounded-xl flex flex-row-reverse items-center gap-2 mt-1"
-          >
-            <ArrowRight size={18} />
-            {updateProfile.isPending ? "Saving…" : "Continue"}
-          </Button>
+          <div className="flex items-center gap-3 mt-1">
+            <Button
+              type="button"
+              variant="ghost"
+              className="text-muted-foreground"
+              onClick={() => router.push("/onboarding/step2")}
+            >
+              Skip for now
+            </Button>
+            <div className="flex-1" />
+            <Button
+              type="submit"
+              disabled={updateProfile.isPending}
+              className="h-12 text-base font-semibold bg-[var(--zd-gold)] hover:bg-[var(--zd-gold-hover)] text-[var(--zd-gold-fg)] rounded-xl flex flex-row-reverse items-center gap-2"
+            >
+              <ArrowRight size={18} />
+              {updateProfile.isPending ? "Saving…" : "Continue"}
+            </Button>
+          </div>
         </form>
       </div>
     </div>

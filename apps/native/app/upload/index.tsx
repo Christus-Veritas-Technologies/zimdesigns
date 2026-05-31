@@ -11,8 +11,10 @@ import {
 } from "react-native";
 import { router } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
-import { Upload, ImageIcon, Check, X, ArrowLeft } from "lucide-react-native";
+import { Upload, ImageIcon, Check, ArrowLeft } from "lucide-react-native";
 import { useCreateRedesign } from "@/hooks/use-redesigns";
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 const TAG_OPTIONS = [
   "Mobile Apps", "Web Apps", "Banking", "E-commerce",
@@ -43,6 +45,10 @@ function ImageSlot({
     });
     if (!result.canceled && result.assets[0]) {
       const asset = result.assets[0];
+      if (asset.fileSize && asset.fileSize > MAX_FILE_SIZE) {
+        Alert.alert("File too large", `Please pick an image under 5 MB. Yours is ${(asset.fileSize / 1024 / 1024).toFixed(1)} MB.`);
+        return;
+      }
       const ext = asset.uri.split(".").pop() ?? "jpg";
       onPick({ uri: asset.uri, name: `${label.toLowerCase()}.${ext}`, type: asset.mimeType ?? `image/${ext}` });
     }
