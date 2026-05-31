@@ -1,4 +1,5 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import * as Haptics from "expo-haptics";
 import { api } from "@/lib/axios";
 
 export interface RedesignAuthor {
@@ -73,6 +74,7 @@ export function useUpvoteRedesign(id: string) {
         old ? { ...old, ...data } : old,
       );
       qc.invalidateQueries({ queryKey: ["redesigns"] });
+      if (data.hasUpvoted) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     },
   });
 }

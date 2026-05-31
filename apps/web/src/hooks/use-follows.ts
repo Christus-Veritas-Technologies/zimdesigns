@@ -1,6 +1,7 @@
 "use client";
 
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { api } from "@/lib/axios";
 import type { Redesign } from "./use-redesigns";
 
@@ -22,6 +23,7 @@ export function useToggleFollow(username: string) {
     onSuccess: (data) => {
       qc.setQueryData(["follow-status", username], data);
       qc.invalidateQueries({ queryKey: ["profile", username] });
+      toast.success(data.following ? `Following @${username}` : `Unfollowed @${username}`);
     },
   });
 }

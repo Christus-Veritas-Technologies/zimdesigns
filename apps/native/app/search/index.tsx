@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -54,7 +54,14 @@ function SearchCard({ item }: { item: Redesign }) {
 }
 
 export default function SearchScreen() {
+  const [input, setInput] = useState("");
   const [q, setQ] = useState("");
+
+  useEffect(() => {
+    const t = setTimeout(() => setQ(input), 350);
+    return () => clearTimeout(t);
+  }, [input]);
+
   const { data: results, isLoading } = useSearch(q);
 
   return (
@@ -66,16 +73,16 @@ export default function SearchScreen() {
         <View className="flex-row items-center gap-2 h-11 px-3.5 rounded-xl border border-input bg-card">
           <Search size={15} color="#8A8278" />
           <TextInput
-            value={q}
-            onChangeText={setQ}
+            value={input}
+            onChangeText={setInput}
             placeholder="App name, title, or tag…"
             placeholderTextColor="#8A8278"
             autoFocus
             returnKeyType="search"
             className="flex-1 text-foreground text-sm"
           />
-          {q.length > 0 && (
-            <TouchableOpacity onPress={() => setQ("")}>
+          {input.length > 0 && (
+            <TouchableOpacity onPress={() => { setInput(""); setQ(""); }}>
               <X size={15} color="#8A8278" />
             </TouchableOpacity>
           )}
@@ -96,7 +103,11 @@ export default function SearchScreen() {
 
       {q.trim().length < 2 && (
         <View className="flex-1 items-center justify-center px-6">
-          <Text className="text-muted-foreground text-sm text-center">Type at least 2 characters to search.</Text>
+          <View className="w-16 h-16 rounded-2xl bg-muted items-center justify-center mb-4">
+            <Search size={24} color="#8A8278" />
+          </View>
+          <Text className="font-semibold text-foreground mb-1">Search redesigns</Text>
+          <Text className="text-sm text-muted-foreground text-center">Find redesigns by app name, title, or tag.</Text>
         </View>
       )}
 

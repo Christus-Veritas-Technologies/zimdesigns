@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { ArrowLeft, Bell, CheckCheck, UserPlus } from "lucide-react";
 import { Button } from "@zimdesigns/ui/components/ui/button";
@@ -10,7 +11,7 @@ import { useRouter } from "next/navigation";
 
 const TYPE_META: Record<string, { icon: string; label: string }> = {
   comment: { icon: "💬", label: "commented on" },
-  upvote: { icon: "↑", label: "upvoted" },
+  upvote: { icon: "⬆", label: "upvoted" },
   follow: { icon: "👤", label: "started following you" },
 };
 
@@ -19,6 +20,13 @@ export default function NotificationsPage() {
   const isAuthenticated = useIsAuthenticated();
   const { data: notifications, isLoading } = useNotifications();
   const markAll = useMarkAllRead();
+
+  // Auto-mark all as read when page is visited
+  useEffect(() => {
+    const hasUnread = notifications?.some((n) => !n.read);
+    if (hasUnread) markAll.mutate();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [notifications]);
 
   const unread = notifications?.filter((n) => !n.read).length ?? 0;
 

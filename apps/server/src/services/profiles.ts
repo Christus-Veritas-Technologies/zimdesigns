@@ -16,7 +16,7 @@ export async function getProfile(username: string) {
       dribbbleUrl: true,
       twitterUrl: true,
       websiteUrl: true,
-      _count: { select: { redesigns: true, followers: true } },
+      _count: { select: { redesigns: true, followers: true, following: true } },
     },
   });
   return {
@@ -29,6 +29,7 @@ export async function getProfile(username: string) {
     createdAt: user.createdAt,
     redesignCount: user._count.redesigns,
     followerCount: user._count.followers,
+    followingCount: user._count.following,
     linkedinUrl: user.linkedinUrl,
     githubUrl: user.githubUrl,
     dribbbleUrl: user.dribbbleUrl,

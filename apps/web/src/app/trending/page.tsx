@@ -113,10 +113,16 @@ export default function TrendingPage() {
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-sm text-foreground truncate">{d.name}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold text-sm text-foreground truncate">{d.name}</p>
+                        {d.role && (
+                          <span className="text-[0.6rem] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-semibold flex-none">
+                            {ROLE_LABEL[d.role] ?? d.role}
+                          </span>
+                        )}
+                      </div>
                       <p className="text-xs text-muted-foreground">
-                        {d.role ? ROLE_LABEL[d.role] ?? d.role : "@" + d.username}
-                        {" · "}{d.redesignCount} redesign{d.redesignCount !== 1 ? "s" : ""}
+                        @{d.username} · {d.redesignCount} redesign{d.redesignCount !== 1 ? "s" : ""}
                       </p>
                     </div>
                   </Link>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import { api } from "@/lib/axios";
 
 export interface RedesignAuthor {
@@ -75,6 +76,7 @@ export function useUpvoteRedesign(id: string) {
         old ? { ...old, ...data } : old,
       );
       qc.invalidateQueries({ queryKey: ["redesigns"] });
+      if (data.hasUpvoted) toast.success("Upvoted!");
     },
   });
 }
@@ -83,6 +85,9 @@ export function useDeleteRedesign() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => api.delete(`/api/redesigns/${id}`).then(() => undefined),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["redesigns"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["redesigns"] });
+      toast.success("Redesign deleted.");
+    },
   });
 }

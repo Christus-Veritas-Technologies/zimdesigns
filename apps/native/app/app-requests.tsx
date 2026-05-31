@@ -8,9 +8,9 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { router } from "expo-router";
-import { ArrowLeft, ArrowUp, Plus } from "lucide-react-native";
+import { ArrowLeft, ArrowUp, Plus, TrendingUp, Clock } from "lucide-react-native";
 import { useAppRequests, useCreateAppRequest, useVoteAppRequest } from "@/hooks/use-bookmarks";
 import { useAuth } from "@/contexts/auth-context";
 
@@ -51,7 +51,14 @@ export default function AppRequestsScreen() {
   const [showForm, setShowForm] = useState(false);
   const [appName, setAppName] = useState("");
   const [description, setDescription] = useState("");
-  const { data: requests, isLoading } = useAppRequests();
+  const [sort, setSort] = useState<"votes" | "recent">("votes");
+  const { data: rawRequests, isLoading } = useAppRequests();
+  const requests = useMemo(
+    () => rawRequests ? [...rawRequests].sort((a, b) =>
+      sort === "votes" ? b.voteCount - a.voteCount : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    ) : undefined,
+    [rawRequests, sort],
+  );
   const createRequest = useCreateAppRequest();
 
   const handleSubmit = () => {
@@ -119,7 +126,21 @@ export default function AppRequestsScreen() {
         </View>
       )}
 
-      <Text className="text-sm text-muted-foreground px-5 mb-3">Vote for the apps you want redesigned next.</Text>
+      <View className="flex-row items-center justify-between px-5 mb-3">
+        <Text className="text-sm text-muted-foreground flex-1">Vote for the apps you want redesigned next.</Text>
+        <View className="flex-row gap-1">
+          <TouchableOpacity onPress={() => setSort("votes")} activeOpacity={0.7}
+            className={`flex-row items-center gap-1 px-2.5 py-1 rounded-lg ${sort === "votes" ? "bg-accent" : ""}`}>
+            <TrendingUp size={11} color={sort === "votes" ? "#E8A900" : "#8A8278"} />
+            <Text className={`text-xs font-medium ${sort === "votes" ? "text-foreground" : "text-muted-foreground"}`}>Top</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setSort("recent")} activeOpacity={0.7}
+            className={`flex-row items-center gap-1 px-2.5 py-1 rounded-lg ${sort === "recent" ? "bg-accent" : ""}`}>
+            <Clock size={11} color={sort === "recent" ? "#E8A900" : "#8A8278"} />
+            <Text className={`text-xs font-medium ${sort === "recent" ? "text-foreground" : "text-muted-foreground"}`}>Recent</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </View>
   );
 
