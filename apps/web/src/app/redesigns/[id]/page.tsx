@@ -10,6 +10,7 @@ import { useComments, useCreateComment, useDeleteComment } from "@/hooks/use-com
 import { useCurrentUser, useIsAuthenticated } from "@/hooks/use-auth";
 import { useToggleBookmark } from "@/hooks/use-bookmarks";
 import { useRouter } from "next/navigation";
+import ComparisonSlider from "@/components/comparison-slider";
 
 const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL ?? "http://localhost:3001";
 
@@ -122,8 +123,6 @@ export default function RedesignPage({ params }: { params: Promise<{ id: string 
   const remove = useDeleteRedesign();
   const user = useCurrentUser();
   const isAuthenticated = useIsAuthenticated();
-  const [view, setView] = useState<"after" | "before">("after");
-
   if (isLoading) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-8 animate-pulse">
@@ -147,6 +146,7 @@ export default function RedesignPage({ params }: { params: Promise<{ id: string 
   const isOwner = user?.id === redesign.author.id;
   const [copied, setCopied] = useState(false);
   const bookmark = useToggleBookmark(id);
+  // view state removed — replaced by ComparisonSlider
 
   const handleShare = async () => {
     const url = window.location.href;
@@ -205,33 +205,14 @@ export default function RedesignPage({ params }: { params: Promise<{ id: string 
           </div>
         </div>
 
-        {/* Image viewer */}
-        <div className="relative rounded-2xl overflow-hidden border border-border bg-muted mb-6">
-          <div className="aspect-[4/3] relative">
-            <Image
-              src={absoluteUrl(view === "after" ? redesign.afterUrl : redesign.beforeUrl)}
-              alt={redesign.title}
-              fill
-              className="object-contain"
-              unoptimized
-            />
-          </div>
-          <div className="absolute top-3 left-3 flex gap-2">
-            {(["after", "before"] as const).map((v) => (
-              <button
-                key={v}
-                onClick={() => setView(v)}
-                className={cn(
-                  "px-3 py-1 rounded-full text-xs font-semibold transition-colors",
-                  view === v
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-black/50 text-white backdrop-blur-sm hover:bg-black/70",
-                )}
-              >
-                {v === "after" ? "After" : "Before"}
-              </button>
-            ))}
-          </div>
+        {/* Before/after comparison slider */}
+        <div className="mb-6">
+          <ComparisonSlider
+            beforeUrl={absoluteUrl(redesign.beforeUrl)}
+            afterUrl={absoluteUrl(redesign.afterUrl)}
+            alt={redesign.title}
+          />
+          <p className="text-xs text-muted-foreground text-center mt-2">Drag to compare before & after</p>
         </div>
 
         {/* Meta */}
