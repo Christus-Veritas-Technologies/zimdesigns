@@ -3,11 +3,12 @@
 import { use, useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, ArrowUp, Trash2, Send, MessageCircle } from "lucide-react";
+import { ArrowLeft, ArrowUp, Trash2, Send, MessageCircle, Share2, Bookmark, Check } from "lucide-react";
 import { cn } from "@zimdesigns/ui/lib/utils";
 import { useRedesign, useUpvoteRedesign, useDeleteRedesign } from "@/hooks/use-redesigns";
 import { useComments, useCreateComment, useDeleteComment } from "@/hooks/use-comments";
 import { useCurrentUser, useIsAuthenticated } from "@/hooks/use-auth";
+import { useToggleBookmark } from "@/hooks/use-bookmarks";
 import { useRouter } from "next/navigation";
 
 const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL ?? "http://localhost:3001";
@@ -144,6 +145,25 @@ export default function RedesignPage({ params }: { params: Promise<{ id: string 
   }
 
   const isOwner = user?.id === redesign.author.id;
+  const [copied, setCopied] = useState(false);
+  const bookmark = useToggleBookmark(id);
+
+  const handleShare = async () => {
+    const url = window.location.href;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: redesign.title, url });
+      } else {
+        await navigator.clipboard.writeText(url);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }
+    } catch {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -156,16 +176,33 @@ export default function RedesignPage({ params }: { params: Promise<{ id: string 
             <ArrowLeft size={15} />
             Back
           </button>
-          {isOwner && (
+          <div className="flex items-center gap-2">
             <button
-              onClick={() => remove.mutate(id, { onSuccess: () => router.replace("/") })}
-              disabled={remove.isPending}
-              className="flex items-center gap-1.5 text-sm text-destructive hover:text-destructive/80 transition-colors"
+              onClick={handleShare}
+              className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-lg hover:bg-accent"
             >
-              <Trash2 size={14} />
-              Delete
+              {copied ? <><Check size={13} className="text-green-500" />Copied</> : <><Share2 size={13} />Share</>}
             </button>
-          )}
+            {isAuthenticated && (
+              <button
+                onClick={() => bookmark.mutate()}
+                disabled={bookmark.isPending}
+                className="p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-accent transition-colors"
+              >
+                <Bookmark size={15} />
+              </button>
+            )}
+            {isOwner && (
+              <button
+                onClick={() => remove.mutate(id, { onSuccess: () => router.replace("/") })}
+                disabled={remove.isPending}
+                className="flex items-center gap-1.5 text-sm text-destructive hover:text-destructive/80 transition-colors"
+              >
+                <Trash2 size={14} />
+                Delete
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Image viewer */}
