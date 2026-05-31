@@ -16,6 +16,7 @@
     "@zimdesigns/env": "workspace:*",
     "dotenv": "catalog:",
     "hono": "^4.8.2",
+    "resend": "^6.12.4",
     "zod": "catalog:"
   },
   "devDependencies": {

@@ -11,6 +11,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   Share,
+  PanResponder,
+  Dimensions,
 } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
 import { ArrowLeft, ArrowUp, Trash2, Send, MessageCircle, Share2, Bookmark } from "lucide-react-native";
@@ -34,7 +36,6 @@ export default function RedesignDetailScreen() {
   const createComment = useCreateComment(id);
   const deleteComment = useDeleteComment(id);
   const { user, isAuthenticated } = useAuth();
-  const [view, setView] = useState<"after" | "before">("after");
   const [commentBody, setCommentBody] = useState("");
 
   if (isLoading) {
@@ -58,6 +59,23 @@ export default function RedesignDetailScreen() {
 
   const isOwner = user?.id === redesign.author.id;
   const bookmark = useToggleBookmark(id);
+  const screenWidth = Dimensions.get("window").width;
+  const [sliderPct, setSliderPct] = useState(50);
+  const sliderX = useRef(0);
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: (e) => {
+        const pct = Math.min(100, Math.max(0, (e.nativeEvent.locationX / screenWidth) * 100));
+        setSliderPct(pct);
+      },
+      onPanResponderMove: (e) => {
+        const pct = Math.min(100, Math.max(0, (e.nativeEvent.pageX / screenWidth) * 100));
+        setSliderPct(pct);
+      },
+    }),
+  ).current;
 
   const handleShare = async () => {
     try {
@@ -93,13 +111,23 @@ export default function RedesignDetailScreen() {
       className="flex-1 bg-background"
     >
       <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-        {/* Image viewer */}
-        <View style={{ aspectRatio: 4 / 3 }} className="relative">
-          <Image
-            source={{ uri: absoluteUrl(view === "after" ? redesign.afterUrl : redesign.beforeUrl) }}
-            className="w-full h-full"
-            resizeMode="cover"
-          />
+        {/* Before/after comparison slider */}
+        <View style={{ aspectRatio: 4 / 3 }} className="relative overflow-hidden" {...panResponder.panHandlers}>
+          {/* After (full) */}
+          <Image source={{ uri: absoluteUrl(redesign.afterUrl) }} className="w-full h-full absolute" resizeMode="cover" />
+          {/* Before (clipped left) */}
+          <View style={{ position: "absolute", top: 0, left: 0, bottom: 0, width: `${sliderPct}%`, overflow: "hidden" }}>
+            <Image source={{ uri: absoluteUrl(redesign.beforeUrl) }} style={{ width: screenWidth, height: "100%" }} resizeMode="cover" />
+          </View>
+          {/* Divider */}
+          <View style={{ position: "absolute", top: 0, bottom: 0, left: `${sliderPct}%`, width: 2, backgroundColor: "#fff", transform: [{ translateX: -1 }] }} />
+          {/* Handle */}
+          <View style={{ position: "absolute", top: "50%", left: `${sliderPct}%`, transform: [{ translateX: -18 }, { translateY: -18 }], width: 36, height: 36, borderRadius: 18, backgroundColor: "#fff", alignItems: "center", justifyContent: "center" }}>
+            <Text style={{ fontSize: 14, color: "#666", letterSpacing: -4 }}>◂▸</Text>
+          </View>
+          {/* Labels */}
+          <View className="absolute top-12 left-3"><View className="bg-black/60 px-2 py-0.5 rounded-full"><Text className="text-white text-[0.65rem] font-semibold">Before</Text></View></View>
+          <View className="absolute top-12 right-3"><View className="bg-black/60 px-2 py-0.5 rounded-full"><Text className="text-white text-[0.65rem] font-semibold">After</Text></View></View>
 
           <TouchableOpacity
             onPress={() => router.back()}
@@ -108,21 +136,6 @@ export default function RedesignDetailScreen() {
           >
             <ArrowLeft size={17} color="#fff" />
           </TouchableOpacity>
-
-          <View className="absolute top-12 flex-row gap-1.5" style={{ left: "50%", transform: [{ translateX: -50 }] }}>
-            {(["after", "before"] as const).map((v) => (
-              <TouchableOpacity
-                key={v}
-                onPress={() => setView(v)}
-                activeOpacity={0.8}
-                className={`px-3 py-1 rounded-full ${view === v ? "bg-primary" : "bg-black/50"}`}
-              >
-                <Text className={`text-xs font-semibold ${view === v ? "text-primary-foreground" : "text-white"}`}>
-                  {v === "after" ? "After" : "Before"}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
 
           <View className="absolute top-12 right-4 flex-row gap-2">
             <TouchableOpacity

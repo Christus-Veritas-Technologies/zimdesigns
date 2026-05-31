@@ -90,7 +90,10 @@ export default function LoginScreen() {
           </View>
 
           <View className="gap-1.5">
-            <Text className="text-[0.84rem] font-semibold text-foreground">Password</Text>
+            <View className="flex-row items-center justify-between">
+              <Text className="text-[0.84rem] font-semibold text-foreground">Password</Text>
+              <Link href="/auth/forgot-password" className="text-xs text-muted-foreground">Forgot password?</Link>
+            </View>
             <View className="flex-row items-center">
               <TextInput
                 className="flex-1 h-11 pl-3.5 pr-12 rounded-xl border border-input bg-card text-foreground text-[0.95rem]"
