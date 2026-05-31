@@ -18,8 +18,24 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "zimdesigns",
-  description: "zimdesigns",
+  title: {
+    default: "ZimDesigns — Redesigns of Zimbabwean apps",
+    template: "%s | ZimDesigns",
+  },
+  description: "Discover and share redesigns of apps used in Zimbabwe. Built by the community, for the community.",
+  keywords: ["Zimbabwe", "app redesign", "UI design", "UX", "design community"],
+  openGraph: {
+    type: "website",
+    siteName: "ZimDesigns",
+    title: "ZimDesigns — Redesigns of Zimbabwean apps",
+    description: "Discover and share redesigns of apps used in Zimbabwe.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ZimDesigns",
+    description: "Discover and share redesigns of apps used in Zimbabwe.",
+  },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://zimdesigns.com"),
 };
 
 export default function RootLayout({
