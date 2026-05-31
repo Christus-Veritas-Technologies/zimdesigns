@@ -8,6 +8,7 @@ import { Input } from "@zimdesigns/ui/components/input";
 import { Label } from "@zimdesigns/ui/components/label";
 import { Wordmark } from "@/components/brand/wordmark";
 import { FlagBar } from "@/components/brand/flag-bar";
+import { FloatingImages } from "@/components/floating-images";
 import { useSignup } from "@/hooks/use-auth";
 import { env } from "@zimdesigns/env/web";
 
@@ -169,6 +170,7 @@ export default function SignupPage() {
               backgroundSize: "16px 16px",
             }}
           />
+          <FloatingImages variant="auth" />
           <div className="relative flex flex-col h-full">
             <Wordmark size={24} />
             <div className="mt-auto max-w-[460px]">
