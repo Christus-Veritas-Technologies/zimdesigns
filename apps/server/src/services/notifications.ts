@@ -1,5 +1,9 @@
 import db from "@zimdesigns/db";
 
+export async function savePushToken(userId: string, token: string) {
+  await db.user.update({ where: { id: userId }, data: { pushToken: token } });
+}
+
 export async function listNotifications(userId: string) {
   return db.notification.findMany({
     where: { userId },

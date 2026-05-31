@@ -1,5 +1,6 @@
 import db from "@zimdesigns/db";
 import { uploadToR2 } from "../lib/r2";
+import { sendPushNotification } from "../lib/push";
 
 export interface RedesignInput {
   title: string;
@@ -129,7 +130,18 @@ export async function toggleUpvote(redesignId: string, userId: string) {
   const r = await db.redesign.update({
     where: { id: redesignId },
     data: { upvoteCount: { increment: 1 } },
+    include: { author: { select: { id: true, pushToken: true } } },
   });
+
+  if (r.author.id !== userId) {
+    const voter = await db.user.findUniqueOrThrow({ where: { id: userId }, select: { username: true } });
+    await sendPushNotification(r.author.pushToken, {
+      title: "New upvote",
+      body: `@${voter.username} upvoted your redesign "${r.title.slice(0, 40)}${r.title.length > 40 ? "…" : ""}"`,
+      data: { type: "upvote", redesignId },
+    });
+  }
+
   return { upvoteCount: r.upvoteCount, hasUpvoted: true };
 }
 

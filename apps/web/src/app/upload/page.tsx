@@ -15,6 +15,15 @@ const TAG_OPTIONS = [
   "Social Media", "Fintech", "Government", "Health", "Other",
 ];
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+
+function validateImage(f: File): string | null {
+  if (!ALLOWED_TYPES.includes(f.type)) return "Only JPG, PNG, WebP, or GIF allowed.";
+  if (f.size > MAX_FILE_SIZE) return `File too large (max 5 MB). Yours is ${(f.size / 1024 / 1024).toFixed(1)} MB.`;
+  return null;
+}
+
 function ImageDropzone({
   label,
   file,
@@ -26,7 +35,15 @@ function ImageDropzone({
 }) {
   const ref = useRef<HTMLInputElement>(null);
   const [drag, setDrag] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const preview = file ? URL.createObjectURL(file) : null;
+
+  const handleFile = (f: File) => {
+    const err = validateImage(f);
+    if (err) { setError(err); return; }
+    setError(null);
+    onFile(f);
+  };
 
   return (
     <div className="flex flex-col gap-1.5">
@@ -39,12 +56,12 @@ function ImageDropzone({
           e.preventDefault();
           setDrag(false);
           const f = e.dataTransfer.files[0];
-          if (f?.type.startsWith("image/")) onFile(f);
+          if (f) handleFile(f);
         }}
         className={cn(
           "relative cursor-pointer rounded-xl border-2 border-dashed transition-colors overflow-hidden",
           "aspect-[4/3] flex flex-col items-center justify-center gap-2",
-          drag ? "border-primary bg-primary/5" : "border-border bg-muted/40 hover:border-primary/50",
+          error ? "border-destructive bg-destructive/5" : drag ? "border-primary bg-primary/5" : "border-border bg-muted/40 hover:border-primary/50",
           preview && "border-solid border-border",
         )}
       >
@@ -53,25 +70,26 @@ function ImageDropzone({
         ) : (
           <>
             <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
-              <ImageIcon size={20} className="text-muted-foreground" />
+              <ImageIcon size={20} className={error ? "text-destructive" : "text-muted-foreground"} />
             </div>
             <p className="text-sm text-muted-foreground text-center px-4">
               Drop an image or <span className="text-primary font-medium">browse</span>
             </p>
-            <p className="text-xs text-muted-foreground">PNG, JPG, WebP</p>
+            <p className="text-xs text-muted-foreground">PNG, JPG, WebP · max 5 MB</p>
           </>
         )}
         <input
           ref={ref}
           type="file"
-          accept="image/*"
+          accept={ALLOWED_TYPES.join(",")}
           className="hidden"
           onChange={(e) => {
             const f = e.target.files?.[0];
-            if (f) onFile(f);
+            if (f) handleFile(f);
           }}
         />
       </div>
+      {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
   );
 }
