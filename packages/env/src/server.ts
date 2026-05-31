@@ -20,6 +20,8 @@ export const env = createEnv({
     R2_SECRET_ACCESS_KEY: z.string().min(1),
     R2_BUCKET_NAME: z.string().min(1),
     R2_PUBLIC_URL: z.url(),
+    RESEND_API_KEY: z.string().optional(),
+    FROM_EMAIL: z.string().optional(),
   },
   runtimeEnv: process.env,
   emptyStringAsUndefined: true,

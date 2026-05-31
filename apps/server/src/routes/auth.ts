@@ -10,6 +10,10 @@ import {
   findOrCreateGoogleUser,
   buildGoogleAuthUrl,
   exchangeGoogleCode,
+  forgotPassword,
+  resetPassword,
+  sendVerificationEmail,
+  verifyEmail,
 } from "../services/auth";
 
 const router = new Hono();
@@ -94,6 +98,61 @@ router.post(
     return c.body(null, 204);
   },
 );
+
+// ── Password reset ───────────────────────────────────────────────────────────
+
+router.post(
+  "/forgot-password",
+  zValidator("json", z.object({ email: z.string().email() })),
+  async (c) => {
+    const { email } = c.req.valid("json");
+    await forgotPassword(email);
+    // Always return 200 to avoid user-enumeration
+    return c.json({ ok: true });
+  },
+);
+
+router.post(
+  "/reset-password",
+  zValidator("json", z.object({ token: z.string().min(1), password: z.string().min(8) })),
+  async (c) => {
+    const { token, password } = c.req.valid("json");
+    try {
+      await resetPassword(token, password);
+      return c.json({ ok: true });
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "";
+      if (msg === "INVALID_TOKEN") return c.json({ message: "This reset link is invalid or has expired." }, 400);
+      return c.json({ message: "Internal server error" }, 500);
+    }
+  },
+);
+
+// ── Email verification ───────────────────────────────────────────────────────
+
+router.post("/send-verification", async (c) => {
+  const authHeader = c.req.header("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) return c.json({ message: "Unauthorized" }, 401);
+  const { verifyJwt } = await import("../lib/jwt");
+  try {
+    const payload = await verifyJwt(authHeader.slice(7), "access");
+    await sendVerificationEmail(payload.userId);
+    return c.json({ ok: true });
+  } catch {
+    return c.json({ message: "Unauthorized" }, 401);
+  }
+});
+
+router.get("/verify-email", async (c) => {
+  const token = c.req.query("token");
+  if (!token) return c.redirect(`${env.WEB_URL}/auth/verify-email?error=missing`);
+  try {
+    await verifyEmail(token);
+    return c.redirect(`${env.WEB_URL}/auth/verify-email?success=1`);
+  } catch {
+    return c.redirect(`${env.WEB_URL}/auth/verify-email?error=invalid`);
+  }
+});
 
 // ── Google OAuth ─────────────────────────────────────────────────────────────
 // The state param carries an optional "platform" flag so the callback knows

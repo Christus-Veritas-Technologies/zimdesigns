@@ -7,6 +7,7 @@ import {
   refreshTokenExpiry,
 } from "../lib/jwt";
 import { hashPassword, verifyPassword } from "../lib/password";
+import { sendEmail, passwordResetEmail, verificationEmail } from "../lib/email";
 
 export interface AuthTokens {
   accessToken: string;
@@ -180,6 +181,66 @@ async function uniqueUsername(base: string): Promise<string> {
     if (!taken) return candidate;
     candidate = `${base}${++i}`;
   }
+}
+
+// ── Password reset ───────────────────────────────────────────────────────────
+
+export async function forgotPassword(email: string): Promise<void> {
+  const user = await db.user.findUnique({ where: { email: email.toLowerCase().trim() } });
+  if (!user || !user.passwordHash) return; // silently ignore unknown emails or Google-only accounts
+
+  // Invalidate any existing tokens
+  await db.passwordResetToken.deleteMany({ where: { userId: user.id } });
+
+  const token = crypto.randomUUID();
+  const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+  await db.passwordResetToken.create({ data: { token, userId: user.id, expiresAt } });
+
+  const resetUrl = `${env.WEB_URL}/auth/reset-password?token=${token}`;
+  await sendEmail({ ...passwordResetEmail(user.name, resetUrl), to: user.email });
+}
+
+export async function resetPassword(token: string, newPassword: string): Promise<void> {
+  const record = await db.passwordResetToken.findUnique({ where: { token } });
+  if (!record || record.used || record.expiresAt < new Date()) {
+    await db.passwordResetToken.deleteMany({ where: { token } });
+    throw new Error("INVALID_TOKEN");
+  }
+
+  const newHash = await hashPassword(newPassword);
+  await Promise.all([
+    db.user.update({ where: { id: record.userId }, data: { passwordHash: newHash } }),
+    db.passwordResetToken.update({ where: { id: record.id }, data: { used: true } }),
+    db.refreshToken.deleteMany({ where: { userId: record.userId } }),
+  ]);
+}
+
+// ── Email verification ───────────────────────────────────────────────────────
+
+export async function sendVerificationEmail(userId: string): Promise<void> {
+  const user = await db.user.findUniqueOrThrow({ where: { id: userId } });
+  if (user.emailVerified) return;
+
+  await db.emailVerificationToken.deleteMany({ where: { userId } });
+
+  const token = crypto.randomUUID();
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+  await db.emailVerificationToken.create({ data: { token, userId, expiresAt } });
+
+  const verifyUrl = `${env.WEB_URL}/api/auth/verify-email?token=${token}`;
+  // Use the server route for the redirect so we can mark it used before redirecting
+  const serverVerifyUrl = `${env.GOOGLE_CALLBACK_URL.replace("/auth/google/callback", "")}/api/auth/verify-email?token=${token}`;
+  await sendEmail({ ...verificationEmail(user.name, serverVerifyUrl), to: user.email });
+}
+
+export async function verifyEmail(token: string): Promise<void> {
+  const record = await db.emailVerificationToken.findUnique({ where: { token } });
+  if (!record || record.expiresAt < new Date()) throw new Error("INVALID_TOKEN");
+
+  await Promise.all([
+    db.user.update({ where: { id: record.userId }, data: { emailVerified: true } }),
+    db.emailVerificationToken.delete({ where: { id: record.id } }),
+  ]);
 }
 
 // Google OAuth URL builder

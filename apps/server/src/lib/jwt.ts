@@ -65,3 +65,10 @@ export async function verifyRefreshToken(token: string): Promise<RefreshTokenPay
 export function refreshTokenExpiry(): Date {
   return new Date(Date.now() + durationToSeconds(env.JWT_REFRESH_EXPIRES_IN) * 1000);
 }
+
+export async function verifyJwt(token: string, type: "access" | "refresh") {
+  const secret = type === "access" ? env.JWT_ACCESS_SECRET : env.JWT_REFRESH_SECRET;
+  const payload = await verify(token, secret);
+  const userId = (payload as { sub: string }).sub;
+  return { userId };
+}
