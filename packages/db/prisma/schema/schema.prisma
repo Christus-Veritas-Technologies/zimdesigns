@@ -19,6 +19,7 @@ model User {
   avatarUrl          String?
   bio                String?
   role               String?
+  location           String?
   interests          String         @default("[]")
   onboardingComplete Boolean        @default(false)
   emailVerified      Boolean        @default(false)
@@ -28,6 +29,7 @@ model User {
   dribbbleUrl        String?
   twitterUrl         String?
   websiteUrl         String?
+  figmaUrl           String?
   createdAt          DateTime       @default(now())
   updatedAt          DateTime       @updatedAt
 
