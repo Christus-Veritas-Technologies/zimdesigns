@@ -29,8 +29,9 @@ function parseTags(raw: string): string[] {
 
 function sanitize(
   r: { id: string; title: string; appName: string; description: string | null; beforeUrl: string; afterUrl: string; tags: string; upvoteCount: number; createdAt: Date; authorId: string },
-  author: { id: string; name: string; username: string; avatarUrl: string | null },
+  author: { id: string; name: string; username: string; avatarUrl: string | null; role?: string | null },
   hasUpvoted = false,
+  commentCount = 0,
 ) {
   return {
     id: r.id,
@@ -41,8 +42,9 @@ function sanitize(
     afterUrl: r.afterUrl,
     tags: parseTags(r.tags),
     upvoteCount: r.upvoteCount,
+    commentCount,
     createdAt: r.createdAt,
-    author: { id: author.id, name: author.name, username: author.username, avatarUrl: author.avatarUrl },
+    author: { id: author.id, name: author.name, username: author.username, avatarUrl: author.avatarUrl, role: author.role ?? null },
     hasUpvoted,
   };
 }
@@ -56,7 +58,8 @@ export async function listRedesigns(filters: RedesignFilters, viewerId?: string)
     where: filters.tag ? { tags: { contains: filters.tag } } : undefined,
     orderBy: filters.sort === "top" ? { upvoteCount: "desc" } : { createdAt: "desc" },
     include: {
-      author: { select: { id: true, name: true, username: true, avatarUrl: true } },
+      author: { select: { id: true, name: true, username: true, avatarUrl: true, role: true } },
+      _count: { select: { comments: true } },
       ...(viewerId && { upvotes: { where: { userId: viewerId } } }),
     },
   });
@@ -67,7 +70,11 @@ export async function listRedesigns(filters: RedesignFilters, viewerId?: string)
 
   return {
     items: page.map((r) =>
-      sanitize(r, r.author, viewerId ? (r as typeof r & { upvotes: { id: string }[] }).upvotes.length > 0 : false),
+      sanitize(
+        r, r.author,
+        viewerId ? (r as typeof r & { upvotes: { id: string }[] }).upvotes.length > 0 : false,
+        (r as typeof r & { _count: { comments: number } })._count.comments,
+      ),
     ),
     nextCursor,
   };
@@ -77,14 +84,15 @@ export async function getRedesign(id: string, viewerId?: string) {
   const r = await db.redesign.findUniqueOrThrow({
     where: { id },
     include: {
-      author: { select: { id: true, name: true, username: true, avatarUrl: true } },
+      author: { select: { id: true, name: true, username: true, avatarUrl: true, role: true } },
+      _count: { select: { comments: true } },
       ...(viewerId && { upvotes: { where: { userId: viewerId } } }),
     },
   });
   return sanitize(
-    r,
-    r.author,
+    r, r.author,
     viewerId ? (r as typeof r & { upvotes: { id: string }[] }).upvotes.length > 0 : false,
+    (r as typeof r & { _count: { comments: number } })._count.comments,
   );
 }
 
