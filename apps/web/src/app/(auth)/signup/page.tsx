@@ -196,7 +196,7 @@ export default function SignupPage() {
             </div>
             <div className="mt-auto pt-8 flex items-center gap-4">
               <FlagBar width={64} height={5} />
-              <span className="text-xs font-mono tracking-wider text-muted-foreground uppercase">
+              <span className="text-[11.52px] uppercase" style={{ color: "var(--zd-muted-fg)", letterSpacing: "1.6128px" }}>
                 Portfolios are a byproduct. The mission is collective.
               </span>
             </div>
