@@ -112,7 +112,7 @@ function SignupForm({ compact = false }: { compact?: boolean }) {
         <Label htmlFor="username" className="text-[0.84rem] font-semibold">Username</Label>
         {!compact && <span className="text-xs text-muted-foreground -mt-0.5">This is your public portfolio handle.</span>}
         <div className="relative flex items-center">
-          <span className="absolute left-3 text-muted-foreground font-mono text-[0.92rem] pointer-events-none">@</span>
+          <span className="absolute left-3 text-[14.72px] pointer-events-none" style={{ color: "var(--zd-faint-fg)" }}>@</span>
           <Input id="username" placeholder="tinashe" className="pl-7" value={form.username}
             onChange={(e) => setForm((f) => ({ ...f, username: e.target.value }))} required />
         </div>
