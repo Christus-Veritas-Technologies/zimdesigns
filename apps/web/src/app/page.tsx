@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowUp, Plus, Flame, Clock, ChevronDown, Bookmark, BookmarkCheck, Users, LogIn, TrendingUp, ListChecks, ArrowUpToLine } from "lucide-react";
+import { ArrowUp, Plus, Flame, Clock, ChevronDown, Bookmark, BookmarkCheck, Users, LogIn, TrendingUp, ListChecks, ArrowUpToLine, MessageCircle } from "lucide-react";
 import { Button } from "@zimdesigns/ui/components/ui/button";
 import { useRedesigns, useUpvoteRedesign, useDeleteRedesign, type Redesign } from "@/hooks/use-redesigns";
 import { useFollowingFeed } from "@/hooks/use-follows";
@@ -116,12 +116,12 @@ function UpvoteButton({ redesign, onAuthRequired }: { redesign: Redesign; onAuth
       onClick={(e) => { e.preventDefault(); isAuthenticated ? upvote.mutate() : onAuthRequired(); }}
       disabled={upvote.isPending}
       className={cn(
-        "flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl border text-sm font-semibold transition-colors",
+        "flex items-center gap-1 px-2.5 py-1 rounded-full border text-xs font-semibold transition-colors",
         redesign.hasUpvoted ? "border-primary bg-primary/10 text-primary" : "border-border bg-card text-muted-foreground hover:border-primary hover:text-primary",
       )}
     >
-      <ArrowUp size={15} strokeWidth={2.5} />
-      <span className="tabular-nums text-xs">{redesign.upvoteCount}</span>
+      <ArrowUp size={12} strokeWidth={2.5} />
+      <span className="tabular-nums">{redesign.upvoteCount}</span>
     </button>
   );
 }
@@ -135,9 +135,12 @@ function BookmarkButton({ redesignId, onAuthRequired }: { redesignId: string; on
     <button
       onClick={(e) => { e.preventDefault(); isAuthenticated ? bookmark.mutate() : onAuthRequired(); }}
       disabled={bookmark.isPending}
-      className={cn("p-1.5 rounded-lg transition-colors", isBookmarked ? "text-primary" : "text-muted-foreground hover:text-primary")}
+      className={cn(
+        "w-8 h-8 rounded-full border flex items-center justify-center transition-colors flex-none",
+        isBookmarked ? "border-primary bg-primary/10 text-primary" : "border-border bg-card text-muted-foreground hover:border-primary hover:text-primary",
+      )}
     >
-      {isBookmarked ? <BookmarkCheck size={14} strokeWidth={2} /> : <Bookmark size={14} strokeWidth={2} />}
+      {isBookmarked ? <BookmarkCheck size={13} strokeWidth={2} /> : <Bookmark size={13} strokeWidth={2} />}
     </button>
   );
 }
@@ -148,32 +151,43 @@ function RedesignCard({ redesign, onAuthRequired, onTagClick }: { redesign: Rede
     <Link href={`/redesigns/${redesign.id}`} className="group flex flex-col rounded-2xl border border-border bg-card overflow-hidden hover:shadow-md transition-shadow">
       <div className="relative aspect-[4/3] overflow-hidden bg-muted" onMouseEnter={() => setHover("before")} onMouseLeave={() => setHover("after")}>
         <Image src={absoluteUrl(hover === "after" ? redesign.afterUrl : redesign.beforeUrl)} alt={redesign.title} fill className="object-cover transition-all duration-300" unoptimized />
-        <div className="absolute top-2 left-2">
-          <span className="text-[0.7rem] font-semibold px-2 py-0.5 rounded-full bg-black/60 text-white backdrop-blur-sm">{hover === "after" ? "After" : "Before"}</span>
+        {/* Top-left pills */}
+        <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
+          <span className="text-[0.65rem] font-bold px-2 py-0.5 rounded-full bg-[var(--zd-gold)] text-[var(--zd-gold-fg)] tracking-wide uppercase">Redesign</span>
+          <span className="text-[0.65rem] font-semibold px-2 py-0.5 rounded-full bg-black/50 text-white backdrop-blur-sm">{redesign.appName}</span>
         </div>
-        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/50 to-transparent" />
-        <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between">
-          <span className="text-xs font-semibold text-white/90">{redesign.appName}</span>
-          <div className="flex gap-1">
-            {redesign.tags.slice(0, 2).map((t) => (
-              <button
-                key={t}
-                onClick={(e) => { e.preventDefault(); onTagClick?.(t); }}
-                className="text-[0.65rem] px-1.5 py-0.5 rounded-full bg-white/20 text-white hover:bg-white/40 transition-colors"
-              >
-                {t}
-              </button>
-            ))}
+        {/* Before/after label */}
+        <div className="absolute top-2.5 right-2.5">
+          <span className="text-[0.65rem] font-semibold px-2 py-0.5 rounded-full bg-black/40 text-white backdrop-blur-sm">{hover === "after" ? "After" : "Before"}</span>
+        </div>
+        <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/40 to-transparent" />
+      </div>
+      <div className="p-3 flex flex-col gap-2.5">
+        <p className="font-semibold text-sm text-foreground leading-snug line-clamp-2">{redesign.title}</p>
+        <div className="flex items-center justify-between gap-2">
+          {/* Author */}
+          <div className="flex items-center gap-2 min-w-0">
+            <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden flex-none">
+              {redesign.author.avatarUrl ? (
+                <Image src={absoluteUrl(redesign.author.avatarUrl)} alt={redesign.author.name} width={24} height={24} className="object-cover" unoptimized />
+              ) : (
+                <span className="text-[0.6rem] font-bold text-primary">{redesign.author.name.charAt(0).toUpperCase()}</span>
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs font-medium text-foreground truncate leading-none">{redesign.author.name}</p>
+              {redesign.author.role && <p className="text-[0.62rem] text-muted-foreground truncate leading-none mt-0.5">{redesign.author.role}</p>}
+            </div>
+          </div>
+          {/* Stats */}
+          <div className="flex items-center gap-2 flex-none">
+            <span className="flex items-center gap-1 text-xs text-muted-foreground">
+              <MessageCircle size={12} strokeWidth={2} />{redesign.commentCount}
+            </span>
+            <UpvoteButton redesign={redesign} onAuthRequired={onAuthRequired} />
+            <BookmarkButton redesignId={redesign.id} onAuthRequired={onAuthRequired} />
           </div>
         </div>
-      </div>
-      <div className="flex items-start gap-3 p-3">
-        <UpvoteButton redesign={redesign} onAuthRequired={onAuthRequired} />
-        <div className="flex-1 min-w-0">
-          <p className="font-semibold text-sm text-foreground leading-snug truncate">{redesign.title}</p>
-          <p className="text-xs text-muted-foreground mt-0.5">by <span className="font-medium text-foreground">@{redesign.author.username}</span></p>
-        </div>
-        <BookmarkButton redesignId={redesign.id} onAuthRequired={onAuthRequired} />
       </div>
     </Link>
   );
