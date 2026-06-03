@@ -7,6 +7,7 @@ export interface RedesignAuthor {
   name: string;
   username: string;
   avatarUrl: string | null;
+  role: string | null;
 }
 
 export interface Redesign {
@@ -18,6 +19,7 @@ export interface Redesign {
   afterUrl: string;
   tags: string[];
   upvoteCount: number;
+  commentCount: number;
   createdAt: string;
   author: RedesignAuthor;
   hasUpvoted: boolean;
