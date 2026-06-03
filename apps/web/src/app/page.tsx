@@ -225,6 +225,8 @@ function BackToTop() {
   );
 }
 
+const CATEGORIES = ["All", "Banking", "Mobile", "Web", "Local", "E-commerce"];
+
 type Tab = "foryou" | "following";
 type Sort = "recent" | "top";
 
@@ -232,6 +234,7 @@ export default function FeedPage() {
   const [tab, setTab] = useState<Tab>("foryou");
   const [sort, setSort] = useState<Sort>("recent");
   const [tag, setTag] = useState<string | undefined>(undefined);
+  const [category, setCategory] = useState<string>("All");
   const [authModal, setAuthModal] = useState<string | null>(null);
   const isAuthenticated = useIsAuthenticated();
 
@@ -292,6 +295,31 @@ export default function FeedPage() {
       <BackToTop />
       <div className="max-w-6xl mx-auto px-4 py-6 flex gap-8">
         <div className="flex-1 min-w-0">
+          {/* Section heading */}
+          <div className="mb-5">
+            <h2 className="text-[1.35rem] font-bold text-foreground tracking-tight" style={{ fontFamily: "'Bricolage Grotesque', system-ui, sans-serif" }}>
+              Latest redesigns
+            </h2>
+            <p className="text-[0.88rem] text-muted-foreground mt-0.5">Zimbabwe's apps, improved by the community.</p>
+          </div>
+          {/* Category chips */}
+          <div className="flex items-center gap-2 flex-wrap mb-5">
+            {CATEGORIES.map((c) => (
+              <button
+                key={c}
+                onClick={() => setCategory(c)}
+                className={cn(
+                  "px-3.5 py-1.5 rounded-full text-[0.82rem] font-semibold border transition-colors",
+                  category === c
+                    ? "bg-foreground text-background border-foreground"
+                    : "bg-card text-muted-foreground border-border hover:border-foreground hover:text-foreground",
+                )}
+              >
+                {c}
+              </button>
+            ))}
+          </div>
+
           {active.isLoading && <SkeletonGrid />}
 
           {!active.isLoading && redesigns.length === 0 && (
