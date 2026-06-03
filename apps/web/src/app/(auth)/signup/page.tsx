@@ -172,8 +172,8 @@ export default function SignupPage() {
           <div className="relative flex flex-col h-full">
             <Wordmark size={24} />
             <div className="mt-auto max-w-[460px]">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[var(--zd-green)] text-[var(--zd-green)] text-xs font-mono tracking-wider uppercase font-bold">
-                <Flag size={12} /> The redesign movement
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--zd-green)] bg-[var(--zd-green-tint)] text-[var(--zd-green)] text-[11.2px] font-normal tracking-[0.06em] uppercase" style={{ paddingTop: "5px", paddingBottom: "5px", paddingLeft: "11px", paddingRight: "11px" }}>
+                <Flag size={10} /> The redesign movement
               </span>
               <h1 className="mt-5 text-[2.65rem] font-bold leading-[1.08] tracking-tight text-foreground"
                 style={{ fontFamily: "'Bricolage Grotesque', system-ui, sans-serif" }}>
