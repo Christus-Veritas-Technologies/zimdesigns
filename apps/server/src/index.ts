@@ -13,6 +13,7 @@ import bookmarkRoutes from "./routes/bookmarks";
 import appRequestRoutes from "./routes/app-requests";
 import settingsRoutes from "./routes/settings";
 import appEntryRoutes from "./routes/app-entries";
+import discoverRoutes from "./routes/discover";
 
 const app = new Hono();
 
@@ -39,5 +40,6 @@ app.route("/api", bookmarkRoutes);
 app.route("/api", appRequestRoutes);
 app.route("/api", settingsRoutes);
 app.route("/api/apps", appEntryRoutes);
+app.route("/api/discover", discoverRoutes);
 
 export default app;
