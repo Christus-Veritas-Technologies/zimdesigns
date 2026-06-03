@@ -55,8 +55,8 @@ export default function Step2Screen() {
       </View>
 
       <Text
-        className="text-[1.5rem] font-extrabold text-foreground tracking-tight mb-1"
-        style={{ fontFamily: "BricolageGrotesque-ExtraBold" }}
+        className="text-[1.5rem] font-bold text-foreground tracking-tight mb-1"
+        style={{ fontFamily: "BricolageGrotesque-Bold" }}
       >
         What Apps Should We Focus On?
       </Text>
@@ -64,8 +64,9 @@ export default function Step2Screen() {
         Help us understand what needs improving.
       </Text>
 
-      {/* Chips */}
-      <View className="flex-row flex-wrap gap-2.5 mb-3">
+      {/* Chips — 2-column grid */}
+      <View className="mb-3" style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
+
         {INTERESTS.map((item) => {
           const on = selected.includes(item);
           return (
@@ -73,6 +74,7 @@ export default function Step2Screen() {
               key={item}
               onPress={() => toggle(item)}
               activeOpacity={0.7}
+              style={{ width: "47%", flexGrow: 1 }}
               className={`flex-row items-center gap-2 px-3.5 py-2.5 rounded-xl border ${
                 on ? "border-primary bg-accent" : "border-border bg-card"
               }`}
@@ -100,7 +102,7 @@ export default function Step2Screen() {
       {/* Buttons */}
       <View className="gap-3">
         <TouchableOpacity
-          onPress={() => updateInterests.mutate(selected)}
+          onPress={() => updateInterests.mutate(selected, { onSuccess: () => router.push("/(onboarding)/step3") })}
           disabled={updateInterests.isPending}
           className="h-12 rounded-xl bg-primary flex-row-reverse items-center justify-center gap-2"
           activeOpacity={0.85}
@@ -116,7 +118,7 @@ export default function Step2Screen() {
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => updateInterests.mutate(selected)}
+          onPress={() => router.push("/(onboarding)/step3")}
           className="h-11 items-center justify-center"
           activeOpacity={0.7}
         >
