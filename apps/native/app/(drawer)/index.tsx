@@ -7,9 +7,10 @@ import {
   Image,
   ActivityIndicator,
   RefreshControl,
+  ScrollView,
 } from "react-native";
 import { router } from "expo-router";
-import { ArrowUp, Flame, Clock, Plus } from "lucide-react-native";
+import { ArrowUp, Flame, Clock, Plus, MessageCircle } from "lucide-react-native";
 import { useRedesigns, useUpvoteRedesign, type Redesign } from "@/hooks/use-redesigns";
 import { useAuth } from "@/contexts/auth-context";
 import { env } from "@zimdesigns/env/native";
@@ -28,14 +29,20 @@ function UpvoteButton({ redesign }: { redesign: Redesign }) {
       onPress={() => { if (isAuthenticated) upvote.mutate(); }}
       disabled={upvote.isPending}
       activeOpacity={0.7}
-      className={`items-center px-2.5 py-2 rounded-xl border gap-0.5 ${
-        redesign.hasUpvoted
-          ? "border-primary bg-primary/10"
-          : "border-border bg-card"
-      }`}
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 4,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: redesign.hasUpvoted ? "#E8A900" : "#E4E0D8",
+        backgroundColor: redesign.hasUpvoted ? "rgba(232,169,0,0.1)" : "transparent",
+      }}
     >
-      <ArrowUp size={14} color={redesign.hasUpvoted ? "#E8A900" : "#8A8278"} strokeWidth={2.5} />
-      <Text className={`text-xs font-semibold tabular-nums ${redesign.hasUpvoted ? "text-primary" : "text-muted-foreground"}`}>
+      <ArrowUp size={12} color={redesign.hasUpvoted ? "#E8A900" : "#8A8278"} strokeWidth={2.5} />
+      <Text style={{ fontSize: 12, fontWeight: "600", color: redesign.hasUpvoted ? "#E8A900" : "#8A8278" }}>
         {redesign.upvoteCount}
       </Text>
     </TouchableOpacity>
@@ -47,32 +54,56 @@ function RedesignCard({ item }: { item: Redesign }) {
     <TouchableOpacity
       onPress={() => router.push(`/redesigns/${item.id}` as never)}
       activeOpacity={0.9}
-      className="flex-row bg-card border border-border rounded-2xl overflow-hidden mb-3"
+      className="bg-card border border-border rounded-2xl overflow-hidden mb-4"
     >
-      <Image
-        source={{ uri: absoluteUrl(item.afterUrl) }}
-        className="w-24 h-24"
-        resizeMode="cover"
-      />
-      <View className="flex-1 px-3 py-2.5 gap-1">
+      {/* Portrait image */}
+      <View style={{ position: "relative" }}>
+        <Image
+          source={{ uri: absoluteUrl(item.afterUrl) }}
+          style={{ width: "100%", aspectRatio: 4 / 3 }}
+          resizeMode="cover"
+        />
+        {/* Top-left pills */}
+        <View style={{ position: "absolute", top: 10, left: 10, flexDirection: "row", gap: 6, alignItems: "center" }}>
+          <View style={{ backgroundColor: "#E8A900", paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20 }}>
+            <Text style={{ fontSize: 10, fontWeight: "700", color: "#2A2410", textTransform: "uppercase", letterSpacing: 0.5 }}>Redesign</Text>
+          </View>
+          <View style={{ backgroundColor: "rgba(0,0,0,0.5)", paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20 }}>
+            <Text style={{ fontSize: 10, fontWeight: "600", color: "#fff" }}>{item.appName}</Text>
+          </View>
+        </View>
+      </View>
+      {/* Info */}
+      <View style={{ padding: 12, gap: 10 }}>
         <Text className="font-semibold text-foreground text-sm leading-snug" numberOfLines={2}>
           {item.title}
         </Text>
-        <Text className="text-xs text-muted-foreground">
-          {item.appName} · @{item.author.username}
-        </Text>
-        {item.tags.length > 0 && (
-          <View className="flex-row gap-1 flex-wrap mt-0.5">
-            {item.tags.slice(0, 2).map((t) => (
-              <Text key={t} className="text-[0.6rem] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground">
-                {t}
-              </Text>
-            ))}
+        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+          {/* Author */}
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 8, flex: 1, minWidth: 0 }}>
+            <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: "rgba(232,169,0,0.2)", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+              {item.author.avatarUrl ? (
+                <Image source={{ uri: absoluteUrl(item.author.avatarUrl) }} style={{ width: 28, height: 28 }} resizeMode="cover" />
+              ) : (
+                <Text style={{ fontSize: 11, fontWeight: "700", color: "#E8A900" }}>{item.author.name.charAt(0).toUpperCase()}</Text>
+              )}
+            </View>
+            <View style={{ flex: 1, minWidth: 0 }}>
+              <Text style={{ fontSize: 12, fontWeight: "600", color: "inherit" }} numberOfLines={1} className="text-foreground">{item.author.name}</Text>
+              {item.author.role ? (
+                <Text style={{ fontSize: 10 }} numberOfLines={1} className="text-muted-foreground">{item.author.role}</Text>
+              ) : null}
+            </View>
           </View>
-        )}
-      </View>
-      <View className="justify-center pr-3">
-        <UpvoteButton redesign={item} />
+          {/* Stats */}
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+              <MessageCircle size={12} color="#8A8278" />
+              <Text style={{ fontSize: 12, color: "#8A8278" }}>{item.commentCount}</Text>
+            </View>
+            <UpvoteButton redesign={item} />
+          </View>
+        </View>
       </View>
     </TouchableOpacity>
   );
