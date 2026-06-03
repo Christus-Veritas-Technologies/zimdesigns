@@ -20,7 +20,7 @@ export default function Step3Page() {
         </div>
 
         <h1
-          className="mt-6 text-[1.9rem] font-extrabold tracking-tight leading-[1.15]"
+          className="mt-6 text-[1.9rem] font-bold tracking-tight leading-[1.15]"
           style={{ fontFamily: "'Bricolage Grotesque', system-ui, sans-serif" }}
         >
           You&apos;re In. Now Let&apos;s Build Something Better.
