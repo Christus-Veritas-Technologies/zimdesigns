@@ -35,15 +35,12 @@ export default function Step2Page() {
     <div className="flex items-center justify-center py-10 px-4">
       <div className="w-full max-w-[540px] bg-card border border-border rounded-2xl shadow-md p-8">
         {/* Progress */}
-        <div className="flex items-center gap-3 mb-6">
-          <StepsBar current={2} className="flex-1" />
-          <span className="text-xs font-mono text-muted-foreground tracking-wider uppercase whitespace-nowrap">
-            Step 2 of 3
-          </span>
+        <div className="mb-6">
+          <StepsBar current={2} />
         </div>
 
         <h1
-          className="text-[1.7rem] font-extrabold tracking-tight leading-tight mb-1"
+          className="text-[1.7rem] font-bold tracking-tight leading-tight mb-1"
           style={{ fontFamily: "'Bricolage Grotesque', system-ui, sans-serif" }}
         >
           What Apps Should We Focus On?
@@ -53,7 +50,7 @@ export default function Step2Page() {
         </p>
 
         {/* Chips */}
-        <div className="flex flex-wrap gap-2.5 mb-3">
+        <div className="grid grid-cols-2 gap-2.5 mb-3">
           {INTERESTS.map((item) => {
             const on = selected.includes(item);
             return (
