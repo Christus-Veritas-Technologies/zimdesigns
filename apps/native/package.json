@@ -22,7 +22,7 @@
     "dotenv": "catalog:",
     "expo": "~56.0.3",
     "expo-constants": "~56.0.14",
-    "expo-device": "~7.2.0",
+    "expo-device": "~56.0.4",
     "expo-font": "~56.0.5",
     "expo-notifications": "~0.30.0",
     "expo-haptics": "~56.0.3",
