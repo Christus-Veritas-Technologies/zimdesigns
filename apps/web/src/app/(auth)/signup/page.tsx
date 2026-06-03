@@ -90,9 +90,9 @@ function SignupForm({ compact = false }: { compact?: boolean }) {
     >
       <GoogleButton />
 
-      <div className="flex items-center gap-3 text-muted-foreground">
+      <div className="flex items-center gap-3" style={{ color: "var(--zd-faint-fg)" }}>
         <span className="flex-1 h-px bg-border" />
-        <span className="text-xs font-mono tracking-wider uppercase">or</span>
+        <span className="text-[12.48px] tracking-[0.08em] uppercase">OR</span>
         <span className="flex-1 h-px bg-border" />
       </div>
 
