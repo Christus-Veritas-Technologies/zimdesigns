@@ -48,6 +48,21 @@ model User {
 }
 
 
+model AppEntry {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  iconColor   String   @default("#E8A900")
+  iconLetter  String
+  description String?
+  tags        String   @default("[]")
+  brokenItems String   @default("[]")
+  screenshotUrl String?
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 model Redesign {
   id          String   @id @default(cuid())
   title       String
