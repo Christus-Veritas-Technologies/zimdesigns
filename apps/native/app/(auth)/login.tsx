@@ -15,7 +15,6 @@ import { Eye, EyeOff, ArrowRight } from "lucide-react-native";
 import { env } from "@zimdesigns/env/native";
 import { Wordmark } from "@/components/brand/wordmark";
 import { FlagBar } from "@/components/brand/flag-bar";
-import { FloatingImages } from "@/components/floating-images";
 import { useLogin } from "@/hooks/use-auth";
 
 export default function LoginScreen() {
@@ -38,7 +37,6 @@ export default function LoginScreen() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       className="flex-1 bg-background"
     >
-      <FloatingImages />
       <ScrollView
         contentContainerClassName="px-6 pt-14 pb-8 flex-grow"
         keyboardShouldPersistTaps="handled"
