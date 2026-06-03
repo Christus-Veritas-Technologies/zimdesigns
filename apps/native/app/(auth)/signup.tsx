@@ -161,7 +161,8 @@ export default function SignupScreen() {
         <TouchableOpacity
           onPress={() => signup.mutate(form)}
           disabled={signup.isPending}
-          className="h-12 mt-5 rounded-xl bg-primary flex-row-reverse items-center justify-center gap-2"
+          className="mt-5 rounded-xl bg-primary flex-row-reverse items-center justify-center gap-2"
+          style={{ height: 50 }}
           activeOpacity={0.85}
         >
           {signup.isPending
