@@ -180,7 +180,7 @@ export default function SignupPage() {
                 style={{ fontFamily: "'Bricolage Grotesque', system-ui, sans-serif" }}>
                 Redesign Zimbabwe's apps.
               </h1>
-              <p className="mt-4 text-[1.08rem] text-muted-foreground leading-[1.55] max-w-[400px]">{MISSION}</p>
+              <p className="mt-1.5 text-[0.98rem] text-muted-foreground leading-[1.5] max-w-[400px]">{MISSION}</p>
             </div>
             {/* Abstract app cards */}
             <div className="relative mt-10 h-[210px]">
