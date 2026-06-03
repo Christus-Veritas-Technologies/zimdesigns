@@ -175,7 +175,7 @@ export default function SignupPage() {
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[var(--zd-green)] text-[var(--zd-green)] text-xs font-mono tracking-wider uppercase font-bold">
                 <Flag size={12} /> The redesign movement
               </span>
-              <h1 className="mt-5 text-[2.65rem] font-extrabold leading-[1.08] tracking-tight text-foreground"
+              <h1 className="mt-5 text-[2.65rem] font-bold leading-[1.08] tracking-tight text-foreground"
                 style={{ fontFamily: "'Bricolage Grotesque', system-ui, sans-serif" }}>
                 Redesign Zimbabwe's apps.
               </h1>
@@ -230,7 +230,7 @@ export default function SignupPage() {
           <FlagBar width={40} height={4} />
         </div>
         <div className="mt-6">
-          <h1 className="text-[1.65rem] font-extrabold tracking-tight leading-tight"
+          <h1 className="text-[1.65rem] font-bold tracking-tight leading-tight"
             style={{ fontFamily: "'Bricolage Grotesque', system-ui, sans-serif" }}>
             Redesign Zimbabwe's apps.
           </h1>
