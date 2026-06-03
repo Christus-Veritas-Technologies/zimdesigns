@@ -27,17 +27,17 @@ function AppCard({ accent = "gold", rotate = 0 }: { accent?: "gold" | "green"; r
         <span className="flex-1 bg-muted" />
       </div>
       <div className="p-3 flex flex-col gap-2 flex-1">
-        <div className="h-2 w-3/5 rounded bg-muted" />
-        <div className="h-8 rounded-lg bg-muted/70" />
+        <div className="h-2 w-3/5 rounded" style={{ background: "var(--zd-mock-a)" }} />
+        <div className="h-8 rounded-lg" style={{ background: "var(--zd-mock-b)" }} />
         {[85, 70, 55].map((w, i) => (
-          <div key={i} className="h-1.5 rounded bg-muted" style={{ width: `${w}%` }} />
+          <div key={i} className="h-1.5 rounded" style={{ width: `${w}%`, background: "var(--zd-mock-a)" }} />
         ))}
         <div className="mt-auto pt-2 flex gap-1.5">
           {[0, 1, 2, 3].map((i) => (
             <div
               key={i}
               className="flex-1 h-3 rounded"
-              style={{ background: i === 0 ? topColor : "var(--zd-bg-alt, var(--muted))" }}
+              style={{ background: i === 0 ? topColor : "var(--zd-mock-a)" }}
             />
           ))}
         </div>
