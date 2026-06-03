@@ -49,7 +49,7 @@ export default function LoginScreen() {
         </View>
 
         <Text
-          className="text-[1.65rem] font-extrabold text-foreground tracking-tight leading-tight mb-2"
+          className="text-[1.65rem] font-bold text-foreground tracking-tight leading-tight mb-2"
           style={{ fontFamily: "BricolageGrotesque-ExtraBold" }}
         >
           Welcome back.
