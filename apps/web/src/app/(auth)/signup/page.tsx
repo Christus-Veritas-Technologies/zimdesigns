@@ -139,7 +139,8 @@ function SignupForm({ compact = false }: { compact?: boolean }) {
       )}
 
       <Button type="submit" disabled={signup.isPending}
-        className="h-12 text-base font-semibold bg-[var(--zd-gold)] hover:bg-[var(--zd-gold-hover)] text-[var(--zd-gold-fg)] rounded-xl mt-1 flex flex-row-reverse items-center gap-2">
+        className="text-base bg-[var(--zd-gold)] hover:bg-[var(--zd-gold-hover)] text-[var(--zd-gold-fg)] rounded-xl mt-1 flex flex-row-reverse items-center gap-2"
+        style={{ height: 50, fontWeight: 650 }}>
         <ArrowRight size={18} />
         {signup.isPending ? "Creating account…" : "Create account"}
       </Button>
