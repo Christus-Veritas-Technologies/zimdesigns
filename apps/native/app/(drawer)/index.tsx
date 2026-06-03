@@ -109,10 +109,13 @@ function RedesignCard({ item }: { item: Redesign }) {
   );
 }
 
+const CATEGORIES = ["All", "Banking", "Mobile", "Web", "Local", "E-commerce"];
+
 type Sort = "recent" | "top";
 
 export default function FeedScreen() {
   const [sort, setSort] = useState<Sort>("recent");
+  const [category, setCategory] = useState("All");
   const {
     data,
     fetchNextPage,
@@ -131,29 +134,54 @@ export default function FeedScreen() {
 
   return (
     <View className="flex-1 bg-background">
-      {/* Sort bar */}
-      <View className="flex-row items-center px-4 py-2.5 gap-2 border-b border-border bg-background">
-        <TouchableOpacity
-          onPress={() => setSort("recent")}
-          activeOpacity={0.7}
-          className={`flex-row items-center gap-1.5 px-3 py-1.5 rounded-lg ${sort === "recent" ? "bg-accent" : ""}`}
-        >
-          <Clock size={13} color={sort === "recent" ? "#2A2410" : "#8A8278"} />
-          <Text className={`text-sm font-medium ${sort === "recent" ? "text-foreground" : "text-muted-foreground"}`}>
-            Recent
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => setSort("top")}
-          activeOpacity={0.7}
-          className={`flex-row items-center gap-1.5 px-3 py-1.5 rounded-lg ${sort === "top" ? "bg-accent" : ""}`}
-        >
-          <Flame size={13} color={sort === "top" ? "#2A2410" : "#8A8278"} />
-          <Text className={`text-sm font-medium ${sort === "top" ? "text-foreground" : "text-muted-foreground"}`}>
-            Top
-          </Text>
-        </TouchableOpacity>
+      {/* Filter bar */}
+      <View className="border-b border-border bg-background">
+        {/* Sort tabs */}
+        <View className="flex-row items-center px-4 pt-2.5 pb-2 gap-2">
+          <TouchableOpacity
+            onPress={() => setSort("recent")}
+            activeOpacity={0.7}
+            className={`flex-row items-center gap-1.5 px-3 py-1.5 rounded-lg ${sort === "recent" ? "bg-accent" : ""}`}
+          >
+            <Clock size={13} color={sort === "recent" ? "#2A2410" : "#8A8278"} />
+            <Text className={`text-sm font-medium ${sort === "recent" ? "text-foreground" : "text-muted-foreground"}`}>
+              Recent
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setSort("top")}
+            activeOpacity={0.7}
+            className={`flex-row items-center gap-1.5 px-3 py-1.5 rounded-lg ${sort === "top" ? "bg-accent" : ""}`}
+          >
+            <Flame size={13} color={sort === "top" ? "#2A2410" : "#8A8278"} />
+            <Text className={`text-sm font-medium ${sort === "top" ? "text-foreground" : "text-muted-foreground"}`}>
+              Top
+            </Text>
+          </TouchableOpacity>
+        </View>
+        {/* Category chips */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 10, gap: 8 }}>
+          {CATEGORIES.map((c) => (
+            <TouchableOpacity
+              key={c}
+              onPress={() => setCategory(c)}
+              activeOpacity={0.7}
+              style={{
+                paddingHorizontal: 14,
+                paddingVertical: 6,
+                borderRadius: 20,
+                borderWidth: 1,
+                borderColor: category === c ? "#1A1A1A" : "#E4E0D8",
+                backgroundColor: category === c ? "#1A1A1A" : "transparent",
+                marginRight: 0,
+              }}
+            >
+              <Text style={{ fontSize: 13, fontWeight: "600", color: category === c ? "#fff" : "#8A8278" }}>
+                {c}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
       </View>
 
       {isLoading && (
