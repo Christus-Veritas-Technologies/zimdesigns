@@ -45,6 +45,7 @@ model User {
   appRequestVotes         AppRequestVote[]
   passwordResetTokens     PasswordResetToken[]
   emailVerificationTokens EmailVerificationToken[]
+  collections             Collection[]
 }
 
 
@@ -64,22 +65,68 @@ model AppEntry {
 }
 
 model Redesign {
-  id          String   @id @default(cuid())
-  title       String
-  appName     String
-  description String?
-  beforeUrl   String
-  afterUrl    String
-  authorId    String
-  tags        String   @default("[]")
-  upvoteCount Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String   @id @default(cuid())
+  title        String
+  appName      String
+  description  String?
+  beforeUrl    String
+  afterUrl     String
+  screenshots  String   @default("[]")
+  figmaUrl     String?
+  githubUrl    String?
+  prototypeUrl String?
+  authorId     String
+  tags         String   @default("[]")
+  upvoteCount  Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  upvotes     Upvote[]
-  comments    Comment[]
-  bookmarks   Bookmark[]
+  author          User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  upvotes         Upvote[]
+  comments        Comment[]
+  bookmarks       Bookmark[]
+  collectionItems CollectionItem[]
+}
+
+model Collection {
+  id           String   @id @default(cuid())
+  title        String
+  description  String?
+  coverImageUrl String?
+  curatorId    String
+  isFeatured   Boolean  @default(false)
+  isPublished  Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  curator      User     @relation(fields: [curatorId], references: [id], onDelete: Cascade)
+  items        CollectionItem[]
+}
+
+model CollectionItem {
+  id           String     @id @default(cuid())
+  collectionId String
+  redesignId   String
+  order        Int        @default(0)
+  createdAt    DateTime   @default(now())
+
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  redesign     Redesign   @relation(fields: [redesignId], references: [id], onDelete: Cascade)
+
+  @@unique([collectionId, redesignId])
+}
+
+model Challenge {
+  id             String   @id @default(cuid())
+  title          String
+  slug           String   @unique
+  description    String?
+  gradientFrom   String   @default("#E8A900")
+  gradientTo     String   @default("#FF6B35")
+  appName        String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
 

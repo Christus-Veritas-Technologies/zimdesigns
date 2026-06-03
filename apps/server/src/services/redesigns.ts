@@ -9,10 +9,17 @@ export interface RedesignInput {
   tags: string[];
   beforeFile: File;
   afterFile: File;
+  screenshotFiles?: File[];
+  figmaUrl?: string;
+  githubUrl?: string;
+  prototypeUrl?: string;
 }
 
 export interface RedesignFilters {
   tag?: string;
+  category?: string;
+  appName?: string;
+  role?: string;
   sort?: "recent" | "top";
   cursor?: string;
   limit?: number;
@@ -28,7 +35,7 @@ function parseTags(raw: string): string[] {
 }
 
 function sanitize(
-  r: { id: string; title: string; appName: string; description: string | null; beforeUrl: string; afterUrl: string; tags: string; upvoteCount: number; createdAt: Date; authorId: string },
+  r: { id: string; title: string; appName: string; description: string | null; beforeUrl: string; afterUrl: string; screenshots?: string; figmaUrl?: string | null; githubUrl?: string | null; prototypeUrl?: string | null; tags: string; upvoteCount: number; createdAt: Date; authorId: string },
   author: { id: string; name: string; username: string; avatarUrl: string | null; role?: string | null },
   hasUpvoted = false,
   commentCount = 0,
@@ -40,6 +47,10 @@ function sanitize(
     description: r.description,
     beforeUrl: r.beforeUrl,
     afterUrl: r.afterUrl,
+    screenshots: parseTags(r.screenshots ?? "[]"),
+    figmaUrl: r.figmaUrl ?? null,
+    githubUrl: r.githubUrl ?? null,
+    prototypeUrl: r.prototypeUrl ?? null,
     tags: parseTags(r.tags),
     upvoteCount: r.upvoteCount,
     commentCount,
@@ -52,10 +63,16 @@ function sanitize(
 export async function listRedesigns(filters: RedesignFilters, viewerId?: string) {
   const limit = Math.min(filters.limit ?? 20, 50);
 
+  const where: Record<string, unknown> = {};
+  if (filters.tag) where.tags = { contains: filters.tag };
+  if (filters.category) where.tags = { contains: filters.category };
+  if (filters.appName) where.appName = { equals: filters.appName, mode: "insensitive" };
+  if (filters.role) where.author = { role: filters.role };
+
   const items = await db.redesign.findMany({
     take: limit + 1,
     ...(filters.cursor && { skip: 1, cursor: { id: filters.cursor } }),
-    where: filters.tag ? { tags: { contains: filters.tag } } : undefined,
+    where: Object.keys(where).length > 0 ? where : undefined,
     orderBy: filters.sort === "top" ? { upvoteCount: "desc" } : { createdAt: "desc" },
     include: {
       author: { select: { id: true, name: true, username: true, avatarUrl: true, role: true } },
@@ -97,10 +114,12 @@ export async function getRedesign(id: string, viewerId?: string) {
 }
 
 export async function createRedesign(authorId: string, input: RedesignInput) {
-  const [beforeUrl, afterUrl] = await Promise.all([
+  const uploads: Promise<string>[] = [
     uploadToR2(input.beforeFile, "redesigns/before"),
     uploadToR2(input.afterFile, "redesigns/after"),
-  ]);
+    ...(input.screenshotFiles ?? []).map((f) => uploadToR2(f, "redesigns/screenshots")),
+  ];
+  const [beforeUrl, afterUrl, ...screenshotUrls] = await Promise.all(uploads);
 
   const r = await db.redesign.create({
     data: {
@@ -110,6 +129,10 @@ export async function createRedesign(authorId: string, input: RedesignInput) {
       tags: JSON.stringify(input.tags),
       beforeUrl,
       afterUrl,
+      screenshots: JSON.stringify(screenshotUrls),
+      figmaUrl: input.figmaUrl?.trim() || null,
+      githubUrl: input.githubUrl?.trim() || null,
+      prototypeUrl: input.prototypeUrl?.trim() || null,
       authorId,
     },
     include: {

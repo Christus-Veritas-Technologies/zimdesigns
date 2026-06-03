@@ -19,6 +19,10 @@ export interface Redesign {
   description: string | null;
   beforeUrl: string;
   afterUrl: string;
+  screenshots: string[];
+  figmaUrl: string | null;
+  githubUrl: string | null;
+  prototypeUrl: string | null;
   tags: string[];
   upvoteCount: number;
   commentCount: number;
@@ -27,12 +31,20 @@ export interface Redesign {
   hasUpvoted: boolean;
 }
 
+export interface RedesignFilters {
+  tag?: string;
+  category?: string;
+  appName?: string;
+  role?: string;
+  sort?: "recent" | "top";
+}
+
 interface ListResult {
   items: Redesign[];
   nextCursor?: string;
 }
 
-export function useRedesigns(params?: { tag?: string; sort?: "recent" | "top" }) {
+export function useRedesigns(params?: RedesignFilters) {
   return useInfiniteQuery<ListResult>({
     queryKey: ["redesigns", params],
     queryFn: ({ pageParam }) =>
