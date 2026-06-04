@@ -68,8 +68,9 @@ export default function ForgotPasswordPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               autoFocus
+              disabled={request.isPending}
               placeholder="you@example.com"
-              className="mt-1 w-full px-3 py-2.5 rounded-xl border border-border bg-card text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="mt-1 w-full px-3 py-2.5 rounded-xl border border-border bg-card text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-60"
             />
           </div>
 
