@@ -48,7 +48,7 @@ export default function TrendingPage() {
             )}
 
             {data?.topRedesigns && data.topRedesigns.length === 0 && (
-              <p className="text-sm text-muted-foreground">No redesigns this week yet.</p>
+              <p className="text-sm text-muted-foreground">No trending redesigns this week...yet</p>
             )}
 
             {data?.topRedesigns && data.topRedesigns.length > 0 && (
@@ -93,7 +93,7 @@ export default function TrendingPage() {
             )}
 
             {data?.topDesigners && data.topDesigners.length === 0 && (
-              <p className="text-sm text-muted-foreground">No designers yet.</p>
+              <p className="text-sm text-muted-foreground">No top designers...yet</p>
             )}
 
             {data?.topDesigners && data.topDesigners.length > 0 && (
