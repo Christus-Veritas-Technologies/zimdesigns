@@ -89,7 +89,8 @@ export default function SettingsPage() {
                   type={showCurrent ? "text" : "password"}
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
-                  className="w-full px-3 py-2 pr-10 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  disabled={changePassword.isPending}
+                  className="w-full px-3 py-2 pr-10 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-60"
                   placeholder="••••••••"
                 />
                 <button
@@ -108,7 +109,8 @@ export default function SettingsPage() {
                   type={showNew ? "text" : "password"}
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full px-3 py-2 pr-10 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  disabled={changePassword.isPending}
+                  className="w-full px-3 py-2 pr-10 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-60"
                   placeholder="Min. 8 characters"
                 />
                 <button
@@ -154,7 +156,8 @@ export default function SettingsPage() {
               <input
                 value={deleteConfirm}
                 onChange={(e) => setDeleteConfirm(e.target.value)}
-                className="mt-1 w-full px-3 py-2 rounded-xl border border-destructive/30 bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-destructive/30"
+                disabled={deleteAccount.isPending}
+                className="mt-1 w-full px-3 py-2 rounded-xl border border-destructive/30 bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-destructive/30 disabled:opacity-60"
                 placeholder="delete my account"
               />
             </div>
