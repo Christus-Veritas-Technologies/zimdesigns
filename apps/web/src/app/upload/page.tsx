@@ -289,7 +289,8 @@ export default function UploadPage() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   maxLength={120}
-                  className="h-11 px-3.5 rounded-xl border border-input bg-card text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  disabled={create.isPending}
+                  className="h-11 px-3.5 rounded-xl border border-input bg-card text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60"
                 />
               </div>
 
@@ -305,7 +306,8 @@ export default function UploadPage() {
                   onChange={(e) => setDescription(e.target.value)}
                   maxLength={500}
                   rows={4}
-                  className="px-3.5 py-3 rounded-xl border border-input bg-card text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none"
+                  disabled={create.isPending}
+                  className="px-3.5 py-3 rounded-xl border border-input bg-card text-sm focus:outline-none focus:ring-2 focus:ring-ring resize-none disabled:opacity-60"
                 />
               </div>
             </section>
@@ -321,8 +323,9 @@ export default function UploadPage() {
                       key={c}
                       type="button"
                       onClick={() => toggleCategory(c)}
+                      disabled={create.isPending}
                       className={cn(
-                        "flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-sm font-medium transition-colors",
+                        "flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-sm font-medium transition-colors disabled:opacity-60 disabled:cursor-not-allowed",
                         on ? "border-primary bg-primary/10 text-primary" : "border-border bg-card text-foreground hover:border-primary/50",
                       )}
                     >
@@ -354,7 +357,8 @@ export default function UploadPage() {
                       placeholder={placeholder}
                       value={value}
                       onChange={(e) => set(e.target.value)}
-                      className="flex-1 h-9 px-3 rounded-xl border border-input bg-card text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                      disabled={create.isPending}
+                      className="flex-1 h-9 px-3 rounded-xl border border-input bg-card text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60"
                     />
                   </div>
                 ))}
