@@ -46,18 +46,22 @@ function AppCard({ accent = "gold", rotate = 0 }: { accent?: "gold" | "green"; r
   );
 }
 
-function GoogleButton() {
+function GoogleButton({ disabled }: { disabled?: boolean }) {
+  const [isLoading, setIsLoading] = useState(false);
   const handleGoogleAuth = () => {
+    setIsLoading(true);
     window.location.href = `${env.NEXT_PUBLIC_SERVER_URL}/api/auth/google`;
   };
+  const busy = isLoading || disabled;
   return (
     <button
       type="button"
       onClick={handleGoogleAuth}
-      className="w-full h-11 flex items-center justify-center gap-3 rounded-xl border border-border bg-card hover:bg-muted transition-colors font-semibold text-[0.95rem] text-foreground cursor-pointer"
+      disabled={busy}
+      className="w-full h-11 flex items-center justify-center gap-3 rounded-xl border border-border bg-card hover:bg-muted transition-colors font-semibold text-[0.95rem] text-foreground cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
     >
-      <GoogleIcon />
-      Continue with Google
+      {isLoading ? <span className="w-4 h-4 rounded-full border-2 border-foreground/30 border-t-foreground animate-spin" /> : <GoogleIcon />}
+      {isLoading ? "Redirecting…" : "Continue with Google"}
     </button>
   );
 }
@@ -88,7 +92,7 @@ function SignupForm({ compact = false }: { compact?: boolean }) {
         signup.mutate(form);
       }}
     >
-      <GoogleButton />
+      <GoogleButton disabled={signup.isPending} />
 
       <div className="flex items-center gap-3" style={{ color: "var(--zd-faint-fg)" }}>
         <span className="flex-1 h-px bg-border" />
@@ -99,13 +103,13 @@ function SignupForm({ compact = false }: { compact?: boolean }) {
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="name" className="text-[0.84rem] font-semibold">Full name</Label>
         <Input id="name" placeholder="Tinashe Moyo" value={form.name}
-          onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} required />
+          onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} required disabled={signup.isPending} />
       </div>
 
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="email" className="text-[0.84rem] font-semibold">Email</Label>
         <Input id="email" type="email" placeholder="you@email.com" value={form.email}
-          onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} required />
+          onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} required disabled={signup.isPending} />
       </div>
 
       <div className="flex flex-col gap-1.5">
@@ -114,7 +118,7 @@ function SignupForm({ compact = false }: { compact?: boolean }) {
         <div className="relative flex items-center">
           <span className="absolute left-3 text-[14.72px] pointer-events-none" style={{ color: "var(--zd-faint-fg)" }}>@</span>
           <Input id="username" placeholder="tinashe" className="pl-7" value={form.username}
-            onChange={(e) => setForm((f) => ({ ...f, username: e.target.value }))} required />
+            onChange={(e) => setForm((f) => ({ ...f, username: e.target.value }))} required disabled={signup.isPending} />
         </div>
       </div>
 
@@ -123,7 +127,7 @@ function SignupForm({ compact = false }: { compact?: boolean }) {
         <div className="relative flex items-center">
           <Input id="password" type={showPw ? "text" : "password"} placeholder="Create a password"
             className="pr-10" value={form.password}
-            onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))} required minLength={8} />
+            onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))} required minLength={8} disabled={signup.isPending} />
           <button type="button" onClick={() => setShowPw((v) => !v)}
             className="absolute right-3 text-muted-foreground hover:text-foreground transition-colors"
             aria-label={showPw ? "Hide password" : "Show password"}>
