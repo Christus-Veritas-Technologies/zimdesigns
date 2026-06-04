@@ -106,7 +106,8 @@ export default function Step1Page() {
           <div className="flex flex-col gap-1.5">
             <Label className="text-[0.84rem] font-semibold">Full name</Label>
             <Input placeholder="Tinashe Moyo" value={form.name}
-              onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} required />
+              onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} required
+              disabled={updateProfile.isPending} />
           </div>
 
           {/* Username */}
@@ -116,7 +117,8 @@ export default function Step1Page() {
             <div className="relative flex items-center">
               <span className="absolute left-3 font-mono text-[0.92rem] text-muted-foreground pointer-events-none">@</span>
               <Input placeholder="tinashe" className="pl-7" value={form.username}
-                onChange={(e) => setForm((f) => ({ ...f, username: e.target.value }))} required />
+                onChange={(e) => setForm((f) => ({ ...f, username: e.target.value }))} required
+                disabled={updateProfile.isPending} />
             </div>
           </div>
 
@@ -132,7 +134,8 @@ export default function Step1Page() {
               placeholder="Designer focused on fixing everyday Zimbabwean apps."
               value={form.bio}
               onChange={(e) => setForm((f) => ({ ...f, bio: e.target.value }))}
-              className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[var(--zd-ring)] focus:border-[var(--zd-gold)] transition-colors"
+              disabled={updateProfile.isPending}
+              className="w-full rounded-xl border border-input bg-background px-3 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[var(--zd-ring)] focus:border-[var(--zd-gold)] transition-colors disabled:opacity-60"
             />
           </div>
 
