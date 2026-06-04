@@ -158,6 +158,7 @@ export default function UploadScreen() {
             value={title}
             onChangeText={setTitle}
             maxLength={120}
+            editable={!create.isPending}
           />
         </View>
 
@@ -174,6 +175,7 @@ export default function UploadScreen() {
             value={appName}
             onChangeText={setAppName}
             maxLength={60}
+            editable={!create.isPending}
           />
         </View>
 
@@ -193,6 +195,7 @@ export default function UploadScreen() {
             multiline
             numberOfLines={4}
             textAlignVertical="top"
+            editable={!create.isPending}
             style={{ minHeight: 90 }}
           />
         </View>
@@ -207,6 +210,7 @@ export default function UploadScreen() {
                 <TouchableOpacity
                   key={t}
                   onPress={() => toggleTag(t)}
+                  disabled={create.isPending}
                   activeOpacity={0.7}
                   className={`flex-row items-center gap-1.5 px-3 py-2 rounded-xl border ${
                     on ? "border-primary bg-primary/10" : "border-border bg-card"
