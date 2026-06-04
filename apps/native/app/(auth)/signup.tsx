@@ -17,25 +17,33 @@ import { Wordmark } from "@/components/brand/wordmark";
 import { FlagBar } from "@/components/brand/flag-bar";
 import { useSignup } from "@/hooks/use-auth";
 
-function GoogleButton() {
+function GoogleButton({ disabled }: { disabled?: boolean }) {
+  const [isLoading, setIsLoading] = useState(false);
   const handlePress = async () => {
-    // Opens external browser — on callback the server redirects to web's
-    // /auth/native-callback which fires the zimdesigns:// deep link
-    await WebBrowser.openAuthSessionAsync(
-      `${env.EXPO_PUBLIC_SERVER_URL}/api/auth/google?platform=native`,
-      "zimdesigns://auth/callback",
-    );
-    // The deep link is handled by app/auth/callback.tsx — nothing to do here
+    setIsLoading(true);
+    try {
+      await WebBrowser.openAuthSessionAsync(
+        `${env.EXPO_PUBLIC_SERVER_URL}/api/auth/google?platform=native`,
+        "zimdesigns://auth/callback",
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
+  const busy = isLoading || disabled;
 
   return (
     <TouchableOpacity
       onPress={handlePress}
+      disabled={busy}
       className="w-full h-12 flex-row items-center justify-center gap-3 rounded-xl border border-border bg-card"
       activeOpacity={0.7}
+      style={{ opacity: busy ? 0.6 : 1 }}
     >
-      {/* Google G logo */}
-      <Text className="text-base font-semibold text-foreground">Continue with Google</Text>
+      {isLoading ? <ActivityIndicator size="small" color="#8A8278" /> : null}
+      <Text className="text-base font-semibold text-foreground">
+        {isLoading ? "Opening browser…" : "Continue with Google"}
+      </Text>
     </TouchableOpacity>
   );
 }
@@ -76,7 +84,7 @@ export default function SignupScreen() {
         </Text>
 
         {/* Google */}
-        <GoogleButton />
+        <GoogleButton disabled={signup.isPending} />
 
         {/* Divider */}
         <View className="flex-row items-center gap-3 my-5">
@@ -96,6 +104,7 @@ export default function SignupScreen() {
               value={form.name}
               onChangeText={(v) => setForm((f) => ({ ...f, name: v }))}
               autoCapitalize="words"
+              editable={!signup.isPending}
             />
           </View>
 
@@ -109,6 +118,7 @@ export default function SignupScreen() {
               onChangeText={(v) => setForm((f) => ({ ...f, email: v }))}
               keyboardType="email-address"
               autoCapitalize="none"
+              editable={!signup.isPending}
             />
           </View>
 
@@ -123,6 +133,7 @@ export default function SignupScreen() {
                 value={form.username}
                 onChangeText={(v) => setForm((f) => ({ ...f, username: v }))}
                 autoCapitalize="none"
+                editable={!signup.isPending}
               />
             </View>
           </View>
@@ -138,6 +149,7 @@ export default function SignupScreen() {
                 onChangeText={(v) => setForm((f) => ({ ...f, password: v }))}
                 secureTextEntry={!showPw}
                 autoCapitalize="none"
+                editable={!signup.isPending}
               />
               <TouchableOpacity
                 onPress={() => setShowPw((v) => !v)}
