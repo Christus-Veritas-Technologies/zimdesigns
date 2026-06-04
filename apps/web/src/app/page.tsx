@@ -19,7 +19,7 @@ function absoluteUrlSidebar(url: string) {
 }
 
 function Sidebar() {
-  const { data } = useTrending();
+  const { data, isLoading } = useTrending();
   return (
     <aside className="hidden xl:block w-64 flex-none">
       <div className="sticky top-20 space-y-4">
@@ -28,6 +28,10 @@ function Sidebar() {
           <Link href="/trending" className="flex items-center gap-2 font-semibold text-sm text-foreground hover:text-primary transition-colors mb-3">
             <TrendingUp size={14} className="text-primary" /> Trending this week
           </Link>
+          {isLoading && <div className="space-y-2">{[1,2,3].map(i => <div key={i} className="h-7 bg-muted rounded animate-pulse" />)}</div>}
+          {!isLoading && data?.topRedesigns?.length === 0 && (
+            <p className="text-xs text-muted-foreground">No trending redesigns this week...yet</p>
+          )}
           {data?.topRedesigns?.slice(0, 5).map((r, i) => (
             <Link key={r.id} href={`/redesigns/${r.id}`} className="flex items-center gap-2 py-1.5 hover:opacity-80 transition-opacity">
               <span className="text-xs font-bold text-primary/60 w-4 flex-none">{i + 1}</span>
@@ -40,7 +44,6 @@ function Sidebar() {
               </div>
             </Link>
           ))}
-          {!data && <div className="space-y-2">{[1,2,3].map(i => <div key={i} className="h-7 bg-muted rounded animate-pulse" />)}</div>}
         </div>
 
         {/* Top designers */}
@@ -48,6 +51,10 @@ function Sidebar() {
           <Link href="/trending" className="flex items-center gap-2 font-semibold text-sm text-foreground hover:text-primary transition-colors mb-3">
             <Users size={14} className="text-primary" /> Top Designers
           </Link>
+          {isLoading && <div className="space-y-2">{[1,2,3].map(i => <div key={i} className="h-7 bg-muted rounded animate-pulse" />)}</div>}
+          {!isLoading && data?.topDesigners?.length === 0 && (
+            <p className="text-xs text-muted-foreground">No top designers...yet</p>
+          )}
           {data?.topDesigners?.slice(0, 5).map((d) => (
             <Link key={d.id} href={`/users/${d.username}`} className="flex items-center gap-2 py-1.5 hover:opacity-80 transition-opacity">
               <div className="w-7 h-7 rounded-lg bg-primary/20 flex items-center justify-center overflow-hidden flex-none">
@@ -63,7 +70,6 @@ function Sidebar() {
               </div>
             </Link>
           ))}
-          {!data && <div className="space-y-2">{[1,2,3].map(i => <div key={i} className="h-7 bg-muted rounded animate-pulse" />)}</div>}
         </div>
 
         {/* App requests CTA */}
