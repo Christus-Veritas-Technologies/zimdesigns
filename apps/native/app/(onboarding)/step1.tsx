@@ -154,6 +154,7 @@ export default function Step1Screen() {
               value={form.name}
               onChangeText={(v) => setForm((f) => ({ ...f, name: v }))}
               autoCapitalize="words"
+              editable={!updateProfile.isPending}
             />
           </View>
 
@@ -170,6 +171,7 @@ export default function Step1Screen() {
                 value={form.username}
                 onChangeText={(v) => setForm((f) => ({ ...f, username: v }))}
                 autoCapitalize="none"
+                editable={!updateProfile.isPending}
               />
             </View>
           </View>
@@ -190,6 +192,7 @@ export default function Step1Screen() {
               numberOfLines={3}
               maxLength={160}
               textAlignVertical="top"
+              editable={!updateProfile.isPending}
               style={{ minHeight: 80 }}
             />
           </View>
