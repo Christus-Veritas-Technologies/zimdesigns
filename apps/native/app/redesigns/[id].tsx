@@ -273,7 +273,12 @@ export default function RedesignDetailScreen() {
                   <Text className="text-sm text-foreground/90 leading-relaxed">{c.body}</Text>
                 </View>
                 {user?.id === c.author.id && (
-                  <TouchableOpacity onPress={() => deleteComment.mutate(c.id)} className="mt-0.5">
+                  <TouchableOpacity
+                    onPress={() => deleteComment.mutate(c.id)}
+                    disabled={deleteComment.isPending}
+                    className="mt-0.5"
+                    style={{ opacity: deleteComment.isPending ? 0.4 : 1 }}
+                  >
                     <Trash2 size={13} color="#8A8278" />
                   </TouchableOpacity>
                 )}
@@ -293,8 +298,9 @@ export default function RedesignDetailScreen() {
                   placeholderTextColor="#8A8278"
                   maxLength={1000}
                   multiline
+                  editable={!createComment.isPending}
                   className="flex-1 px-3.5 py-2.5 rounded-xl border border-input bg-card text-foreground text-sm"
-                  style={{ minHeight: 44, maxHeight: 120 }}
+                  style={{ minHeight: 44, maxHeight: 120, opacity: createComment.isPending ? 0.6 : 1 }}
                 />
                 <TouchableOpacity
                   onPress={handleSubmitComment}
