@@ -16,11 +16,12 @@
     "@zimdesigns/env": "workspace:*",
     "dotenv": "catalog:",
     "hono": "^4.8.2",
-    "resend": "^6.12.4",
+    "nodemailer": "^6.10.1",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@types/bun": "catalog:",
+    "@types/nodemailer": "^6.4.17",
     "@zimdesigns/config": "workspace:*",
     "tsdown": "^0.21.9",
     "typescript": "catalog:"

@@ -1,8 +1,17 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 import { env } from "@zimdesigns/env/server";
 
-const resend = env.RESEND_API_KEY ? new Resend(env.RESEND_API_KEY) : null;
 const FROM = env.FROM_EMAIL ?? "ZimDesigns <noreply@zimdesigns.com>";
+
+function createTransporter() {
+  if (!env.SMTP_HOST || !env.SMTP_USER || !env.SMTP_PASS) return null;
+  return nodemailer.createTransport({
+    host: env.SMTP_HOST,
+    port: env.SMTP_PORT ?? 587,
+    secure: (env.SMTP_PORT ?? 587) === 465,
+    auth: { user: env.SMTP_USER, pass: env.SMTP_PASS },
+  });
+}
 
 interface EmailPayload {
   to: string;
@@ -11,11 +20,12 @@ interface EmailPayload {
 }
 
 export async function sendEmail(payload: EmailPayload): Promise<void> {
-  if (!resend) {
+  const transporter = createTransporter();
+  if (!transporter) {
     console.log(`[EMAIL – dev mode] To: ${payload.to}\nSubject: ${payload.subject}\n${payload.html.replace(/<[^>]+>/g, "")}`);
     return;
   }
-  await resend.emails.send({ from: FROM, ...payload });
+  await transporter.sendMail({ from: FROM, ...payload });
 }
 
 export function passwordResetEmail(name: string, resetUrl: string): EmailPayload {
