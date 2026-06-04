@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import Image from "next/image";
-import { ArrowRight, Camera } from "lucide-react";
+import { ArrowRight, Camera, Palette, Terminal, Layers } from "lucide-react";
 import { Button } from "@zimdesigns/ui/components/button";
 import { Input } from "@zimdesigns/ui/components/input";
 import { Label } from "@zimdesigns/ui/components/label";
@@ -13,9 +13,9 @@ import { useRouter } from "next/navigation";
 type Role = "designer" | "developer" | "both";
 
 const ROLES: { id: Role; label: string; icon: React.ReactNode }[] = [
-  { id: "designer", label: "Designer", icon: <BrushIcon /> },
-  { id: "developer", label: "Developer", icon: <CodeIcon /> },
-  { id: "both", label: "Both", icon: <BothIcon /> },
+  { id: "designer", label: "Designer", icon: <Palette size={18} /> },
+  { id: "developer", label: "Developer", icon: <Terminal size={18} /> },
+  { id: "both", label: "Both", icon: <Layers size={18} /> },
 ];
 
 export default function Step1Page() {
@@ -192,12 +192,3 @@ export default function Step1Page() {
   );
 }
 
-function BrushIcon() {
-  return <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 3l7 7-8 2-4 4M9.5 16a3.5 3.5 0 1 1-3.5-3.5"/></svg>;
-}
-function CodeIcon() {
-  return <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M8 6l-6 6 6 6M16 6l6 6-6 6"/></svg>;
-}
-function BothIcon() {
-  return <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v18"/><path d="M8 7l-4 5 4 5M16 7l4 5-4 5"/></svg>;
-}
