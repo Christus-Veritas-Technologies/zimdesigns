@@ -8,7 +8,6 @@ import { Input } from "@zimdesigns/ui/components/input";
 import { Label } from "@zimdesigns/ui/components/label";
 import { Wordmark } from "@/components/brand/wordmark";
 import { FlagBar } from "@/components/brand/flag-bar";
-import { FloatingImages } from "@/components/floating-images";
 import { useSignup } from "@/hooks/use-auth";
 import { env } from "@zimdesigns/env/web";
 
@@ -28,17 +27,17 @@ function AppCard({ accent = "gold", rotate = 0 }: { accent?: "gold" | "green"; r
         <span className="flex-1 bg-muted" />
       </div>
       <div className="p-3 flex flex-col gap-2 flex-1">
-        <div className="h-2 w-3/5 rounded bg-muted" />
-        <div className="h-8 rounded-lg bg-muted/70" />
+        <div className="h-2 w-3/5 rounded" style={{ background: "var(--zd-mock-a)" }} />
+        <div className="h-8 rounded-lg" style={{ background: "var(--zd-mock-b)" }} />
         {[85, 70, 55].map((w, i) => (
-          <div key={i} className="h-1.5 rounded bg-muted" style={{ width: `${w}%` }} />
+          <div key={i} className="h-1.5 rounded" style={{ width: `${w}%`, background: "var(--zd-mock-a)" }} />
         ))}
         <div className="mt-auto pt-2 flex gap-1.5">
           {[0, 1, 2, 3].map((i) => (
             <div
               key={i}
               className="flex-1 h-3 rounded"
-              style={{ background: i === 0 ? topColor : "var(--zd-bg-alt, var(--muted))" }}
+              style={{ background: i === 0 ? topColor : "var(--zd-mock-a)" }}
             />
           ))}
         </div>
@@ -91,9 +90,9 @@ function SignupForm({ compact = false }: { compact?: boolean }) {
     >
       <GoogleButton />
 
-      <div className="flex items-center gap-3 text-muted-foreground">
+      <div className="flex items-center gap-3" style={{ color: "var(--zd-faint-fg)" }}>
         <span className="flex-1 h-px bg-border" />
-        <span className="text-xs font-mono tracking-wider uppercase">or</span>
+        <span className="text-[12.48px] tracking-[0.08em] uppercase">OR</span>
         <span className="flex-1 h-px bg-border" />
       </div>
 
@@ -113,7 +112,7 @@ function SignupForm({ compact = false }: { compact?: boolean }) {
         <Label htmlFor="username" className="text-[0.84rem] font-semibold">Username</Label>
         {!compact && <span className="text-xs text-muted-foreground -mt-0.5">This is your public portfolio handle.</span>}
         <div className="relative flex items-center">
-          <span className="absolute left-3 text-muted-foreground font-mono text-[0.92rem] pointer-events-none">@</span>
+          <span className="absolute left-3 text-[14.72px] pointer-events-none" style={{ color: "var(--zd-faint-fg)" }}>@</span>
           <Input id="username" placeholder="tinashe" className="pl-7" value={form.username}
             onChange={(e) => setForm((f) => ({ ...f, username: e.target.value }))} required />
         </div>
@@ -140,7 +139,8 @@ function SignupForm({ compact = false }: { compact?: boolean }) {
       )}
 
       <Button type="submit" disabled={signup.isPending}
-        className="h-12 text-base font-semibold bg-[var(--zd-gold)] hover:bg-[var(--zd-gold-hover)] text-[var(--zd-gold-fg)] rounded-xl mt-1 flex flex-row-reverse items-center gap-2">
+        className="text-base bg-[var(--zd-gold)] hover:bg-[var(--zd-gold-hover)] text-[var(--zd-gold-fg)] rounded-xl mt-1 flex flex-row-reverse items-center gap-2"
+        style={{ height: 50, fontWeight: 650 }}>
         <ArrowRight size={18} />
         {signup.isPending ? "Creating account…" : "Create account"}
       </Button>
@@ -170,18 +170,17 @@ export default function SignupPage() {
               backgroundSize: "16px 16px",
             }}
           />
-          <FloatingImages variant="auth" />
           <div className="relative flex flex-col h-full">
             <Wordmark size={24} />
             <div className="mt-auto max-w-[460px]">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-[var(--zd-green)] text-[var(--zd-green)] text-xs font-mono tracking-wider uppercase font-bold">
-                <Flag size={12} /> The redesign movement
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--zd-green)] bg-[var(--zd-green-tint)] text-[var(--zd-green)] text-[11.2px] font-normal tracking-[0.06em] uppercase" style={{ paddingTop: "5px", paddingBottom: "5px", paddingLeft: "11px", paddingRight: "11px" }}>
+                <Flag size={10} /> The redesign movement
               </span>
-              <h1 className="mt-5 text-[2.65rem] font-extrabold leading-[1.08] tracking-tight text-foreground"
+              <h1 className="mt-5 text-[2.65rem] font-bold leading-[1.08] tracking-tight text-foreground"
                 style={{ fontFamily: "'Bricolage Grotesque', system-ui, sans-serif" }}>
                 Redesign Zimbabwe's apps.
               </h1>
-              <p className="mt-4 text-[1.08rem] text-muted-foreground leading-[1.55] max-w-[400px]">{MISSION}</p>
+              <p className="mt-1.5 text-[0.98rem] text-muted-foreground leading-[1.5] max-w-[400px]">{MISSION}</p>
             </div>
             {/* Abstract app cards */}
             <div className="relative mt-10 h-[210px]">
@@ -197,7 +196,7 @@ export default function SignupPage() {
             </div>
             <div className="mt-auto pt-8 flex items-center gap-4">
               <FlagBar width={64} height={5} />
-              <span className="text-xs font-mono tracking-wider text-muted-foreground uppercase">
+              <span className="text-[11.52px] uppercase" style={{ color: "var(--zd-muted-fg)", letterSpacing: "1.6128px" }}>
                 Portfolios are a byproduct. The mission is collective.
               </span>
             </div>
@@ -232,7 +231,7 @@ export default function SignupPage() {
           <FlagBar width={40} height={4} />
         </div>
         <div className="mt-6">
-          <h1 className="text-[1.65rem] font-extrabold tracking-tight leading-tight"
+          <h1 className="text-[1.65rem] font-bold tracking-tight leading-tight"
             style={{ fontFamily: "'Bricolage Grotesque', system-ui, sans-serif" }}>
             Redesign Zimbabwe's apps.
           </h1>

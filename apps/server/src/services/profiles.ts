@@ -10,15 +10,19 @@ export async function getProfile(username: string) {
       avatarUrl: true,
       bio: true,
       role: true,
+      location: true,
       createdAt: true,
       linkedinUrl: true,
       githubUrl: true,
       dribbbleUrl: true,
       twitterUrl: true,
       websiteUrl: true,
+      figmaUrl: true,
       _count: { select: { redesigns: true, followers: true, following: true } },
+      redesigns: { select: { upvoteCount: true } },
     },
   });
+  const votesEarned = user.redesigns.reduce((sum, r) => sum + r.upvoteCount, 0);
   return {
     id: user.id,
     name: user.name,
@@ -26,15 +30,18 @@ export async function getProfile(username: string) {
     avatarUrl: user.avatarUrl,
     bio: user.bio,
     role: user.role,
+    location: user.location,
     createdAt: user.createdAt,
     redesignCount: user._count.redesigns,
     followerCount: user._count.followers,
     followingCount: user._count.following,
+    votesEarned,
     linkedinUrl: user.linkedinUrl,
     githubUrl: user.githubUrl,
     dribbbleUrl: user.dribbbleUrl,
     twitterUrl: user.twitterUrl,
     websiteUrl: user.websiteUrl,
+    figmaUrl: user.figmaUrl,
   };
 }
 
@@ -45,7 +52,8 @@ export async function getUserRedesigns(username: string) {
     where: { authorId: user.id },
     orderBy: { createdAt: "desc" },
     include: {
-      author: { select: { id: true, name: true, username: true, avatarUrl: true } },
+      author: { select: { id: true, name: true, username: true, avatarUrl: true, role: true } },
+      _count: { select: { comments: true } },
     },
   });
 
@@ -58,8 +66,9 @@ export async function getUserRedesigns(username: string) {
     afterUrl: r.afterUrl,
     tags: (() => { try { return JSON.parse(r.tags); } catch { return []; } })(),
     upvoteCount: r.upvoteCount,
+    commentCount: (r as typeof r & { _count: { comments: number } })._count.comments,
     createdAt: r.createdAt,
-    author: r.author,
+    author: { ...r.author, role: r.author.role ?? null },
     hasUpvoted: false,
   }));
 }

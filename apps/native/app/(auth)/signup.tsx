@@ -15,7 +15,6 @@ import { Eye, EyeOff, ArrowRight } from "lucide-react-native";
 import { env } from "@zimdesigns/env/native";
 import { Wordmark } from "@/components/brand/wordmark";
 import { FlagBar } from "@/components/brand/flag-bar";
-import { FloatingImages } from "@/components/floating-images";
 import { useSignup } from "@/hooks/use-auth";
 
 function GoogleButton() {
@@ -54,7 +53,6 @@ export default function SignupScreen() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       className="flex-1 bg-background"
     >
-      <FloatingImages />
       <ScrollView
         contentContainerClassName="px-6 pt-14 pb-8 flex-grow"
         keyboardShouldPersistTaps="handled"
@@ -68,7 +66,7 @@ export default function SignupScreen() {
 
         {/* Hero text */}
         <Text
-          className="text-[1.65rem] font-extrabold text-foreground tracking-tight leading-tight mb-2"
+          className="text-[1.65rem] font-bold text-foreground tracking-tight leading-tight mb-2"
           style={{ fontFamily: "BricolageGrotesque-ExtraBold" }}
         >
           Redesign Zimbabwe&apos;s apps.
@@ -163,7 +161,8 @@ export default function SignupScreen() {
         <TouchableOpacity
           onPress={() => signup.mutate(form)}
           disabled={signup.isPending}
-          className="h-12 mt-5 rounded-xl bg-primary flex-row-reverse items-center justify-center gap-2"
+          className="mt-5 rounded-xl bg-primary flex-row-reverse items-center justify-center gap-2"
+          style={{ height: 50 }}
           activeOpacity={0.85}
         >
           {signup.isPending

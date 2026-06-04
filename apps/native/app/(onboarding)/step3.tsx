@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from "react-native";
 import { useRouter } from "expo-router";
-import { Upload, Compass, Flag } from "lucide-react-native";
+import { Upload, Compass, Flag, Check } from "lucide-react-native";
 import { Wordmark } from "@/components/brand/wordmark";
 import { FlagBar } from "@/components/brand/flag-bar";
 import { useCompleteOnboarding } from "@/hooks/use-onboarding";
@@ -19,12 +19,12 @@ export default function Step3Screen() {
         className="w-[72px] h-[72px] rounded-full bg-secondary items-center justify-center mb-6"
         style={{ shadowColor: "#2D9D6A", shadowOpacity: 0.25, shadowRadius: 16, shadowOffset: { width: 0, height: 0 } }}
       >
-        <Text className="text-white text-3xl font-bold">✓</Text>
+        <Check size={30} color="white" strokeWidth={3} />
       </View>
 
       <Text
-        className="text-[1.55rem] font-extrabold text-foreground text-center tracking-tight leading-[1.2] mb-3"
-        style={{ fontFamily: "BricolageGrotesque-ExtraBold" }}
+        className="text-[1.55rem] font-bold text-foreground text-center tracking-tight leading-[1.2] mb-3"
+        style={{ fontFamily: "BricolageGrotesque-Bold" }}
       >
         You&apos;re In. Now Let&apos;s Build Something Better.
       </Text>

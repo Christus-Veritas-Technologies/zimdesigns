@@ -31,7 +31,7 @@ export function useAppRequests() {
   return useQuery({
     queryKey: ["app-requests"],
     queryFn: () =>
-      api.get<{ id: string; appName: string; description: string | null; voteCount: number; hasVoted: boolean; requester: { username: string }; createdAt: string }[]>("/api/app-requests").then((r) => r.data),
+      api.get<{ id: string; appName: string; description: string | null; voteCount: number; hasVoted: boolean; status: string; requester: { username: string; avatarUrl?: string | null }; createdAt: string }[]>("/api/app-requests").then((r) => r.data),
   });
 }
 

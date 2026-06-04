@@ -80,6 +80,9 @@ function CustomDrawer() {
             <NavItem icon="bookmark-outline" label="Saved" onPress={() => router.push("/bookmarks" as never)} color={fg} />
             <NavItem icon="person-outline" label="Profile" onPress={() => user && router.push(`/users/${user.username}` as never)} color={fg} />
             <NavItem icon="settings-outline" label="Settings" onPress={() => router.push("/settings" as never)} color={fg} />
+            {user?.role === "ADMIN" && (
+              <NavItem icon="shield-outline" label="Admin" onPress={() => router.push("/admin" as never)} color={primary} />
+            )}
             <View style={{ height: 1, backgroundColor: useThemeColor("border"), marginVertical: 8, marginHorizontal: 16 }} />
             <NavItem icon="log-out-outline" label="Sign Out" onPress={async () => { await clearAuth(); router.replace("/auth/login" as never); }} color="#ef4444" />
           </>

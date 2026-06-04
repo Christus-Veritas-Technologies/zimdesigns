@@ -9,13 +9,18 @@ export interface UserProfile {
   avatarUrl: string | null;
   bio: string | null;
   role: string | null;
+  location: string | null;
   createdAt: string;
   redesignCount: number;
+  followerCount: number;
+  followingCount: number;
+  votesEarned: number;
   linkedinUrl: string | null;
   githubUrl: string | null;
   dribbbleUrl: string | null;
   twitterUrl: string | null;
   websiteUrl: string | null;
+  figmaUrl: string | null;
 }
 
 export function useProfile(username: string) {

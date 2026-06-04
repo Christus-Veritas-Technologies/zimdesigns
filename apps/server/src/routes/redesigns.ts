@@ -19,6 +19,9 @@ router.get(
     "query",
     z.object({
       tag: z.string().optional(),
+      category: z.string().optional(),
+      appName: z.string().optional(),
+      role: z.enum(["designer", "developer", "both"]).optional(),
       sort: z.enum(["recent", "top"]).optional(),
       cursor: z.string().optional(),
       limit: z.coerce.number().int().min(1).max(50).optional(),
@@ -42,7 +45,7 @@ router.get("/redesigns/:id", optionalAuth, async (c) => {
 });
 
 router.post("/redesigns", requireAuth, async (c) => {
-  const body = await c.req.parseBody();
+  const body = await c.req.parseBody({ all: true });
 
   const title = body["title"];
   const appName = body["appName"];
@@ -50,6 +53,9 @@ router.post("/redesigns", requireAuth, async (c) => {
   const tagsRaw = body["tags"];
   const beforeFile = body["before"];
   const afterFile = body["after"];
+  const figmaUrl = body["figmaUrl"];
+  const githubUrl = body["githubUrl"];
+  const prototypeUrl = body["prototypeUrl"];
 
   if (!title || !appName || !beforeFile || !afterFile) {
     return c.json({ message: "title, appName, before, and after are required" }, 400);
@@ -59,6 +65,16 @@ router.post("/redesigns", requireAuth, async (c) => {
   }
   if (!(beforeFile instanceof File) || !(afterFile instanceof File)) {
     return c.json({ message: "before and after must be image files" }, 400);
+  }
+
+  const screenshotRaw = body["screenshots"];
+  const screenshotFiles: File[] = [];
+  if (Array.isArray(screenshotRaw)) {
+    for (const s of screenshotRaw) {
+      if (s instanceof File) screenshotFiles.push(s);
+    }
+  } else if (screenshotRaw instanceof File) {
+    screenshotFiles.push(screenshotRaw);
   }
 
   let tags: string[] = [];
@@ -79,6 +95,10 @@ router.post("/redesigns", requireAuth, async (c) => {
       tags,
       beforeFile,
       afterFile,
+      screenshotFiles,
+      figmaUrl: typeof figmaUrl === "string" ? figmaUrl : undefined,
+      githubUrl: typeof githubUrl === "string" ? githubUrl : undefined,
+      prototypeUrl: typeof prototypeUrl === "string" ? prototypeUrl : undefined,
     });
     return c.json(r, 201);
   } catch (err) {
