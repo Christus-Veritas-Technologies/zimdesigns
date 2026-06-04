@@ -110,7 +110,10 @@ export default function Header() {
     <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-sm">
       <div className="max-w-6xl mx-auto px-4 h-14 flex items-center gap-3">
         {/* Logo */}
-        <Link href="/" className="font-extrabold text-lg text-foreground tracking-tight flex-none mr-1" style={{ fontFamily: "'Bricolage Grotesque', system-ui, sans-serif" }}>
+        <Link href="/" className="inline-flex items-center gap-2 font-extrabold text-lg text-foreground tracking-tight flex-none mr-1" style={{ fontFamily: "'Bricolage Grotesque', system-ui, sans-serif", letterSpacing: "-0.03em" }}>
+          <span className="inline-flex rounded-xl overflow-hidden flex-none">
+            <Image src="/zd-icon.png" width={28} height={28} alt="" unoptimized />
+          </span>
           Zim<span className="text-primary">Designs</span>
         </Link>
 
