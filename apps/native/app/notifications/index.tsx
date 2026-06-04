@@ -10,6 +10,7 @@ import {
 import { router } from "expo-router";
 import { Bell, CheckCheck } from "lucide-react-native";
 import { useNotifications, useMarkAllRead, type Notification } from "@/hooks/use-notifications";
+import { useAuth } from "@/contexts/auth-context";
 
 const TYPE_ICON: Record<string, string> = { comment: "💬", upvote: "↑" };
 
@@ -37,8 +38,24 @@ function NotificationItem({ item }: { item: Notification }) {
 }
 
 export default function NotificationsScreen() {
+  const { isAuthenticated } = useAuth();
   const { data: notifications, isLoading, refetch, isRefetching } = useNotifications();
   const markAll = useMarkAllRead();
+
+  if (!isAuthenticated) {
+    return (
+      <View className="flex-1 bg-background items-center justify-center px-6">
+        <View className="w-16 h-16 rounded-2xl bg-muted items-center justify-center mb-4">
+          <Bell size={24} color="#8A8278" />
+        </View>
+        <Text className="font-semibold text-foreground text-base mb-1">Sign in to see notifications</Text>
+        <Text className="text-muted-foreground text-sm text-center mb-4">Get notified when someone upvotes or comments on your work.</Text>
+        <TouchableOpacity onPress={() => router.push("/auth/login" as never)} activeOpacity={0.8} className="px-5 py-2.5 rounded-xl bg-primary">
+          <Text className="text-white font-semibold text-sm">Sign in</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
   const unread = notifications?.filter((n) => !n.read).length ?? 0;
 
