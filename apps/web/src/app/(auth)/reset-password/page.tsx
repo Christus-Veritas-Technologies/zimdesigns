@@ -70,7 +70,8 @@ function ResetForm() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Min. 8 characters"
-              className="w-full px-3 py-2.5 pr-10 rounded-xl border border-border bg-card text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+              disabled={reset.isPending}
+              className="w-full px-3 py-2.5 pr-10 rounded-xl border border-border bg-card text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-60"
             />
             <button type="button" onClick={() => setShowPw(!showPw)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
               {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
@@ -85,7 +86,8 @@ function ResetForm() {
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
             placeholder="Repeat password"
-            className={`mt-1 w-full px-3 py-2.5 rounded-xl border bg-card text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 ${mismatch ? "border-destructive focus:ring-destructive/30" : "border-border focus:ring-primary/30"}`}
+            disabled={reset.isPending}
+            className={`mt-1 w-full px-3 py-2.5 rounded-xl border bg-card text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 disabled:opacity-60 ${mismatch ? "border-destructive focus:ring-destructive/30" : "border-border focus:ring-primary/30"}`}
           />
           {mismatch && <p className="text-xs text-destructive mt-1">Passwords don't match</p>}
         </div>
