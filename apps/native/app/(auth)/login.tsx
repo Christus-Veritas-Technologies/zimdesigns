@@ -20,16 +20,22 @@ import { useLogin } from "@/hooks/use-auth";
 export default function LoginScreen() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPw, setShowPw] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const login = useLogin();
 
   const errorMsg =
     (login.error as Error & { response?: { data?: { message?: string } } })?.response?.data?.message;
 
   const handleGooglePress = async () => {
-    await WebBrowser.openAuthSessionAsync(
-      `${env.EXPO_PUBLIC_SERVER_URL}/api/auth/google?platform=native`,
-      "zimdesigns://auth/callback",
-    );
+    setIsGoogleLoading(true);
+    try {
+      await WebBrowser.openAuthSessionAsync(
+        `${env.EXPO_PUBLIC_SERVER_URL}/api/auth/google?platform=native`,
+        "zimdesigns://auth/callback",
+      );
+    } finally {
+      setIsGoogleLoading(false);
+    }
   };
 
   return (
@@ -61,10 +67,17 @@ export default function LoginScreen() {
         {/* Google */}
         <TouchableOpacity
           onPress={handleGooglePress}
+          disabled={isGoogleLoading || login.isPending}
           className="w-full h-12 flex-row items-center justify-center gap-3 rounded-xl border border-border bg-card mb-5"
           activeOpacity={0.7}
+          style={{ opacity: isGoogleLoading || login.isPending ? 0.6 : 1 }}
         >
-          <Text className="text-base font-semibold text-foreground">Continue with Google</Text>
+          {isGoogleLoading
+            ? <ActivityIndicator size="small" color="#8A8278" />
+            : null}
+          <Text className="text-base font-semibold text-foreground">
+            {isGoogleLoading ? "Opening browser…" : "Continue with Google"}
+          </Text>
         </TouchableOpacity>
 
         {/* Divider */}
@@ -86,6 +99,7 @@ export default function LoginScreen() {
               onChangeText={(v) => setForm((f) => ({ ...f, email: v }))}
               keyboardType="email-address"
               autoCapitalize="none"
+              editable={!login.isPending}
             />
           </View>
 
@@ -103,6 +117,7 @@ export default function LoginScreen() {
                 onChangeText={(v) => setForm((f) => ({ ...f, password: v }))}
                 secureTextEntry={!showPw}
                 autoCapitalize="none"
+                editable={!login.isPending}
               />
               <TouchableOpacity
                 onPress={() => setShowPw((v) => !v)}
