@@ -25,9 +25,11 @@ function GoogleIcon() {
 export default function LoginPage() {
   const [showPw, setShowPw] = useState(false);
   const [form, setForm] = useState({ email: "", password: "" });
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const login = useLogin();
 
   const handleGoogleAuth = () => {
+    setIsGoogleLoading(true);
     window.location.href = `${env.NEXT_PUBLIC_SERVER_URL}/api/auth/google`;
   };
 
@@ -79,7 +81,7 @@ export default function LoginPage() {
               Continue to your ZimDesigns account.
             </p>
             <LoginForm showPw={showPw} setShowPw={setShowPw} form={form} setForm={setForm}
-              login={login} handleGoogleAuth={handleGoogleAuth} />
+              login={login} handleGoogleAuth={handleGoogleAuth} isGoogleLoading={isGoogleLoading} />
             <p className="text-center mt-5 text-[0.92rem] text-muted-foreground">
               Don&apos;t have an account?{" "}
               <Link href="/signup" className="font-semibold underline decoration-[var(--zd-gold)] underline-offset-2">
@@ -109,7 +111,7 @@ export default function LoginPage() {
         </div>
         <div className="mt-6 flex-1">
           <LoginForm compact showPw={showPw} setShowPw={setShowPw} form={form}
-            setForm={setForm} login={login} handleGoogleAuth={handleGoogleAuth} />
+            setForm={setForm} login={login} handleGoogleAuth={handleGoogleAuth} isGoogleLoading={isGoogleLoading} />
         </div>
         <p className="text-center mt-4 text-[0.9rem] text-muted-foreground">
           Don&apos;t have an account?{" "}
@@ -129,18 +131,20 @@ function LoginForm({
   setForm: React.Dispatch<React.SetStateAction<{ email: string; password: string }>>;
   login: ReturnType<typeof useLogin>;
   handleGoogleAuth: () => void;
+  isGoogleLoading: boolean;
   compact?: boolean;
 }) {
   const gap = compact ? "gap-3.5" : "gap-4";
+  const busy = login.isPending || isGoogleLoading;
   return (
     <form
       className={`flex flex-col ${gap}`}
       onSubmit={(e) => { e.preventDefault(); login.mutate(form); }}
     >
-      <button type="button" onClick={handleGoogleAuth}
-        className="w-full h-11 flex items-center justify-center gap-3 rounded-xl border border-border bg-card hover:bg-muted transition-colors font-semibold text-[0.95rem] text-foreground cursor-pointer">
-        <GoogleIcon />
-        Continue with Google
+      <button type="button" onClick={handleGoogleAuth} disabled={isGoogleLoading || login.isPending}
+        className="w-full h-11 flex items-center justify-center gap-3 rounded-xl border border-border bg-card hover:bg-muted transition-colors font-semibold text-[0.95rem] text-foreground cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
+        {isGoogleLoading ? <span className="w-4 h-4 rounded-full border-2 border-foreground/30 border-t-foreground animate-spin" /> : <GoogleIcon />}
+        {isGoogleLoading ? "Redirecting…" : "Continue with Google"}
       </button>
 
       <div className="flex items-center gap-3 text-muted-foreground">
@@ -152,7 +156,7 @@ function LoginForm({
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="email" className="text-[0.84rem] font-semibold">Email</Label>
         <Input id="email" type="email" placeholder="you@email.com" value={form.email}
-          onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} required />
+          onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} required disabled={busy} />
       </div>
 
       <div className="flex flex-col gap-1.5">
@@ -165,7 +169,7 @@ function LoginForm({
         <div className="relative flex items-center">
           <Input id="password" type={showPw ? "text" : "password"} placeholder="Your password"
             className="pr-10" value={form.password}
-            onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))} required />
+            onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))} required disabled={busy} />
           <button type="button" onClick={() => setShowPw(!showPw)}
             className="absolute right-3 text-muted-foreground hover:text-foreground transition-colors"
             aria-label={showPw ? "Hide password" : "Show password"}>
