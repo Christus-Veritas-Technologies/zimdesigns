@@ -15,8 +15,11 @@ export const unstable_settings = {
   initialRouteName: "(drawer)",
 };
 
-// Redirects unauthenticated users to login and authenticated users
-// past onboarding once complete.
+// Pages that require authentication to access
+const AUTH_REQUIRED_SEGMENTS = new Set(["upload", "notifications", "profile", "admin"]);
+
+// Redirects unauthenticated users away from auth-required pages and
+// authenticated users past onboarding once complete.
 function AuthGate() {
   const { isAuthenticated, isLoading, user } = useAuth();
   const segments = useSegments();
@@ -31,7 +34,9 @@ function AuthGate() {
     const inAuthCallback = segments[0] === "auth"; // deep-link callback
 
     if (!isAuthenticated && !inAuth && !inAuthCallback) {
-      router.replace("/(auth)/login");
+      if (AUTH_REQUIRED_SEGMENTS.has(segments[0] as string)) {
+        router.replace("/(auth)/login");
+      }
     } else if (isAuthenticated && !user?.onboardingComplete && !inOnboarding && !inAuthCallback) {
       router.replace("/(onboarding)/step1");
     } else if (isAuthenticated && user?.onboardingComplete && (inAuth || inOnboarding)) {
