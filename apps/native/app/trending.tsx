@@ -45,7 +45,7 @@ export default function TrendingScreen() {
               <Text className="font-semibold text-foreground">Top Redesigns this week</Text>
             </View>
             {data?.topRedesigns?.length === 0 && (
-              <Text className="text-sm text-muted-foreground">No redesigns this week yet.</Text>
+              <Text className="text-sm text-muted-foreground">No trending redesigns this week...yet</Text>
             )}
             {data?.topRedesigns?.map((r, i) => (
               <TouchableOpacity
@@ -77,7 +77,7 @@ export default function TrendingScreen() {
               <Text className="font-semibold text-foreground">Top Designers</Text>
             </View>
             {data?.topDesigners?.length === 0 && (
-              <Text className="text-sm text-muted-foreground">No designers yet.</Text>
+              <Text className="text-sm text-muted-foreground">No top designers...yet</Text>
             )}
             {data?.topDesigners?.map((d, i) => (
               <TouchableOpacity
