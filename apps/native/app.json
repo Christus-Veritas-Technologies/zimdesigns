@@ -8,10 +8,21 @@
     },
     "name": "zimdesigns",
     "slug": "zimdesigns",
-    "plugins": ["expo-font", "expo-notifications"],
+    "plugins": [
+      "expo-font",
+      "expo-notifications"
+    ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "5b3bb520-aa3b-4a59-bc67-1ad2e4ef9769"
+      }
+    },
+    "android": {
+      "package": "com.zimdesignsinc.zimdesigns"
     }
   }
 }
