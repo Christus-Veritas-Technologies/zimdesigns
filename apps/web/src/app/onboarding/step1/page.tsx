@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import Image from "next/image";
-import { ArrowRight, Camera, Upload } from "lucide-react";
+import { ArrowRight, Camera } from "lucide-react";
 import { Button } from "@zimdesigns/ui/components/button";
 import { Input } from "@zimdesigns/ui/components/input";
 import { Label } from "@zimdesigns/ui/components/label";
@@ -79,27 +79,23 @@ export default function Step1Page() {
 
         <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
           {/* Avatar */}
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col items-center gap-2 mb-1">
             <button
               type="button"
               onClick={() => avatarInputRef.current?.click()}
-              className="w-[72px] h-[72px] rounded-xl bg-muted border-2 border-dashed border-border flex items-center justify-center text-muted-foreground flex-none overflow-hidden hover:border-primary/50 transition-colors relative"
+              className="relative w-24 h-24 rounded-full bg-muted border-2 border-dashed border-border flex items-center justify-center text-muted-foreground overflow-hidden hover:border-primary/50 transition-colors group"
             >
               {avatarPreview ? (
                 <Image src={avatarPreview} alt="Avatar" fill className="object-cover" unoptimized />
               ) : (
-                <Camera size={22} />
+                <Camera size={28} />
               )}
+              <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <Camera size={20} className="text-white" />
+              </div>
             </button>
-            <div>
-              <Button type="button" variant="outline"
-                onClick={() => avatarInputRef.current?.click()}
-                className="h-9 text-sm rounded-xl gap-2 border-border">
-                <Upload size={15} /> {avatarPreview ? "Change photo" : "Upload photo"}
-              </Button>
-              <p className="text-xs text-muted-foreground mt-1.5">PNG or JPG, max 5 MB. Optional.</p>
-              <input ref={avatarInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleAvatarChange} />
-            </div>
+            <p className="text-xs text-muted-foreground">PNG or JPG · max 5 MB · optional</p>
+            <input ref={avatarInputRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleAvatarChange} />
           </div>
 
           {/* Name */}
