@@ -173,41 +173,61 @@ export default function RedesignDetailScreen() {
         </View>
 
         <View className="px-5 pt-5 pb-6">
-          {/* Title + upvote */}
-          <View className="flex-row items-start gap-4 mb-4">
+          {/* Pills */}
+          <View style={{ flexDirection: "row", gap: 6, alignItems: "center", marginBottom: 10 }}>
+            <View style={{ backgroundColor: "#F0F0F0", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 }}>
+              <Text style={{ fontSize: 10, fontWeight: "700", color: "#6B6B6B", textTransform: "uppercase", letterSpacing: 0.5 }}>Redesign</Text>
+            </View>
+            <Text style={{ color: "#8A8278", fontSize: 12 }}>·</Text>
+            <View style={{ backgroundColor: "#F0F0F0", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 }}>
+              <Text style={{ fontSize: 10, fontWeight: "700", color: "#6B6B6B", textTransform: "uppercase", letterSpacing: 0.5 }}>{redesign.appName}</Text>
+            </View>
+          </View>
+
+          {/* Title */}
+          <Text className="text-[1.2rem] font-bold text-foreground tracking-tight leading-tight mb-2" style={{ fontFamily: "BricolageGrotesque-Bold" }}>
+            {redesign.title}
+          </Text>
+
+          {/* Author + stats row */}
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
+            <TouchableOpacity
+              onPress={() => router.push(`/users/${redesign.author.username}` as never)}
+              style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
+            >
+              <View style={{ width: 26, height: 26, borderRadius: 13, backgroundColor: "rgba(232,169,0,0.2)", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+                {redesign.author.avatarUrl ? (
+                  <Image source={{ uri: absoluteUrl(redesign.author.avatarUrl) }} style={{ width: 26, height: 26 }} resizeMode="cover" />
+                ) : (
+                  <Text style={{ fontSize: 10, fontWeight: "700", color: "#E8A900" }}>{redesign.author.name.charAt(0)}</Text>
+                )}
+              </View>
+              <Text className="text-sm font-semibold text-foreground">{redesign.author.name}</Text>
+            </TouchableOpacity>
+            <View style={{ flex: 1 }} />
             <TouchableOpacity
               onPress={() => { if (isAuthenticated) upvote.mutate(); }}
               disabled={upvote.isPending}
               activeOpacity={0.7}
-              className={`items-center px-3 py-2.5 rounded-xl border gap-1 ${
-                redesign.hasUpvoted ? "border-primary bg-primary/10" : "border-border bg-card"
-              }`}
+              style={{
+                flexDirection: "row", alignItems: "center", gap: 6,
+                paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20,
+                borderWidth: 1,
+                borderColor: redesign.hasUpvoted ? "#E8A900" : "#E4E0D8",
+                backgroundColor: redesign.hasUpvoted ? "rgba(232,169,0,0.1)" : "transparent",
+              }}
             >
-              <ArrowUp size={18} color={redesign.hasUpvoted ? "#E8A900" : "#8A8278"} strokeWidth={2.5} />
-              <Text className={`text-sm font-bold tabular-nums ${redesign.hasUpvoted ? "text-primary" : "text-muted-foreground"}`}>
-                {redesign.upvoteCount}
-              </Text>
+              <ArrowUp size={14} color={redesign.hasUpvoted ? "#E8A900" : "#8A8278"} strokeWidth={2.5} />
+              <Text style={{ fontSize: 13, fontWeight: "600", color: redesign.hasUpvoted ? "#E8A900" : "#8A8278" }}>{redesign.upvoteCount}</Text>
+              <Text style={{ fontSize: 12, color: "#8A8278" }}>votes</Text>
             </TouchableOpacity>
-
-            <View className="flex-1">
-              <Text className="text-[1.2rem] font-extrabold text-foreground tracking-tight leading-tight" style={{ fontFamily: "BricolageGrotesque-ExtraBold" }}>
-                {redesign.title}
-              </Text>
-              <Text className="text-sm text-muted-foreground mt-0.5">
-                <Text className="font-medium text-foreground">{redesign.appName}</Text>
-                {" · "}by{" "}
-                <Text
-                  className="font-medium text-foreground"
-                  onPress={() => router.push(`/users/${redesign.author.username}` as never)}
-                >
-                  @{redesign.author.username}
-                </Text>
-              </Text>
-            </View>
           </View>
 
           {redesign.description ? (
-            <Text className="text-[0.94rem] text-foreground/80 leading-relaxed mb-4">{redesign.description}</Text>
+            <View className="mb-4">
+              <Text className="text-sm font-bold text-foreground mb-1" style={{ fontFamily: "BricolageGrotesque-Bold" }}>What this redesign solves</Text>
+              <Text className="text-[0.94rem] text-foreground/80 leading-relaxed">{redesign.description}</Text>
+            </View>
           ) : null}
 
           {redesign.tags.length > 0 && (
@@ -221,25 +241,36 @@ export default function RedesignDetailScreen() {
           {/* Comments */}
           <View className="border-t border-border pt-5">
             <View className="flex-row items-center gap-2 mb-4">
-              <MessageCircle size={15} color="#8A8278" />
-              <Text className="font-semibold text-foreground text-sm">
-                Comments {comments ? `(${comments.length})` : ""}
+              <Text className="font-bold text-foreground text-base" style={{ fontFamily: "BricolageGrotesque-Bold" }}>
+                Let&apos;s Build on This
               </Text>
+              {comments && comments.length > 0 && (
+                <View style={{ backgroundColor: "#F0F0F0", paddingHorizontal: 7, paddingVertical: 2, borderRadius: 20 }}>
+                  <Text style={{ fontSize: 9, fontWeight: "700", color: "#6B6B6B", textTransform: "uppercase" }}>{comments.length} {comments.length === 1 ? "note" : "notes"}</Text>
+                </View>
+              )}
             </View>
 
             {comments?.map((c) => (
-              <View key={c.id} className="flex-row gap-3 mb-4">
-                <View className="w-8 h-8 rounded-full bg-primary/20 items-center justify-center flex-none">
+              <View key={c.id} className="flex-row gap-3 mb-4 p-3 rounded-2xl border border-border bg-card">
+                <View className="w-9 h-9 rounded-full bg-primary/20 items-center justify-center flex-none">
                   <Text className="text-primary font-bold text-xs">{c.author.name.charAt(0).toUpperCase()}</Text>
                 </View>
                 <View className="flex-1">
-                  <View className="flex-row items-center gap-2">
+                  <View className="flex-row items-center gap-2 flex-wrap mb-1">
                     <TouchableOpacity onPress={() => router.push(`/users/${c.author.username}` as never)}>
-                      <Text className="text-sm font-semibold text-foreground">@{c.author.username}</Text>
+                      <Text className="text-sm font-semibold text-foreground">{c.author.name}</Text>
                     </TouchableOpacity>
-                    <Text className="text-xs text-muted-foreground">{new Date(c.createdAt).toLocaleDateString()}</Text>
+                    {(c.author as typeof c.author & { role?: string | null }).role && (
+                      <View style={{ backgroundColor: "#F0F0F0", paddingHorizontal: 7, paddingVertical: 2, borderRadius: 10 }}>
+                        <Text style={{ fontSize: 9, fontWeight: "600", color: "#6B6B6B" }}>
+                          {(c.author as typeof c.author & { role?: string }).role}
+                        </Text>
+                      </View>
+                    )}
+                    <Text className="text-xs text-muted-foreground">· {new Date(c.createdAt).toLocaleDateString()}</Text>
                   </View>
-                  <Text className="text-sm text-foreground/90 mt-0.5 leading-relaxed">{c.body}</Text>
+                  <Text className="text-sm text-foreground/90 leading-relaxed">{c.body}</Text>
                 </View>
                 {user?.id === c.author.id && (
                   <TouchableOpacity onPress={() => deleteComment.mutate(c.id)} className="mt-0.5">

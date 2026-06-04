@@ -8,6 +8,7 @@ export interface AuthUser {
   username: string;
   avatarUrl: string | null;
   onboardingComplete: boolean;
+  role: string | null;
 }
 
 interface AuthContextType {

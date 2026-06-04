@@ -12,10 +12,8 @@ export default function manifest(): MetadataRoute.Manifest {
     orientation: "portrait",
     categories: ["design", "social"],
     icons: [
-      { src: "/icon.png", sizes: "32x32", type: "image/png" },
-      { src: "/apple-icon.png", sizes: "180x180", type: "image/png" },
-      { src: "/apple-icon.png", sizes: "192x192", type: "image/png" },
-      { src: "/apple-icon.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+      { src: "/web-app-manifest-192x192.png", sizes: "192x192", type: "image/png", purpose: "maskable any" },
+      { src: "/web-app-manifest-512x512.png", sizes: "512x512", type: "image/png", purpose: "maskable any" },
     ],
   };
 }

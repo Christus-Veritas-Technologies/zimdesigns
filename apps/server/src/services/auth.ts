@@ -21,6 +21,7 @@ export interface SafeUser {
   username: string;
   avatarUrl: string | null;
   onboardingComplete: boolean;
+  role: string | null;
 }
 
 export interface AuthResult {
@@ -144,6 +145,7 @@ async function buildAuthResult(user: {
   username: string;
   avatarUrl: string | null;
   onboardingComplete: boolean;
+  role?: string | null;
 }): Promise<AuthResult> {
   const tokens = await issueTokenPair(user.id, user.email);
   return {
@@ -154,6 +156,7 @@ async function buildAuthResult(user: {
       username: user.username,
       avatarUrl: user.avatarUrl,
       onboardingComplete: user.onboardingComplete,
+      role: user.role ?? null,
     },
     tokens,
   };

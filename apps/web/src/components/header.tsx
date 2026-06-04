@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { TrendingUp, ListChecks, Bell, Settings, LogOut, User, ChevronDown, LogIn } from "lucide-react";
+import { Bell, Settings, LogOut, User, ChevronDown, LogIn, Search, Upload } from "lucide-react";
 import { ModeToggle } from "./mode-toggle";
 import { useCurrentUser, useIsAuthenticated, useLogout } from "@/hooks/use-auth";
 import { useNotifications } from "@/hooks/use-notifications";
@@ -84,26 +84,43 @@ function NotificationDot() {
   );
 }
 
+function SearchBar() {
+  const router = useRouter();
+  const [value, setValue] = useState("");
+  return (
+    <form
+      onSubmit={(e) => { e.preventDefault(); if (value.trim()) router.push(`/search?q=${encodeURIComponent(value.trim())}`); }}
+      className="relative hidden md:flex items-center"
+    >
+      <Search size={14} className="absolute left-3 text-muted-foreground pointer-events-none" />
+      <input
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        placeholder="Search redesigns…"
+        className="h-9 pl-8 pr-3 w-52 lg:w-64 rounded-xl border border-border bg-card text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring transition-all"
+      />
+    </form>
+  );
+}
+
 export default function Header() {
   const isAuthenticated = useIsAuthenticated();
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-sm">
-      <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+      <div className="max-w-6xl mx-auto px-4 h-14 flex items-center gap-3">
         {/* Logo */}
-        <Link href="/" className="font-extrabold text-lg text-foreground tracking-tight flex-none" style={{ fontFamily: "'Bricolage Grotesque', system-ui, sans-serif" }}>
+        <Link href="/" className="inline-flex items-center gap-2 font-extrabold text-lg text-foreground tracking-tight flex-none mr-1" style={{ fontFamily: "'Bricolage Grotesque', system-ui, sans-serif", letterSpacing: "-0.03em" }}>
+          <span className="inline-flex rounded-xl overflow-hidden flex-none">
+            <Image src="/zd-icon.png" width={28} height={28} alt="" unoptimized />
+          </span>
           Zim<span className="text-primary">Designs</span>
         </Link>
 
-        {/* Nav links */}
-        <nav className="hidden sm:flex items-center gap-1">
-          <Link href="/trending" className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
-            <TrendingUp size={14} /> Trending
-          </Link>
-          <Link href="/app-requests" className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
-            <ListChecks size={14} /> Requests
-          </Link>
-        </nav>
+        {/* Search */}
+        <SearchBar />
+
+        <div className="flex-1" />
 
         {/* Right side */}
         <div className="flex items-center gap-2">
@@ -114,15 +131,29 @@ export default function Header() {
                 <Bell size={17} />
                 <NotificationDot />
               </Link>
+              <Link
+                href="/upload"
+                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"
+              >
+                <Upload size={14} /> Upload
+              </Link>
               <UserMenu />
             </>
           ) : (
-            <Link
-              href="/auth/login"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"
-            >
-              <LogIn size={14} /> Sign in
-            </Link>
+            <>
+              <Link
+                href="/upload"
+                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border bg-card text-sm font-semibold text-foreground hover:bg-accent transition-colors"
+              >
+                <Upload size={14} /> Upload
+              </Link>
+              <Link
+                href="/login"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary/90 transition-colors"
+              >
+                <LogIn size={14} /> Sign in
+              </Link>
+            </>
           )}
         </div>
       </div>

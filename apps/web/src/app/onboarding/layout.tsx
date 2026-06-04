@@ -1,6 +1,5 @@
 import { Wordmark } from "@/components/brand/wordmark";
-
-const STEPS = ["Profile", "Interests", "All set"];
+import { StepLabel } from "./step-label";
 
 export default function OnboardingLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -16,6 +15,7 @@ export default function OnboardingLayout({ children }: { children: React.ReactNo
       {/* Top bar */}
       <div className="relative flex items-center justify-between px-8 py-6 border-b border-border bg-background/80 backdrop-blur-sm">
         <Wordmark size={20} />
+        <StepLabel />
       </div>
       <div className="relative flex-1">{children}</div>
     </div>
