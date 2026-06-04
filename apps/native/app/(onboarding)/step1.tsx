@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
-import { ArrowRight, Camera, Upload } from "lucide-react-native";
+import { ArrowRight, Camera } from "lucide-react-native";
 import { useMe, useUpdateProfile } from "@/hooks/use-onboarding";
 import { useAuth } from "@/contexts/auth-context";
 
@@ -116,31 +116,28 @@ export default function Step1Screen() {
         </Text>
 
         {/* Avatar */}
-        <View className="flex-row items-center gap-4 mb-5">
+        <View className="items-center mb-5">
           <TouchableOpacity
             onPress={pickAvatar}
-            activeOpacity={0.8}
-            className="w-[72px] h-[72px] rounded-xl bg-muted border-2 border-dashed border-border items-center justify-center overflow-hidden"
+            activeOpacity={0.85}
+            style={{ width: 96, height: 96 }}
+            className="relative"
           >
-            {avatarUri ? (
-              <Image source={{ uri: avatarUri }} className="w-full h-full" resizeMode="cover" />
-            ) : (
-              <Camera size={22} color="#8A8278" />
-            )}
-          </TouchableOpacity>
-          <View>
-            <TouchableOpacity
-              onPress={pickAvatar}
-              activeOpacity={0.8}
-              className="flex-row items-center gap-2 h-9 px-3.5 rounded-xl border border-border bg-card"
+            <View className="w-full h-full rounded-full bg-muted border-2 border-dashed border-border items-center justify-center overflow-hidden">
+              {avatarUri ? (
+                <Image source={{ uri: avatarUri }} style={{ width: 96, height: 96 }} resizeMode="cover" />
+              ) : (
+                <Camera size={28} color="#8A8278" />
+              )}
+            </View>
+            <View
+              className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary items-center justify-center"
+              style={{ borderWidth: 2, borderColor: "white" }}
             >
-              <Upload size={15} color="#8A8278" />
-              <Text className="text-sm font-semibold text-foreground">
-                {avatarUri ? "Change photo" : "Upload photo"}
-              </Text>
-            </TouchableOpacity>
-            <Text className="text-xs text-muted-foreground mt-1.5">PNG or JPG, max 5 MB. Optional.</Text>
-          </View>
+              <Camera size={14} color="#2A2410" />
+            </View>
+          </TouchableOpacity>
+          <Text className="text-xs text-muted-foreground mt-2">PNG or JPG · max 5 MB · optional</Text>
         </View>
 
         <View className="gap-4">
