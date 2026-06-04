@@ -123,7 +123,7 @@ export default function LoginPage() {
 }
 
 function LoginForm({
-  showPw, setShowPw, form, setForm, login, handleGoogleAuth, compact = false,
+  showPw, setShowPw, form, setForm, login, handleGoogleAuth, isGoogleLoading, compact = false,
 }: {
   showPw: boolean;
   setShowPw: (v: boolean) => void;
