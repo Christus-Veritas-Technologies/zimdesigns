@@ -69,7 +69,7 @@ export default function HomeScreen() {
   const { isAuthenticated } = useAuth();
 
   const forYou = useRedesigns({ sort });
-  const following = useFollowingFeed();
+  const following = useFollowingFeed(isAuthenticated);
 
   const active = tab === "foryou" ? forYou : following;
   const items = active.data?.pages.flatMap((p) => p.items) ?? [];
