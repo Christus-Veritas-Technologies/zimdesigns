@@ -245,7 +245,8 @@ export default function AppRequestsPage() {
                     onChange={(e) => setAppName(e.target.value)}
                     placeholder="e.g. EcoCash, NetOne, ZESA"
                     required
-                    className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    disabled={createRequest.isPending}
+                    className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-60"
                   />
                 </div>
 
@@ -258,8 +259,9 @@ export default function AppRequestsPage() {
                         key={cat}
                         type="button"
                         onClick={() => setCategory(category === cat ? "" : cat)}
+                        disabled={createRequest.isPending}
                         className={cn(
-                          "px-3 py-1 rounded-full text-xs font-medium border transition-colors",
+                          "px-3 py-1 rounded-full text-xs font-medium border transition-colors disabled:opacity-60 disabled:cursor-not-allowed",
                           category === cat
                             ? "bg-primary border-primary text-primary-foreground"
                             : "border-border text-muted-foreground hover:border-primary hover:text-foreground",
@@ -279,7 +281,8 @@ export default function AppRequestsPage() {
                     onChange={(e) => setDescription(e.target.value)}
                     rows={3}
                     placeholder="Describe what's broken or what could be improved..."
-                    className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
+                    disabled={createRequest.isPending}
+                    className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none disabled:opacity-60"
                   />
                 </div>
 
@@ -293,7 +296,8 @@ export default function AppRequestsPage() {
                       onChange={(e) => setAppUrl(e.target.value)}
                       placeholder="https://play.google.com/..."
                       type="url"
-                      className="w-full pl-8 pr-3 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                      disabled={createRequest.isPending}
+                      className="w-full pl-8 pr-3 py-2.5 rounded-xl border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 disabled:opacity-60"
                     />
                   </div>
                 </div>
