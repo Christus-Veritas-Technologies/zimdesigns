@@ -139,14 +139,14 @@ export default function EditProfilePage() {
           {/* Basic info */}
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-semibold text-foreground">Full name</label>
-            <Input value={name} onChange={(e) => setName(e.target.value)} maxLength={100} className="rounded-xl" />
+            <Input value={name} onChange={(e) => setName(e.target.value)} maxLength={100} className="rounded-xl" disabled={update.isPending} />
           </div>
 
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-semibold text-foreground">Username</label>
             <div className="relative">
               <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-mono text-muted-foreground text-sm">@</span>
-              <Input value={username} onChange={(e) => setUsername(e.target.value)} maxLength={30} className="rounded-xl pl-8" />
+              <Input value={username} onChange={(e) => setUsername(e.target.value)} maxLength={30} className="rounded-xl pl-8" disabled={update.isPending} />
             </div>
           </div>
 
@@ -155,7 +155,7 @@ export default function EditProfilePage() {
               <label className="text-sm font-semibold text-foreground">Bio</label>
               <span className="text-xs font-mono text-muted-foreground">{bio.length}/160</span>
             </div>
-            <Textarea value={bio} onChange={(e) => setBio(e.target.value)} maxLength={160} rows={3} className="rounded-xl resize-none" />
+            <Textarea value={bio} onChange={(e) => setBio(e.target.value)} maxLength={160} rows={3} className="rounded-xl resize-none" disabled={update.isPending} />
           </div>
 
           <div className="flex flex-col gap-2">
@@ -198,6 +198,7 @@ export default function EditProfilePage() {
                   placeholder={placeholder}
                   type="url"
                   className="rounded-xl flex-1"
+                  disabled={update.isPending}
                 />
               </div>
             ))}
