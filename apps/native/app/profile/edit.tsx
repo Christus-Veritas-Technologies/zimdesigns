@@ -160,6 +160,7 @@ export default function EditProfileScreen() {
             value={name}
             onChangeText={setName}
             maxLength={100}
+            editable={!update.isPending}
             className="h-11 px-3.5 rounded-xl border border-input bg-card text-foreground"
             placeholderTextColor="#8A8278"
           />
@@ -175,6 +176,7 @@ export default function EditProfileScreen() {
               onChangeText={setUsername}
               maxLength={30}
               autoCapitalize="none"
+              editable={!update.isPending}
               className="flex-1 h-11 pl-8 pr-3.5 rounded-xl border border-input bg-card text-foreground"
               placeholderTextColor="#8A8278"
             />
@@ -194,6 +196,7 @@ export default function EditProfileScreen() {
             multiline
             numberOfLines={3}
             textAlignVertical="top"
+            editable={!update.isPending}
             className="px-3.5 py-2.5 rounded-xl border border-input bg-card text-foreground"
             style={{ minHeight: 80 }}
             placeholderTextColor="#8A8278"
@@ -232,6 +235,7 @@ export default function EditProfileScreen() {
               placeholderTextColor="#8A8278"
               autoCapitalize="none"
               keyboardType="url"
+              editable={!update.isPending}
               className="flex-1 h-11 px-3.5 rounded-xl border border-input bg-card text-foreground text-sm"
             />
           </View>
