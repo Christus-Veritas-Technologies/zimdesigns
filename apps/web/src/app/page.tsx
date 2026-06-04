@@ -239,7 +239,7 @@ export default function FeedPage() {
   const isAuthenticated = useIsAuthenticated();
 
   const forYou = useRedesigns({ sort, tag });
-  const following = useFollowingFeed();
+  const following = useFollowingFeed(isAuthenticated);
 
   const active = tab === "foryou" ? forYou : following;
   const redesigns = active.data?.pages.flatMap((p) => p.items) ?? [];

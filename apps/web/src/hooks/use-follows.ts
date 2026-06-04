@@ -42,12 +42,13 @@ export function useFollowing(username: string) {
   });
 }
 
-export function useFollowingFeed() {
+export function useFollowingFeed(enabled = true) {
   return useInfiniteQuery<ListResult>({
     queryKey: ["feed", "following"],
     queryFn: ({ pageParam }) =>
       api.get<ListResult>("/api/feed/following", { params: { cursor: pageParam } }).then((r) => r.data),
     initialPageParam: undefined,
     getNextPageParam: (last) => last.nextCursor,
+    enabled,
   });
 }
