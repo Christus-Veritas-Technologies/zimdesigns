@@ -48,14 +48,28 @@ export default function Step1Screen() {
   const updateProfile = useUpdateProfile();
   const router = useRouter();
 
+  // Seed immediately from auth context (synchronous, available right after signup/login)
   const [form, setForm] = useState({
-    name: me?.name ?? user?.name ?? "",
-    username: me?.username ?? user?.username ?? "",
-    bio: me?.bio ?? "",
-    role: (me?.role ?? "designer") as Role,
+    name: user?.name ?? "",
+    username: user?.username ?? "",
+    bio: "",
+    role: "designer" as Role,
   });
-  const [avatarUri, setAvatarUri] = useState<string | null>(me?.avatarUrl ?? null);
+  const [avatarUri, setAvatarUri] = useState<string | null>(user?.avatarUrl ?? null);
   const [avatarAsset, setAvatarAsset] = useState<{ uri: string; name: string; type: string } | null>(null);
+  const [initialised, setInitialised] = useState(false);
+
+  // Once /api/me resolves, fill in bio, role, and any richer data
+  if (me && !initialised) {
+    setForm({
+      name: me.name ?? user?.name ?? "",
+      username: me.username ?? user?.username ?? "",
+      bio: me.bio ?? "",
+      role: (me.role ?? "designer") as Role,
+    });
+    if (me.avatarUrl && !avatarAsset) setAvatarUri(me.avatarUrl);
+    setInitialised(true);
+  }
 
   const bioLen = form.bio.length;
 
