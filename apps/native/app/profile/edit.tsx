@@ -131,25 +131,23 @@ export default function EditProfileScreen() {
       </View>
 
       {/* Avatar picker */}
-      <View className="flex-row items-center gap-4 mb-6">
-        <TouchableOpacity onPress={pickAvatar} activeOpacity={0.8} className="relative">
-          <View className="w-20 h-20 rounded-2xl bg-primary/20 items-center justify-center overflow-hidden border-2 border-dashed border-border">
+      <View className="items-center mb-6">
+        <TouchableOpacity onPress={pickAvatar} activeOpacity={0.85} style={{ width: 96, height: 96 }} className="relative">
+          <View className="w-full h-full rounded-full bg-primary/20 items-center justify-center overflow-hidden">
             {avatarSrc ? (
-              <Image source={{ uri: avatarSrc }} className="w-full h-full" resizeMode="cover" />
+              <Image source={{ uri: avatarSrc }} style={{ width: 96, height: 96 }} resizeMode="cover" />
             ) : (
-              <Text className="text-2xl font-extrabold text-primary">{(me?.name ?? "?").charAt(0).toUpperCase()}</Text>
+              <Text className="text-3xl font-extrabold text-primary">{(me?.name ?? "?").charAt(0).toUpperCase()}</Text>
             )}
           </View>
-          <View className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-primary items-center justify-center">
-            <Camera size={12} color="#2A2410" />
+          <View
+            className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-primary items-center justify-center"
+            style={{ borderWidth: 2, borderColor: "white" }}
+          >
+            <Camera size={14} color="#2A2410" />
           </View>
         </TouchableOpacity>
-        <View>
-          <Text className="text-sm font-medium text-foreground">Profile photo</Text>
-          <TouchableOpacity onPress={pickAvatar} activeOpacity={0.7}>
-            <Text className="text-xs text-primary font-medium mt-0.5">{avatarSrc ? "Change photo" : "Upload photo"}</Text>
-          </TouchableOpacity>
-        </View>
+        <Text className="text-xs text-muted-foreground mt-2">PNG or JPG · max 5 MB</Text>
       </View>
 
       <View className="gap-4 mb-6">
