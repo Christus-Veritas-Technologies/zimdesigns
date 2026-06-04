@@ -1,0 +1,91 @@
+# =============================================================
+# EAS BUILD ARCHIVE IGNORE — ZimDesigns monorepo
+# Placed at monorepo root because pnpm workspaces causes EAS
+# to archive from the workspace root, not apps/native/.
+# =============================================================
+
+# ─────────────────────────────────────────
+# OTHER APPS — only the native app is built
+# ─────────────────────────────────────────
+apps/web/
+apps/server/
+
+# ─────────────────────────────────────────
+# WORKSPACE PACKAGES native does NOT use
+# Native only needs: @zimdesigns/env, @zimdesigns/config
+# ─────────────────────────────────────────
+packages/db/
+packages/ui/
+
+# ─────────────────────────────────────────
+# NODE MODULES — EAS does a fresh pnpm install
+# ─────────────────────────────────────────
+node_modules/
+**/node_modules/
+
+# ─────────────────────────────────────────
+# BUILD OUTPUT & CACHES
+# ─────────────────────────────────────────
+.next/
+**/.next/
+dist/
+**/dist/
+build/
+**/build/
+.turbo/
+**/.turbo/
+**/.expo/
+**/web-build/
+**/*.tsbuildinfo
+**/.cache/
+.alchemy/
+
+# ─────────────────────────────────────────
+# NATIVE PREBUILD OUTPUT (android / ios dirs)
+# Generated at build time — do not archive
+# ─────────────────────────────────────────
+apps/native/android/
+apps/native/ios/
+
+# ─────────────────────────────────────────
+# LOCK FILES — keep only pnpm-lock.yaml
+# bun.lock is not used by EAS; others are redundant
+# ─────────────────────────────────────────
+bun.lock
+package-lock.json
+yarn.lock
+
+# ─────────────────────────────────────────
+# ENVIRONMENT & SECRETS
+# EAS manages env vars separately via eas.json
+# ─────────────────────────────────────────
+.env
+.env.*
+**/.env
+**/.env.*
+!**/.env.example
+
+# ─────────────────────────────────────────
+# TEST & COVERAGE
+# ─────────────────────────────────────────
+coverage/
+**/coverage/
+.nyc_output/
+
+# ─────────────────────────────────────────
+# EDITOR, OS & TOOLING ARTIFACTS
+# ─────────────────────────────────────────
+.vscode/
+.idea/
+.DS_Store
+**/.DS_Store
+Thumbs.db
+**/*.log
+tmp/
+temp/
+
+# ─────────────────────────────────────────
+# CI / REPO META (not needed on EAS servers)
+# ─────────────────────────────────────────
+.github/
+.claude/
