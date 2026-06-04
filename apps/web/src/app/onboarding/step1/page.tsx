@@ -8,6 +8,7 @@ import { Input } from "@zimdesigns/ui/components/input";
 import { Label } from "@zimdesigns/ui/components/label";
 import { StepsBar } from "@/components/onboarding/steps-bar";
 import { useMe, useUpdateProfile } from "@/hooks/use-onboarding";
+import { useAuthStore } from "@/store/auth";
 import { useRouter } from "next/navigation";
 
 type Role = "designer" | "developer" | "both";
@@ -20,18 +21,33 @@ const ROLES: { id: Role; label: string; icon: React.ReactNode }[] = [
 
 export default function Step1Page() {
   const { data: me } = useMe();
+  const user = useAuthStore((s) => s.user);
   const updateProfile = useUpdateProfile();
   const router = useRouter();
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
+  // Seed from auth store immediately (available synchronously after signup/login)
   const [form, setForm] = useState({
-    name: me?.name ?? "",
-    username: me?.username ?? "",
-    bio: me?.bio ?? "",
-    role: (me?.role ?? "designer") as Role,
+    name: user?.name ?? "",
+    username: user?.username ?? "",
+    bio: "",
+    role: "designer" as Role,
   });
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(me?.avatarUrl ?? null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(user?.avatarUrl ?? null);
+  const [initialised, setInitialised] = useState(false);
+
+  // Once /api/me resolves, fill in bio, role, and any richer data
+  if (me && !initialised) {
+    setForm({
+      name: me.name ?? user?.name ?? "",
+      username: me.username ?? user?.username ?? "",
+      bio: me.bio ?? "",
+      role: (me.role ?? "designer") as Role,
+    });
+    if (me.avatarUrl && !avatarFile) setAvatarPreview(me.avatarUrl);
+    setInitialised(true);
+  }
 
   const bioLen = form.bio.length;
 
