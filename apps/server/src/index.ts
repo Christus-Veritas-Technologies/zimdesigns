@@ -14,6 +14,7 @@ import appRequestRoutes from "./routes/app-requests";
 import settingsRoutes from "./routes/settings";
 import appEntryRoutes from "./routes/app-entries";
 import discoverRoutes from "./routes/discover";
+import adminRoutes from "./routes/admin";
 
 const app = new Hono();
 
@@ -41,5 +42,6 @@ app.route("/api", appRequestRoutes);
 app.route("/api", settingsRoutes);
 app.route("/api/apps", appEntryRoutes);
 app.route("/api/discover", discoverRoutes);
+app.route("/api/admin", adminRoutes);
 
 export default app;

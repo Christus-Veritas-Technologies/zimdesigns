@@ -26,7 +26,7 @@ export default function AuthCallbackPage() {
 
     // We don't have the full user object from query params — fetch /me after setting tokens
     setAuth(
-      { id: userId, email: "", name: "", username: "", avatarUrl: null, onboardingComplete },
+      { id: userId, email: "", name: "", username: "", avatarUrl: null, onboardingComplete, role: null },
       token,
       refreshToken,
     );
