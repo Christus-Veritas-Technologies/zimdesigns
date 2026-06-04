@@ -112,10 +112,10 @@ export default function EditProfilePage() {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           {/* Avatar */}
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col items-center gap-2 mb-2">
             <div
               onClick={() => fileRef.current?.click()}
-              className="relative w-20 h-20 rounded-2xl overflow-hidden bg-primary/20 flex items-center justify-center cursor-pointer group border-2 border-dashed border-border hover:border-primary transition-colors"
+              className="relative w-24 h-24 rounded-full overflow-hidden bg-primary/20 flex items-center justify-center cursor-pointer group border-2 border-dashed border-border hover:border-primary transition-colors"
             >
               {currentAvatar ? (
                 <Image src={currentAvatar} alt="Avatar" fill className="object-cover" unoptimized />
@@ -123,16 +123,10 @@ export default function EditProfilePage() {
                 <span className="text-2xl font-extrabold text-primary">{(me?.name ?? "?").charAt(0).toUpperCase()}</span>
               )}
               <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                <Camera size={18} className="text-white" />
+                <Camera size={20} className="text-white" />
               </div>
             </div>
-            <div>
-              <p className="text-sm font-medium text-foreground">Profile photo</p>
-              <p className="text-xs text-muted-foreground">PNG or JPG, shown on your profile</p>
-              <button type="button" onClick={() => fileRef.current?.click()} className="text-xs text-primary font-medium mt-1 hover:underline">
-                {currentAvatar ? "Change photo" : "Upload photo"}
-              </button>
-            </div>
+            <p className="text-xs text-muted-foreground">PNG or JPG · max 5 MB</p>
             <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarPick} />
           </div>
 
