@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
-import { ArrowRight, Camera } from "lucide-react-native";
+import { ArrowRight, Camera, Palette, Terminal, Layers } from "lucide-react-native";
 import { useMe, useUpdateProfile } from "@/hooks/use-onboarding";
 import { useAuth } from "@/contexts/auth-context";
 
@@ -198,21 +198,28 @@ export default function Step1Screen() {
           <View className="gap-2">
             <Text className="text-[0.84rem] font-semibold text-foreground">I am a…</Text>
             <View className="flex-row gap-2">
-              {ROLES.map(({ id, label }) => (
-                <TouchableOpacity
-                  key={id}
-                  onPress={() => setForm((f) => ({ ...f, role: id }))}
-                  className={`flex-1 py-3.5 px-2 rounded-xl border items-center justify-center ${
-                    form.role === id
-                      ? "border-primary bg-accent"
-                      : "border-border bg-card"
-                  }`}
-                >
-                  <Text className={`text-sm font-semibold ${form.role === id ? "text-primary" : "text-foreground"}`}>
-                    {label}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+              {ROLES.map(({ id, label }) => {
+                const selected = form.role === id;
+                return (
+                  <TouchableOpacity
+                    key={id}
+                    onPress={() => setForm((f) => ({ ...f, role: id }))}
+                    className={`flex-1 py-3.5 px-2 rounded-xl border items-center justify-center ${
+                      selected ? "border-primary bg-accent" : "border-border bg-card"
+                    }`}
+                    style={{ gap: 6 }}
+                  >
+                    <View className={`w-8 h-8 rounded-lg items-center justify-center ${selected ? "bg-primary" : "bg-muted"}`}>
+                      {id === "designer" && <Palette size={16} color={selected ? "#2A2410" : "#8A8278"} />}
+                      {id === "developer" && <Terminal size={16} color={selected ? "#2A2410" : "#8A8278"} />}
+                      {id === "both" && <Layers size={16} color={selected ? "#2A2410" : "#8A8278"} />}
+                    </View>
+                    <Text className={`text-sm font-semibold ${selected ? "text-primary" : "text-foreground"}`}>
+                      {label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
           </View>
         </View>
