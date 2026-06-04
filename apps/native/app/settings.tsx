@@ -98,13 +98,14 @@ export default function SettingsScreen() {
           )}
 
           <Text className="text-xs font-medium text-muted-foreground mb-1">Current password</Text>
-          <View className="flex-row items-center border border-border rounded-xl bg-background mb-3">
+          <View className="flex-row items-center border border-border rounded-xl bg-background mb-3" style={{ opacity: changePassword.isPending ? 0.6 : 1 }}>
             <TextInput
               value={currentPassword}
               onChangeText={setCurrentPassword}
               secureTextEntry={!showCurrent}
               placeholder="••••••••"
               placeholderTextColor="#8A8278"
+              editable={!changePassword.isPending}
               className="flex-1 px-3 py-2.5 text-sm text-foreground"
             />
             <TouchableOpacity onPress={() => setShowCurrent(!showCurrent)} className="pr-3">
@@ -113,13 +114,14 @@ export default function SettingsScreen() {
           </View>
 
           <Text className="text-xs font-medium text-muted-foreground mb-1">New password</Text>
-          <View className="flex-row items-center border border-border rounded-xl bg-background mb-3">
+          <View className="flex-row items-center border border-border rounded-xl bg-background mb-3" style={{ opacity: changePassword.isPending ? 0.6 : 1 }}>
             <TextInput
               value={newPassword}
               onChangeText={setNewPassword}
               secureTextEntry={!showNew}
               placeholder="Min. 8 characters"
               placeholderTextColor="#8A8278"
+              editable={!changePassword.isPending}
               className="flex-1 px-3 py-2.5 text-sm text-foreground"
             />
             <TouchableOpacity onPress={() => setShowNew(!showNew)} className="pr-3">
@@ -170,7 +172,9 @@ export default function SettingsScreen() {
             onChangeText={setDeleteConfirm}
             placeholder="delete my account"
             placeholderTextColor="#8A8278"
+            editable={!deleteAccount.isPending}
             className="px-3 py-2.5 rounded-xl border border-red-300/30 bg-background text-sm text-foreground mb-3"
+            style={{ opacity: deleteAccount.isPending ? 0.6 : 1 }}
           />
           <TouchableOpacity
             onPress={confirmDelete}
