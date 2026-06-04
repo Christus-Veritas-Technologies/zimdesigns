@@ -55,3 +55,39 @@ export async function getActiveChallenges() {
     appName: ch.appName,
   }));
 }
+
+export async function getCollectionById(id: string) {
+  const collection = await db.collection.findUnique({
+    where: { id },
+    include: {
+      curator: { select: { id: true, name: true, username: true, avatarUrl: true } },
+      items: {
+        orderBy: { order: "asc" },
+        include: {
+          redesign: {
+            select: {
+              id: true, title: true, appName: true, beforeUrl: true, afterUrl: true,
+              upvoteCount: true, tags: true,
+              author: { select: { id: true, name: true, username: true, avatarUrl: true, role: true } },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!collection) return null;
+
+  return {
+    id: collection.id,
+    title: collection.title,
+    description: collection.description,
+    coverImageUrl: collection.coverImageUrl,
+    isFeatured: collection.isFeatured,
+    curator: collection.curator,
+    redesigns: collection.items.map((item) => ({
+      ...item.redesign,
+      tags: parseJson(item.redesign.tags),
+    })),
+  };
+}

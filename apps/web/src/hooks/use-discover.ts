@@ -41,3 +41,26 @@ export function useChallenges() {
     queryFn: () => api.get<Challenge[]>("/api/discover/challenges").then((r) => r.data),
   });
 }
+
+export interface CollectionRedesign {
+  id: string;
+  title: string;
+  appName: string;
+  beforeUrl: string;
+  afterUrl: string;
+  upvoteCount: number;
+  tags: string[];
+  author: { id: string; name: string; username: string; avatarUrl: string | null; role: string | null };
+}
+
+export interface CollectionDetail extends Omit<Collection, "redesignCount"> {
+  redesigns: CollectionRedesign[];
+}
+
+export function useCollection(id: string) {
+  return useQuery<CollectionDetail>({
+    queryKey: ["collection", id],
+    queryFn: () => api.get<CollectionDetail>(`/api/discover/collections/${id}`).then((r) => r.data),
+    enabled: !!id,
+  });
+}
