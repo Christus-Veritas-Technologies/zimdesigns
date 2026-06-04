@@ -129,7 +129,8 @@ function CommentsSection({ redesignId }: { redesignId: string }) {
               value={body}
               onChange={(e) => setBody(e.target.value)}
               placeholder="Add to the conversation…"
-              className="flex-1 h-10 px-3.5 rounded-xl border border-input bg-card text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              disabled={createComment.isPending}
+              className="flex-1 h-10 px-3.5 rounded-xl border border-input bg-card text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60"
               onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(e); }}
             />
             <button
@@ -184,7 +185,8 @@ function CommentsSection({ redesignId }: { redesignId: string }) {
             {user?.id === c.author.id && (
               <button
                 onClick={() => deleteComment.mutate(c.id)}
-                className="text-muted-foreground hover:text-destructive transition-colors flex-none"
+                disabled={deleteComment.isPending}
+                className="text-muted-foreground hover:text-destructive transition-colors flex-none disabled:opacity-40"
               >
                 <Trash2 size={13} />
               </button>
