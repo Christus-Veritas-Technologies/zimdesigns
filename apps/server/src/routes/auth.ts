@@ -134,12 +134,21 @@ router.post("/send-verification", async (c) => {
   const authHeader = c.req.header("Authorization");
   if (!authHeader?.startsWith("Bearer ")) return c.json({ message: "Unauthorized" }, 401);
   const { verifyJwt } = await import("../lib/jwt");
+
+  let userId: string;
   try {
     const payload = await verifyJwt(authHeader.slice(7), "access");
-    await sendVerificationEmail(payload.userId);
-    return c.json({ ok: true });
+    userId = payload.userId;
   } catch {
     return c.json({ message: "Unauthorized" }, 401);
+  }
+
+  try {
+    await sendVerificationEmail(userId);
+    return c.json({ ok: true });
+  } catch (err) {
+    console.error("send-verification:", err);
+    return c.json({ message: "Failed to send verification email" }, 500);
   }
 });
 
