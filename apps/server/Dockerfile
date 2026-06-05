@@ -6,7 +6,7 @@ COPY . .
 
 RUN bun install
 
-RUN bunx turbo run build --filter=server
+RUN bun --cwd apps/server run build
 
 WORKDIR /app/apps/server
 
