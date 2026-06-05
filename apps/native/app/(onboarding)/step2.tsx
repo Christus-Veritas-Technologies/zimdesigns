@@ -94,10 +94,16 @@ export default function Step2Screen() {
         })}
       </View>
 
-      <View className="flex-row items-center gap-1.5 mb-8">
+      <View className="flex-row items-center gap-1.5 mb-4">
         <Check size={12} color="#2D9D6A" />
         <Text className="text-xs text-muted-foreground">Pick as many as you like — you can change this later.</Text>
       </View>
+
+      {updateInterests.isError && (
+        <Text className="text-destructive text-sm mb-4">
+          {(updateInterests.error as Error & { response?: { data?: { message?: string } } })?.response?.data?.message ?? "Failed to save interests. Please try again."}
+        </Text>
+      )}
 
       {/* Buttons */}
       <View className="gap-3">
