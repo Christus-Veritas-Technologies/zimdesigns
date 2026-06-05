@@ -6,10 +6,10 @@ COPY . .
 
 RUN bun install
 
-RUN bun --cwd apps/server run build
+RUN bunx turbo run build --filter=server
 
 WORKDIR /app/apps/server
 
 EXPOSE 3000
 
-CMD ["bun", "run", "start"]
+CMD ["bun", "run", "apps/server/dist/index.mjs"]
