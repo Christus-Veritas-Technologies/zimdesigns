@@ -4,55 +4,70 @@
 ARG NODE_VERSION=24.13.0-slim
 FROM node:${NODE_VERSION} AS base
 
+# ✅ Fix: prevent pnpm interactive prompts in CI/Docker
+ENV CI=true
+ENV PNPM_CONFIG_CONFIRM_MODULES_PURGE=false
+
 WORKDIR /app
 
-# Enable corepack (pnpm manager)
+# Enable Corepack (pnpm manager)
 RUN corepack enable
+
+# (Optional but recommended stability fix)
+# Prevents pnpm version drift between builds
+RUN corepack prepare pnpm@11.4.0 --activate
+
 
 # =========================
 # Dependencies stage
 # =========================
 FROM base AS deps
 
-# Copy only dependency manifests first (monorepo safe)
+ENV CI=true
+ENV PNPM_CONFIG_CONFIRM_MODULES_PURGE=false
+
+WORKDIR /app
+
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc* ./
 
-# If you use catalog:* (you do), ensure pnpm respects it
 ENV PNPM_HOME=/pnpm
 ENV PATH=$PNPM_HOME:$PATH
 
 RUN pnpm install --frozen-lockfile
+
 
 # =========================
 # Build stage
 # =========================
 FROM base AS builder
 
+ENV CI=true
+ENV PNPM_CONFIG_CONFIRM_MODULES_PURGE=false
+ENV NODE_ENV=production
+
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-ENV NODE_ENV=production
-
-# Build Next.js app
 RUN pnpm build
+
 
 # =========================
 # Runtime stage (Next standalone)
 # =========================
 FROM base AS runner
 
-WORKDIR /app
-
+ENV CI=true
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
-# Create non-root user
+WORKDIR /app
+
 RUN useradd -m nextjs
 
-# Copy standalone output (IMPORTANT for Next 16)
+# Copy Next standalone output
 COPY --from=builder --chown=nextjs:nextjs /app/apps/web/.next/standalone ./
 COPY --from=builder --chown=nextjs:nextjs /app/apps/web/.next/static ./apps/web/.next/static
 COPY --from=builder --chown=nextjs:nextjs /app/apps/web/public ./apps/web/public
