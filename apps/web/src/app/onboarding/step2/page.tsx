@@ -81,10 +81,16 @@ export default function Step2Page() {
           })}
         </div>
 
-        <p className="text-xs text-muted-foreground flex items-center gap-1.5 mb-8">
+        <p className="text-xs text-muted-foreground flex items-center gap-1.5 mb-4">
           <Check size={12} className="text-[var(--zd-green)]" />
           Pick as many as you like — you can change this later.
         </p>
+
+        {updateInterests.isError && (
+          <p className="text-sm text-destructive mb-4">
+            {(updateInterests.error as Error & { response?: { data?: { message?: string } } })?.response?.data?.message ?? "Failed to save interests. Please try again."}
+          </p>
+        )}
 
         {/* Footer */}
         <div className="flex items-center gap-3">
