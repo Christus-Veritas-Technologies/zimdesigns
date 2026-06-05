@@ -25,7 +25,7 @@ function absoluteUrl(url: string) {
 const ROLE_LABEL: Record<string, string> = {
   designer: "Designer",
   developer: "Developer",
-  both: "Both",
+  both: "Designer & Developer",
 };
 
 const SOCIAL_FIELDS = [
@@ -217,8 +217,9 @@ export default function ProfileScreen() {
             {profile.name}
           </Text>
           {profile.role && (
-            <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20, borderWidth: 1, borderColor: "#2D9D6A", backgroundColor: "rgba(45,157,106,0.12)" }}>
-              <Text style={{ fontSize: 10, fontWeight: "700", color: "#2D9D6A", textTransform: "uppercase", letterSpacing: 0.5 }}>
+            <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20, borderWidth: 1, borderColor: "#2D9D6A", backgroundColor: "rgba(45,157,106,0.12)", flexDirection: "row", alignItems: "center", gap: 4 }}>
+              {profile.role === "both" && <Text style={{ fontSize: 11 }}>⚔️</Text>}
+              <Text style={{ fontSize: 10, fontWeight: "700", color: "#2D9D6A", textTransform: profile.role === "both" ? "none" : "uppercase", letterSpacing: 0.5 }}>
                 {ROLE_LABEL[profile.role] ?? profile.role}
               </Text>
             </View>
