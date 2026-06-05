@@ -55,6 +55,12 @@ export default function Step3Screen() {
           Show us how you&apos;d improve a Zimbabwean app.
         </Text>
 
+        {complete.isError && (
+          <Text className="text-destructive text-sm text-center">
+            {(complete.error as Error & { response?: { data?: { message?: string } } })?.response?.data?.message ?? "Something went wrong. Please try again."}
+          </Text>
+        )}
+
         <TouchableOpacity
           onPress={() => { complete.mutate(); }}
           className="h-12 rounded-xl bg-secondary flex-row items-center justify-center gap-2"
