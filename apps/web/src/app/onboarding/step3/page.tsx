@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Upload, Compass, Flag } from "lucide-react";
+import { Upload, Compass } from "lucide-react";
 import { Button } from "@zimdesigns/ui/components/button";
 import { FlagBar } from "@/components/brand/flag-bar";
 import { useCompleteOnboarding } from "@/hooks/use-onboarding";
@@ -20,12 +20,12 @@ export default function Step3Page() {
         </div>
 
         <h1
-          className="mt-6 text-[1.9rem] font-bold tracking-tight leading-[1.15]"
+          className="mt-6 text-2xl font-bold tracking-tight leading-[1.15]"
           style={{ fontFamily: "'Bricolage Grotesque', system-ui, sans-serif" }}
         >
           You&apos;re In. Now Let&apos;s Build Something Better.
         </h1>
-        <p className="mt-3 text-[1rem] text-muted-foreground mb-8">
+        <p className="mt-3 text-sm text-muted-foreground mb-8">
           Your profile is ready. Here&apos;s what happens next.
         </p>
 
@@ -39,10 +39,6 @@ export default function Step3Page() {
             <Upload size={18} />
             Upload Your First Redesign
           </Button>
-
-          <p className="text-xs text-muted-foreground -mt-1">
-            Show us how you&apos;d improve a Zimbabwean app.
-          </p>
 
           {complete.isError && (
             <p className="text-sm text-destructive text-center">
@@ -58,12 +54,6 @@ export default function Step3Page() {
             </Link>
           </Button>
 
-          <Button variant="ghost" asChild
-            className="w-full text-muted-foreground gap-2">
-            <Link href="/request">
-              <Flag size={15} /> Tell us what app needs fixing
-            </Link>
-          </Button>
         </div>
 
         <div className="mt-8">
