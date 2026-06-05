@@ -302,6 +302,12 @@ export default function AppRequestsPage() {
                   </div>
                 </div>
 
+                {createRequest.isError && (
+                  <p className="text-sm text-destructive">
+                    {(createRequest.error as Error & { response?: { data?: { message?: string } } })?.response?.data?.message ?? "Failed to submit. Please try again."}
+                  </p>
+                )}
+
                 <Button
                   type="submit"
                   disabled={createRequest.isPending || !appName.trim()}
