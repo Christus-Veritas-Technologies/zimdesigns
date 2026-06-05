@@ -18,6 +18,7 @@
     "@zimdesigns/env": "workspace:*",
     "dotenv": "catalog:",
     "hono": "^4.8.2",
+    "jose": "^6.2.3",
     "nodemailer": "^6.10.1",
     "pg": "^8.21.0",
     "zod": "catalog:"
