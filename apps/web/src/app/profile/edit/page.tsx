@@ -9,7 +9,6 @@ import {
 } from "lucide-react";
 import { Button } from "@zimdesigns/ui/components/ui/button";
 import { Input } from "@zimdesigns/ui/components/ui/input";
-import { Textarea } from "@zimdesigns/ui/components/ui/textarea";
 import { cn } from "@zimdesigns/ui/lib/utils";
 import { useMe, useUpdateProfile } from "@/hooks/use-onboarding";
 
@@ -149,7 +148,14 @@ export default function EditProfilePage() {
               <label className="text-sm font-semibold text-foreground">Bio</label>
               <span className="text-xs font-mono text-muted-foreground">{bio.length}/160</span>
             </div>
-            <Textarea value={bio} onChange={(e) => setBio(e.target.value)} maxLength={160} rows={3} className="rounded-xl resize-none" disabled={update.isPending} />
+            <textarea
+              value={bio}
+              onChange={(e) => setBio(e.target.value)}
+              maxLength={160}
+              rows={3}
+              disabled={update.isPending}
+              className="w-full rounded-xl border border-input bg-transparent px-3 py-2 text-sm resize-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/50 focus-visible:border-ring disabled:opacity-50 disabled:cursor-not-allowed placeholder:text-muted-foreground"
+            />
           </div>
 
           <div className="flex flex-col gap-2">

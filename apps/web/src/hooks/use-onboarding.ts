@@ -28,12 +28,10 @@ export function useMe() {
 export function useUpdateProfile() {
   const { setUser } = useAuthStore();
   return useMutation({
+    // Do NOT set Content-Type manually — Axios detects FormData and sets
+    // multipart/form-data with the correct boundary automatically.
     mutationFn: (formData: FormData) =>
-      api
-        .patch<SafeUser>("/api/me", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        })
-        .then((r) => r.data),
+      api.patch<SafeUser>("/api/me", formData).then((r) => r.data),
     onSuccess: (user) => setUser(user),
   });
 }

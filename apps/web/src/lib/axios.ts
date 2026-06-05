@@ -7,9 +7,18 @@ export const api = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-// Attach access token to every request
+// Attach access token to every request.
+// Primary: read from the in-memory Zustand store (updated synchronously on login/logout).
+// Fallback: read directly from localStorage in case the persist middleware hasn't rehydrated yet
+// (can happen if the page was refreshed and a mutation fires before the first rehydration tick).
 api.interceptors.request.use((config) => {
-  const token = useAuthStore.getState().accessToken;
+  let token = useAuthStore.getState().accessToken;
+  if (!token && typeof window !== "undefined") {
+    try {
+      const raw = localStorage.getItem("zd-auth");
+      if (raw) token = (JSON.parse(raw) as { state?: { accessToken?: string } })?.state?.accessToken ?? null;
+    } catch {}
+  }
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
