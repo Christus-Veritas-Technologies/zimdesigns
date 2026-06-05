@@ -51,7 +51,8 @@ export function useLogout() {
       api.post("/api/auth/logout", { refreshToken }).then(() => undefined),
     onSettled: () => {
       clearAuth();
-      router.replace("/auth/login");
+      // Login lives at /login (route group (auth)), not /auth/login
+      router.replace("/login");
     },
   });
 }
