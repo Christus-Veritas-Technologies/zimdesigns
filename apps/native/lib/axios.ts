@@ -1,6 +1,7 @@
 import axios from "axios";
 import { env } from "@zimdesigns/env/native";
-import { getAccessToken, getRefreshToken, saveTokens, clearAll } from "./token-storage";
+import { getAccessToken, getRefreshToken, saveTokens } from "./token-storage";
+import { globalClearAuth } from "./auth-actions";
 
 export const api = axios.create({
   baseURL: env.EXPO_PUBLIC_SERVER_URL,
@@ -26,7 +27,7 @@ api.interceptors.response.use(
       refreshing = (async () => {
         try {
           const refreshToken = await getRefreshToken();
-          if (!refreshToken) { await clearAll(); return null; }
+          if (!refreshToken) { await globalClearAuth(); return null; }
 
           const res = await axios.post<{ accessToken: string; refreshToken: string }>(
             `${env.EXPO_PUBLIC_SERVER_URL}/api/auth/refresh`,
@@ -35,7 +36,9 @@ api.interceptors.response.use(
           await saveTokens(res.data.accessToken, res.data.refreshToken);
           return res.data.accessToken;
         } catch {
-          await clearAll();
+          // Clear both SecureStore and the AuthContext React state so the UI
+          // immediately reflects the logged-out state (isAuthenticated = false).
+          await globalClearAuth();
           return null;
         } finally {
           refreshing = null;

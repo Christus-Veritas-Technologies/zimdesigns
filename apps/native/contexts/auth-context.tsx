@@ -1,5 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { saveTokens, saveUser, getUser, clearAll, getAccessToken } from "@/lib/token-storage";
+import { registerClearAuth } from "@/lib/auth-actions";
 
 export interface AuthUser {
   id: string;
@@ -40,6 +41,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     })();
   }, []);
+
+  // Register clearAuth with the global bridge so the axios interceptor can
+  // call it when a token refresh fails (interceptor has no context access).
+  useEffect(() => {
+    registerClearAuth(clearAuth);
+  }, [clearAuth]);
 
   const setAuth = useCallback(async (newUser: AuthUser, accessToken: string, refreshToken: string) => {
     await Promise.all([
