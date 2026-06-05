@@ -26,21 +26,14 @@ export function useMe() {
 export function useUpdateProfile() {
   const { updateUser } = useAuth();
   return useMutation({
+    // Do NOT set Content-Type manually — Axios/React-Native detects FormData and sets
+    // multipart/form-data with the correct boundary automatically.
     mutationFn: (data: FormData | {
       name?: string;
       username?: string;
       bio?: string;
       role?: "designer" | "developer" | "both";
-    }) => {
-      if (data instanceof FormData) {
-        return api
-          .patch<SafeUser>("/api/me", data, {
-            headers: { "Content-Type": "multipart/form-data" },
-          })
-          .then((r) => r.data);
-      }
-      return api.patch<SafeUser>("/api/me", data).then((r) => r.data);
-    },
+    }) => api.patch<SafeUser>("/api/me", data).then((r) => r.data),
     onSuccess: async (user) => {
       await updateUser(user);
       router.push("/(onboarding)/step2");
@@ -51,12 +44,9 @@ export function useUpdateProfile() {
 export function useUpdateProfileSettings() {
   const { updateUser } = useAuth();
   return useMutation({
-    mutationFn: (data: FormData) =>
-      api
-        .patch<SafeUser>("/api/me", data, {
-          headers: { "Content-Type": "multipart/form-data" },
-        })
-        .then((r) => r.data),
+    // Do NOT set Content-Type manually — Axios/React-Native detects FormData and sets
+    // multipart/form-data with the correct boundary automatically.
+    mutationFn: (data: FormData) => api.patch<SafeUser>("/api/me", data).then((r) => r.data),
     onSuccess: async (user) => {
       await updateUser(user);
     },
