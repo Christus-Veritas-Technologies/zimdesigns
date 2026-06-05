@@ -44,6 +44,12 @@ export default function Step3Page() {
             Show us how you&apos;d improve a Zimbabwean app.
           </p>
 
+          {complete.isError && (
+            <p className="text-sm text-destructive text-center">
+              {(complete.error as Error & { response?: { data?: { message?: string } } })?.response?.data?.message ?? "Something went wrong. Please try again."}
+            </p>
+          )}
+
           <Button asChild variant="secondary"
             className="h-12 text-base font-semibold bg-[var(--zd-green)] hover:bg-[var(--zd-green-hover)] text-[var(--zd-green-fg)] rounded-xl gap-2">
             <Link href="/">
