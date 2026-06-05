@@ -8,6 +8,7 @@ import { Bell, Settings, LogOut, User, ChevronDown, LogIn, Search, Upload } from
 import { ModeToggle } from "./mode-toggle";
 import { useCurrentUser, useIsAuthenticated, useLogout } from "@/hooks/use-auth";
 import { useNotifications } from "@/hooks/use-notifications";
+import { useAuthStore } from "@/store/auth";
 
 const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL ?? "http://localhost:3001";
 function absoluteUrl(url: string) {
@@ -105,6 +106,10 @@ function SearchBar() {
 
 export default function Header() {
   const isAuthenticated = useIsAuthenticated();
+  // _hasHydrated becomes true once Zustand has read from localStorage.
+  // Without this guard the server render (which has no localStorage) always
+  // shows "Sign in", causing a visible flash for already-authenticated users.
+  const hasHydrated = useAuthStore((s) => s._hasHydrated);
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-sm">
@@ -125,7 +130,11 @@ export default function Header() {
         {/* Right side */}
         <div className="flex items-center gap-2">
           <ModeToggle />
-          {isAuthenticated ? (
+
+          {/* Defer auth-dependent UI until localStorage has been read */}
+          {!hasHydrated ? (
+            <div className="w-20 h-8 rounded-xl bg-muted/60 animate-pulse" />
+          ) : isAuthenticated ? (
             <>
               <Link href="/notifications" className="relative p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors">
                 <Bell size={17} />
