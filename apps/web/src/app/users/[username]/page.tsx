@@ -20,7 +20,7 @@ function absoluteUrl(url: string) {
 const ROLE_LABEL: Record<string, string> = {
   designer: "Designer",
   developer: "Developer",
-  both: "Both",
+  both: "Designer & Developer",
 };
 
 const SOCIAL_LINKS = [
@@ -165,7 +165,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
 
       {/* Profile header */}
       <div className="max-w-4xl mx-auto px-4 md:px-6">
-        <div className="flex items-end justify-between -mt-10 md:-mt-12 mb-4">
+        <div className="relative z-10 flex items-end justify-between -mt-10 md:-mt-12 mb-4">
           {/* Avatar */}
           <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-primary/20 flex items-center justify-center overflow-hidden border-4 border-background flex-none shadow-sm">
             {profile.avatarUrl ? (
@@ -210,7 +210,11 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
               {profile.name}
             </h1>
             {profile.role && (
-              <span className="text-[0.7rem] font-semibold px-2 py-0.5 rounded-full border border-[var(--zd-green)] bg-[var(--zd-green-tint)] text-[var(--zd-green)] uppercase tracking-wide">
+              <span className={cn(
+                "inline-flex items-center gap-1 text-[0.7rem] font-semibold px-2 py-0.5 rounded-full border border-[var(--zd-green)] bg-[var(--zd-green-tint)] text-[var(--zd-green)] tracking-wide",
+                profile.role !== "both" && "uppercase",
+              )}>
+                {profile.role === "both" && <span aria-hidden>⚔️</span>}
                 {ROLE_LABEL[profile.role] ?? profile.role}
               </span>
             )}
