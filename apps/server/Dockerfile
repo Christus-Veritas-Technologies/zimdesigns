@@ -6,7 +6,7 @@ COPY . .
 
 RUN bun install
 
-RUN bun --filter server run build
+RUN bun --cwd apps/server run build
 
 WORKDIR /app/apps/server
 
