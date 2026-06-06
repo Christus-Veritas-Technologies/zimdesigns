@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import "../index.css";
@@ -16,6 +16,10 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+export const viewport: Viewport = {
+  themeColor: "#E8A900",
+};
 
 export const metadata: Metadata = {
   title: {
@@ -37,7 +41,6 @@ export const metadata: Metadata = {
   },
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://zimdesigns.com"),
   manifest: "/manifest.webmanifest",
-  themeColor: "#E8A900",
   appleWebApp: {
     capable: true,
     title: "ZimDesigns",
