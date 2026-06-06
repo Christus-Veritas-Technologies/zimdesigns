@@ -7,7 +7,7 @@ COPY . .
 RUN bun install
 
 # Generate Prisma client before building
-RUN cd packages/db && bunx prisma generate
+RUN cd packages/db && bunx prisma migrate deploy && bunx prisma generate
 
 RUN cd apps/server && bun run build
 
