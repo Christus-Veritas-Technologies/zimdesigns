@@ -3,7 +3,9 @@
 import { use, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowUp, Linkedin, Github, Globe, Twitter, Dribbble, UserPlus, UserMinus, LogIn, Share2, MessageCircle, Bookmark, BookmarkCheck, MoreHorizontal, Figma } from "lucide-react";
+import { ArrowUp, Linkedin, Github, Globe, Twitter, Dribbble, UserPlus, UserMinus, LogIn, Share2, Check, Flag, UserX, Swords, MessageCircle, Bookmark, BookmarkCheck, MoreHorizontal, Figma } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@zimdesigns/ui/components/dropdown-menu";
+import { toast } from "sonner";
 import { useProfile, useUserRedesigns } from "@/hooks/use-profiles";
 import { useCurrentUser, useIsAuthenticated } from "@/hooks/use-auth";
 import { useFollowStatus, useToggleFollow } from "@/hooks/use-follows";
@@ -110,6 +112,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
   const router = useRouter();
   const [authModal, setAuthModal] = useState(false);
   const [tab, setTab] = useState<ProfileTab>("redesigns");
+  const [shareCopied, setShareCopied] = useState(false);
   const { data: profile, isLoading: profileLoading, isError } = useProfile(username);
   const { data: redesigns, isLoading: redesignsLoading } = useUserRedesigns(username);
   const currentUser = useCurrentUser();
@@ -119,8 +122,17 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
   const toggleFollow = useToggleFollow(username);
 
   const handleShare = async () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: `${profile?.name ?? username} on ZimDesigns`, url });
+        return;
+      } catch {} // user dismissed — fall through to clipboard
+    }
     try {
-      await navigator.clipboard.writeText(window.location.href);
+      await navigator.clipboard.writeText(url);
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
     } catch {}
   };
 
@@ -194,12 +206,40 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                 {followStatus?.following ? <><UserMinus size={13} className="inline mr-1" />Unfollow</> : <><UserPlus size={13} className="inline mr-1" />Follow</>}
               </button>
             )}
-            <button onClick={handleShare} className="h-8 w-8 flex items-center justify-center rounded-xl border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
-              <Share2 size={14} />
+
+            {/* Share — tries Web Share API, falls back to clipboard with visual tick */}
+            <button
+              onClick={handleShare}
+              title={shareCopied ? "Link copied!" : "Share profile"}
+              className={cn(
+                "h-8 w-8 flex items-center justify-center rounded-xl border bg-card transition-colors",
+                shareCopied
+                  ? "border-[var(--zd-green)] text-[var(--zd-green)]"
+                  : "border-border text-muted-foreground hover:text-foreground hover:bg-muted",
+              )}
+            >
+              {shareCopied ? <Check size={14} /> : <Share2 size={14} />}
             </button>
-            <button className="h-8 w-8 flex items-center justify-center rounded-xl border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
-              <MoreHorizontal size={14} />
-            </button>
+
+            {/* More — only shown for other people's profiles */}
+            {!isOwnProfile && (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="h-8 w-8 flex items-center justify-center rounded-xl border border-border bg-card text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+                  <MoreHorizontal size={14} />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="min-w-44">
+                  <DropdownMenuItem onClick={() => toast.info(`Report @${profile.username} — coming soon`)}>
+                    <Flag size={14} />
+                    Report @{profile.username}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem variant="destructive" onClick={() => toast.info(`Block @${profile.username} — coming soon`)}>
+                    <UserX size={14} />
+                    Block @{profile.username}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </div>
 
@@ -214,7 +254,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                 "inline-flex items-center gap-1 text-[0.7rem] font-semibold px-2 py-0.5 rounded-full border border-[var(--zd-green)] bg-[var(--zd-green-tint)] text-[var(--zd-green)] tracking-wide",
                 profile.role !== "both" && "uppercase",
               )}>
-                {profile.role === "both" && <span aria-hidden>⚔️</span>}
+                {profile.role === "both" && <Swords size={11} aria-hidden />}
                 {ROLE_LABEL[profile.role] ?? profile.role}
               </span>
             )}

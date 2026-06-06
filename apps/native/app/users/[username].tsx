@@ -6,11 +6,14 @@ import {
   TouchableOpacity,
   FlatList,
   ActivityIndicator,
+  Alert,
   Linking,
+  Modal,
+  Share,
   ScrollView,
 } from "react-native";
 import { useLocalSearchParams, router } from "expo-router";
-import { ArrowUp, UserPlus, UserMinus, Share2, Bookmark, BookmarkCheck, MessageCircle } from "lucide-react-native";
+import { ArrowUp, UserPlus, UserMinus, Share2, Flag, UserX, Swords, MoreVertical, Bookmark, BookmarkCheck, MessageCircle } from "lucide-react-native";
 import { useProfile, useUserRedesigns } from "@/hooks/use-profiles";
 import { useFollowStatus, useToggleFollow } from "@/hooks/use-follows";
 import { useToggleBookmark, useBookmarks } from "@/hooks/use-bookmarks";
@@ -113,11 +116,81 @@ export default function ProfileScreen() {
   const { username } = useLocalSearchParams<{ username: string }>();
   const { user, isAuthenticated } = useAuth();
   const [tab, setTab] = useState<"redesigns" | "saved" | "comments" | "votes">("redesigns");
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
   const { data: profile, isLoading: profileLoading, isError } = useProfile(username);
   const { data: redesigns, isLoading: redesignsLoading } = useUserRedesigns(username);
   const isOwnProfile = user?.username === username;
   const { data: followStatus } = useFollowStatus(username);
   const toggleFollow = useToggleFollow(username);
+
+  const handleShare = async () => {
+    if (!profile) return;
+    try {
+      await Share.share({
+        message: `Check out ${profile.name} on ZimDesigns`,
+        title: `${profile.name} on ZimDesigns`,
+      });
+    } catch {}
+  };
+
+  /** Action-sheet modal for Report / Block on other profiles */
+  const moreMenuModal = (
+    <Modal
+      visible={showMoreMenu}
+      transparent
+      animationType="slide"
+      onRequestClose={() => setShowMoreMenu(false)}
+    >
+      <TouchableOpacity
+        style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.45)", justifyContent: "flex-end" }}
+        activeOpacity={1}
+        onPress={() => setShowMoreMenu(false)}
+      >
+        <View style={{ backgroundColor: "#fff", borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingBottom: 32 }}>
+          {/* Handle + label */}
+          <View style={{ paddingTop: 12, paddingBottom: 12, alignItems: "center", borderBottomWidth: 1, borderBottomColor: "#F0EDE8" }}>
+            <View style={{ width: 36, height: 4, borderRadius: 2, backgroundColor: "#E4E0D8", marginBottom: 8 }} />
+            <Text style={{ fontSize: 13, color: "#8A8278", fontWeight: "500" }}>@{profile?.username}</Text>
+          </View>
+
+          {/* Report */}
+          <TouchableOpacity
+            activeOpacity={0.7}
+            style={{ flexDirection: "row", alignItems: "center", gap: 14, paddingVertical: 15, paddingHorizontal: 20 }}
+            onPress={() => {
+              setShowMoreMenu(false);
+              Alert.alert("Coming soon", "Report feature will be available in a future update.");
+            }}
+          >
+            <Flag size={19} color="#1A1A1A" />
+            <Text style={{ fontSize: 15, color: "#1A1A1A" }}>Report @{profile?.username}</Text>
+          </TouchableOpacity>
+
+          {/* Block */}
+          <TouchableOpacity
+            activeOpacity={0.7}
+            style={{ flexDirection: "row", alignItems: "center", gap: 14, paddingVertical: 15, paddingHorizontal: 20 }}
+            onPress={() => {
+              setShowMoreMenu(false);
+              Alert.alert("Coming soon", "Block feature will be available in a future update.");
+            }}
+          >
+            <UserX size={19} color="#DC2626" />
+            <Text style={{ fontSize: 15, color: "#DC2626" }}>Block @{profile?.username}</Text>
+          </TouchableOpacity>
+
+          {/* Cancel */}
+          <TouchableOpacity
+            activeOpacity={0.7}
+            style={{ marginHorizontal: 16, marginTop: 6, paddingVertical: 14, borderRadius: 12, borderWidth: 1, borderColor: "#E4E0D8", alignItems: "center" }}
+            onPress={() => setShowMoreMenu(false)}
+          >
+            <Text style={{ fontSize: 15, fontWeight: "600", color: "#1A1A1A" }}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+    </Modal>
+  );
 
   if (profileLoading) {
     return (
@@ -179,7 +252,7 @@ export default function ProfileScreen() {
             )}
           </View>
 
-          <View style={{ flexDirection: "row", gap: 8, paddingBottom: 4 }}>
+          <View style={{ flexDirection: "row", gap: 8, paddingBottom: 4, alignItems: "center" }}>
             {!isOwnProfile && isAuthenticated && (
               <TouchableOpacity
                 onPress={() => toggleFollow.mutate()}
@@ -208,6 +281,26 @@ export default function ProfileScreen() {
                 <Text style={{ fontSize: 13, fontWeight: "600" }} className="text-foreground">Edit profile</Text>
               </TouchableOpacity>
             )}
+
+            {/* Share */}
+            <TouchableOpacity
+              onPress={handleShare}
+              activeOpacity={0.75}
+              style={{ width: 34, height: 34, borderRadius: 10, borderWidth: 1, borderColor: "#E4E0D8", alignItems: "center", justifyContent: "center" }}
+            >
+              <Share2 size={15} color="#8A8278" />
+            </TouchableOpacity>
+
+            {/* More — only for others' profiles */}
+            {!isOwnProfile && (
+              <TouchableOpacity
+                onPress={() => setShowMoreMenu(true)}
+                activeOpacity={0.75}
+                style={{ width: 34, height: 34, borderRadius: 10, borderWidth: 1, borderColor: "#E4E0D8", alignItems: "center", justifyContent: "center" }}
+              >
+                <MoreVertical size={15} color="#8A8278" />
+              </TouchableOpacity>
+            )}
           </View>
         </View>
 
@@ -218,7 +311,7 @@ export default function ProfileScreen() {
           </Text>
           {profile.role && (
             <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 20, borderWidth: 1, borderColor: "#2D9D6A", backgroundColor: "rgba(45,157,106,0.12)", flexDirection: "row", alignItems: "center", gap: 4 }}>
-              {profile.role === "both" && <Text style={{ fontSize: 11 }}>⚔️</Text>}
+              {profile.role === "both" && <Swords size={11} color="#2D9D6A" />}
               <Text style={{ fontSize: 10, fontWeight: "700", color: "#2D9D6A", textTransform: profile.role === "both" ? "none" : "uppercase", letterSpacing: 0.5 }}>
                 {ROLE_LABEL[profile.role] ?? profile.role}
               </Text>
@@ -286,6 +379,7 @@ export default function ProfileScreen() {
   if (tab !== "redesigns") {
     return (
       <ScrollView className="flex-1 bg-background">
+        {moreMenuModal}
         {header}
         <View style={{ alignItems: "center", paddingVertical: 40 }}>
           <Text className="text-muted-foreground text-sm">Coming soon.</Text>
@@ -296,6 +390,7 @@ export default function ProfileScreen() {
 
   return (
     <View className="flex-1 bg-background">
+      {moreMenuModal}
       {redesignsLoading ? (
         <>
           <ScrollView>{header}</ScrollView>
