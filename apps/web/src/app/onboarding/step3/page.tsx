@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Upload, Compass } from "lucide-react";
-import { Button } from "@zimdesigns/ui/components/button";
+import { Button } from "@zimdesigns/ui/components/button"; // used by Upload button
 import { FlagBar } from "@/components/brand/flag-bar";
 import { useCompleteOnboarding } from "@/hooks/use-onboarding";
 
@@ -46,13 +46,13 @@ export default function Step3Page() {
             </p>
           )}
 
-          <Button asChild variant="secondary"
-            className="h-12 text-base font-semibold bg-[var(--zd-green)] hover:bg-[var(--zd-green-hover)] text-[var(--zd-green-fg)] rounded-xl gap-2">
-            <Link href="/">
-              <Compass size={18} />
-              Explore Redesigns
-            </Link>
-          </Button>
+          <Link
+            href="/"
+            className="h-12 w-full inline-flex items-center justify-center gap-2 text-base font-semibold bg-[var(--zd-green)] hover:bg-[var(--zd-green-hover)] text-[var(--zd-green-fg)] rounded-xl"
+          >
+            <Compass size={18} />
+            Explore Redesigns
+          </Link>
 
         </div>
 
