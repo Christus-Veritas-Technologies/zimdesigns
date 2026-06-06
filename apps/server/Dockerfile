@@ -6,10 +6,12 @@ COPY . .
 
 RUN bun install
 
-RUN bun --cwd apps/server run build
+# Change this — run build from within the server app directory
+RUN cd apps/server && bun run build
 
 WORKDIR /app/apps/server
 
 EXPOSE 3000
 
-CMD ["bun", "run", "apps/server/dist/index.mjs"]
+# This is fine since WORKDIR is already /app/apps/server
+CMD ["bun", "run", "dist/index.mjs"]
