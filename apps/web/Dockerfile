@@ -10,18 +10,19 @@ RUN pnpm install --frozen-lockfile
 
 RUN pnpm --filter web build
 
-
 FROM node:22-slim AS runner
 
 WORKDIR /app
 
 RUN corepack enable
 
-COPY --from=builder /app/apps/web/.next /app/apps/web/.next
-COPY --from=builder /app/apps/web/public /app/apps/web/public
-COPY --from=builder /app/apps/web/package.json /app/apps/web/package.json
-
-COPY --from=builder /app/node_modules /app/node_modules
+# Copy the full workspace structure needed for pnpm to resolve correctly
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/pnpm-workspace.yaml ./pnpm-workspace.yaml
+COPY --from=builder /app/pnpm-lock.yaml ./pnpm-lock.yaml
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/apps/web ./apps/web
+COPY --from=builder /app/packages ./packages
 
 WORKDIR /app/apps/web
 
