@@ -23,6 +23,7 @@ model User {
   interests          String         @default("[]")
   onboardingComplete Boolean        @default(false)
   emailVerified      Boolean        @default(false)
+  banned             Boolean        @default(false)
   pushToken          String?
   linkedinUrl        String?
   githubUrl          String?
@@ -46,6 +47,7 @@ model User {
   passwordResetTokens     PasswordResetToken[]
   emailVerificationTokens EmailVerificationToken[]
   collections             Collection[]
+  reports             Report[]      @relation("Reporter")
 }
 
 
@@ -244,4 +246,16 @@ model EmailVerificationToken {
   createdAt DateTime @default(now())
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Report {
+  id          String   @id @default(cuid())
+  reporterId  String
+  targetType  String   // "user" | "redesign"
+  targetId    String
+  reason      String
+  status      String   @default("open")  // "open" | "resolved" | "dismissed"
+  createdAt   DateTime @default(now())
+
+  reporter    User     @relation("Reporter", fields: [reporterId], references: [id], onDelete: Cascade)
 }
