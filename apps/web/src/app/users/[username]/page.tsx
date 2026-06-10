@@ -3,16 +3,123 @@
 import { use, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowUp, Linkedin, Github, Globe, Twitter, Dribbble, UserPlus, UserMinus, LogIn, Share2, Check, Flag, UserX, Swords, MessageCircle, Bookmark, BookmarkCheck, MoreHorizontal, Figma } from "lucide-react";
+import { ArrowUp, Linkedin, Github, Globe, Twitter, Dribbble, UserPlus, UserMinus, LogIn, Share2, Check, Flag, UserX, Swords, MessageCircle, Bookmark, BookmarkCheck, MoreHorizontal, Figma, X } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@zimdesigns/ui/components/dropdown-menu";
 import { toast } from "sonner";
+import { useMutation } from "@tanstack/react-query";
 import { useProfile, useUserRedesigns } from "@/hooks/use-profiles";
 import { useCurrentUser, useIsAuthenticated } from "@/hooks/use-auth";
+import { useAuthStore } from "@/store/auth";
 import { useFollowStatus, useToggleFollow } from "@/hooks/use-follows";
 import { useToggleBookmark, useBookmarks } from "@/hooks/use-bookmarks";
 import { cn } from "@zimdesigns/ui/lib/utils";
 import { useRouter } from "next/navigation";
 import type { Redesign } from "@/hooks/use-redesigns";
+
+const REPORT_REASONS = [
+  "Spam or self-promotion",
+  "Harassment or bullying",
+  "Inappropriate content",
+  "Impersonation",
+  "Other",
+];
+
+function ReportModal({ targetType, targetId, targetName, onClose }: {
+  targetType: "user" | "redesign";
+  targetId: string;
+  targetName: string;
+  onClose: () => void;
+}) {
+  const [reason, setReason] = useState(REPORT_REASONS[0]);
+  const [custom, setCustom] = useState("");
+  const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL ?? "http://localhost:3001";
+
+  const submit = useMutation({
+    mutationFn: async () => {
+      const token = useAuthStore.getState().accessToken;
+      const res = await fetch(`${SERVER_URL}/api/reports`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          targetType,
+          targetId,
+          reason: reason === "Other" ? custom || "Other" : reason,
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error((data as { message?: string }).message ?? "Failed to submit report");
+      }
+    },
+    onSuccess: () => {
+      toast.success("Report submitted — thank you for keeping the community safe.");
+      onClose();
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={onClose}>
+      <div className="bg-card border border-border rounded-2xl p-6 w-full max-w-sm shadow-xl" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-bold text-base text-foreground" style={{ fontFamily: "'Bricolage Grotesque', system-ui" }}>
+            Report {targetName}
+          </h2>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors">
+            <X size={16} />
+          </button>
+        </div>
+
+        <p className="text-xs text-muted-foreground mb-4">Help us understand what's wrong with this {targetType}.</p>
+
+        <div className="space-y-2 mb-4">
+          {REPORT_REASONS.map((r) => (
+            <label key={r} className="flex items-center gap-3 p-2.5 rounded-xl border border-border cursor-pointer hover:bg-muted/50 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+              <input
+                type="radio"
+                name="reason"
+                value={r}
+                checked={reason === r}
+                onChange={() => setReason(r)}
+                className="accent-primary"
+              />
+              <span className="text-sm text-foreground">{r}</span>
+            </label>
+          ))}
+        </div>
+
+        {reason === "Other" && (
+          <textarea
+            value={custom}
+            onChange={(e) => setCustom(e.target.value)}
+            placeholder="Please describe the issue…"
+            rows={3}
+            className="w-full px-3 py-2 rounded-xl border border-border bg-background text-sm text-foreground outline-none focus:border-ring focus:ring-1 focus:ring-ring/50 transition-all resize-none mb-4"
+          />
+        )}
+
+        <div className="flex gap-2">
+          <button
+            onClick={onClose}
+            className="flex-1 h-10 rounded-xl border border-border text-sm font-semibold text-foreground hover:bg-muted transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => submit.mutate()}
+            disabled={submit.isPending || (reason === "Other" && !custom.trim())}
+            className="flex-1 h-10 rounded-xl bg-destructive text-destructive-foreground text-sm font-semibold hover:bg-destructive/90 transition-colors disabled:opacity-50"
+          >
+            {submit.isPending ? "Submitting…" : "Submit report"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const SERVER_URL = process.env.NEXT_PUBLIC_SERVER_URL ?? "http://localhost:3001";
 function absoluteUrl(url: string) {
@@ -111,6 +218,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
   const { username } = use(params);
   const router = useRouter();
   const [authModal, setAuthModal] = useState(false);
+  const [reportModal, setReportModal] = useState(false);
   const [tab, setTab] = useState<ProfileTab>("redesigns");
   const [shareCopied, setShareCopied] = useState(false);
   const { data: profile, isLoading: profileLoading, isError } = useProfile(username);
@@ -164,6 +272,14 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
   return (
     <div className="min-h-screen bg-background">
       {authModal && <AuthGateModal action="follow designers" onClose={() => setAuthModal(false)} />}
+      {reportModal && profile && (
+        <ReportModal
+          targetType="user"
+          targetId={profile.id}
+          targetName={`@${profile.username}`}
+          onClose={() => setReportModal(false)}
+        />
+      )}
 
       {/* Banner */}
       <div
@@ -228,7 +344,7 @@ export default function ProfilePage({ params }: { params: Promise<{ username: st
                   <MoreHorizontal size={14} />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="min-w-44">
-                  <DropdownMenuItem onClick={() => toast.info(`Report @${profile.username} — coming soon`)}>
+                  <DropdownMenuItem onClick={() => isAuthenticated ? setReportModal(true) : setAuthModal(true)}>
                     <Flag size={14} />
                     Report @{profile.username}
                   </DropdownMenuItem>

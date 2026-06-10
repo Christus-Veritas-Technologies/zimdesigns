@@ -65,6 +65,9 @@ router.post(
       if (msg === "INVALID_CREDENTIALS" || msg === "GOOGLE_ACCOUNT") {
         return c.json({ message: "Invalid email or password" }, 401);
       }
+      if (msg === "BANNED") {
+        return c.json({ message: "Your account has been suspended." }, 403);
+      }
       console.error("login:", err);
       return c.json({ message: "Internal server error" }, 500);
     }
@@ -83,6 +86,9 @@ router.post(
       const msg = err instanceof Error ? err.message : "";
       if (msg === "INVALID_REFRESH_TOKEN" || msg === "REFRESH_TOKEN_EXPIRED") {
         return c.json({ message: "Invalid or expired refresh token" }, 401);
+      }
+      if (msg === "BANNED") {
+        return c.json({ message: "Your account has been suspended." }, 403);
       }
       return c.json({ message: "Internal server error" }, 500);
     }

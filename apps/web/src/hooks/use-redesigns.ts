@@ -85,12 +85,75 @@ export function useUpvoteRedesign(id: string) {
       api
         .post<{ upvoteCount: number; hasUpvoted: boolean }>(`/api/redesigns/${id}/upvote`)
         .then((r) => r.data),
+
+    onMutate: async () => {
+      // Cancel any in-flight refetches that would overwrite our optimistic update
+      await qc.cancelQueries({ queryKey: ["redesign", id] });
+      await qc.cancelQueries({ queryKey: ["redesigns"] });
+
+      const prevSingle = qc.getQueryData<Redesign>(["redesign", id]);
+      const prevList = qc.getQueriesData<{ pages: { items: Redesign[] }[] }>({ queryKey: ["redesigns"] });
+
+      // Optimistically update the single redesign view
+      qc.setQueryData<Redesign>(["redesign", id], (old) =>
+        old
+          ? {
+              ...old,
+              hasUpvoted: !old.hasUpvoted,
+              upvoteCount: old.hasUpvoted ? old.upvoteCount - 1 : old.upvoteCount + 1,
+            }
+          : old,
+      );
+
+      // Optimistically update every page in the infinite list
+      qc.setQueriesData<{ pages: { items: Redesign[]; nextCursor?: string }[] }>(
+        { queryKey: ["redesigns"] },
+        (old) => {
+          if (!old) return old;
+          return {
+            ...old,
+            pages: old.pages.map((page) => ({
+              ...page,
+              items: page.items.map((r) =>
+                r.id === id
+                  ? { ...r, hasUpvoted: !r.hasUpvoted, upvoteCount: r.hasUpvoted ? r.upvoteCount - 1 : r.upvoteCount + 1 }
+                  : r,
+              ),
+            })),
+          };
+        },
+      );
+
+      return { prevSingle, prevList };
+    },
+
+    onError: (_err, _v, ctx) => {
+      // Roll back on error
+      if (ctx?.prevSingle !== undefined) {
+        qc.setQueryData(["redesign", id], ctx.prevSingle);
+      }
+      ctx?.prevList?.forEach(([key, data]) => qc.setQueryData(key, data));
+      toast.error("Failed to vote — please try again.");
+    },
+
     onSuccess: (data) => {
+      // Reconcile with server truth
       qc.setQueryData<Redesign>(["redesign", id], (old) =>
         old ? { ...old, ...data } : old,
       );
-      qc.invalidateQueries({ queryKey: ["redesigns"] });
-      if (data.hasUpvoted) toast.success("Upvoted!");
+      qc.setQueriesData<{ pages: { items: Redesign[]; nextCursor?: string }[] }>(
+        { queryKey: ["redesigns"] },
+        (old) => {
+          if (!old) return old;
+          return {
+            ...old,
+            pages: old.pages.map((page) => ({
+              ...page,
+              items: page.items.map((r) => (r.id === id ? { ...r, ...data } : r)),
+            })),
+          };
+        },
+      );
     },
   });
 }
