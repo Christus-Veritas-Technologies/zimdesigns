@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Plus, CheckCircle, XCircle, TrendingUp, TrendingDown, Clock } from "lucide-react";
-import { Button } from "@zimdesigns/ui/components/ui/button";
+import { Button } from "@zimdesigns/ui/components/button";
 import { useAdminStats, useAdminAppRequests, useApproveAppRequest, useDenyAppRequest } from "@/hooks/use-admin";
 import type { PendingAppRequest } from "@/hooks/use-admin";
 

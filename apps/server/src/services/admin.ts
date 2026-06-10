@@ -55,3 +55,27 @@ export async function requireAdminRole(userId: string) {
   const user = await db.user.findUnique({ where: { id: userId }, select: { role: true } });
   if (user?.role !== "ADMIN") throw new Error("FORBIDDEN");
 }
+
+export async function listAdminApps() {
+  return db.appEntry.findMany({ orderBy: { createdAt: "desc" } });
+}
+
+export async function createAdminApp(data: {
+  name: string;
+  slug: string;
+  description?: string;
+  iconColor?: string;
+  tags?: string[];
+}) {
+  return db.appEntry.create({
+    data: {
+      name: data.name,
+      slug: data.slug,
+      description: data.description,
+      iconColor: data.iconColor ?? "#E8A900",
+      iconLetter: data.name.charAt(0).toUpperCase(),
+      tags: JSON.stringify(data.tags ?? []),
+      isPublished: true,
+    },
+  });
+}
