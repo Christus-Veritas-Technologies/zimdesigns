@@ -1,12 +1,41 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Upload, X, Check, ArrowLeft, ImageIcon, Figma, Github, Link2, ArrowUp, MessageCircle, Bookmark } from "lucide-react";
+import { Upload, X, Check, ArrowLeft, ImageIcon, Figma, Github, Link2, ArrowUp, MessageCircle, Bookmark, Save } from "lucide-react";
+import { toast } from "sonner";
 import { cn } from "@zimdesigns/ui/lib/utils";
 import { useCreateRedesign } from "@/hooks/use-redesigns";
 import { useAppEntries } from "@/hooks/use-app-entries";
+
+const DRAFT_KEY = "zd_upload_draft";
+
+interface DraftData {
+  title: string;
+  appName: string;
+  description: string;
+  categories: string[];
+  figmaUrl: string;
+  githubUrl: string;
+  prototypeUrl: string;
+  savedAt: number;
+}
+
+function saveDraft(data: DraftData) {
+  try { localStorage.setItem(DRAFT_KEY, JSON.stringify(data)); } catch {}
+}
+
+function loadDraft(): DraftData | null {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    return raw ? (JSON.parse(raw) as DraftData) : null;
+  } catch { return null; }
+}
+
+function clearDraft() {
+  try { localStorage.removeItem(DRAFT_KEY); } catch {}
+}
 
 const CATEGORIES = ["Banking", "Mobile", "Web", "Local", "E-commerce", "Social"];
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -152,6 +181,47 @@ export default function UploadPage() {
   const [beforeFile, setBeforeFile] = useState<File | null>(null);
   const [afterFile, setAfterFile] = useState<File | null>(null);
   const [screenshots, setScreenshots] = useState<(File | null)[]>([null, null, null]);
+  const [hasDraft, setHasDraft] = useState(false);
+  const autoSaveRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Load draft on mount
+  useEffect(() => {
+    const draft = loadDraft();
+    if (draft) {
+      setTitle(draft.title);
+      setAppName(draft.appName);
+      setDescription(draft.description);
+      setCategories(draft.categories);
+      setFigmaUrl(draft.figmaUrl);
+      setGithubUrl(draft.githubUrl);
+      setPrototypeUrl(draft.prototypeUrl);
+      setHasDraft(true);
+    }
+  }, []);
+
+  const draftData = useCallback((): DraftData => ({
+    title, appName, description, categories, figmaUrl, githubUrl, prototypeUrl, savedAt: Date.now(),
+  }), [title, appName, description, categories, figmaUrl, githubUrl, prototypeUrl]);
+
+  // Auto-save text fields after 1.5s of inactivity
+  useEffect(() => {
+    if (autoSaveRef.current) clearTimeout(autoSaveRef.current);
+    autoSaveRef.current = setTimeout(() => {
+      const data = draftData();
+      if (data.title || data.appName || data.description) {
+        saveDraft(data);
+        setHasDraft(true);
+      }
+    }, 1500);
+    return () => { if (autoSaveRef.current) clearTimeout(autoSaveRef.current); };
+  }, [draftData]);
+
+  function handleSaveDraft() {
+    saveDraft(draftData());
+    setHasDraft(true);
+    toast.success("Draft saved", { description: "Your progress has been saved locally." });
+  }
+
   const toggleCategory = (c: string) =>
     setCategories((s) => (s.includes(c) ? s.filter((x) => x !== c) : [...s, c]));
 
@@ -183,24 +253,42 @@ export default function UploadPage() {
     if (githubUrl.trim()) fd.append("githubUrl", githubUrl.trim());
     if (prototypeUrl.trim()) fd.append("prototypeUrl", prototypeUrl.trim());
 
-    create.mutate(fd, { onSuccess: (r) => router.push(`/redesigns/${r.id}`) });
+    create.mutate(fd, {
+      onSuccess: (r) => {
+        clearDraft();
+        router.push(`/redesigns/${r.id}`);
+      },
+    });
   };
 
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-6xl mx-auto px-4 pt-6 pb-12">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-8">
+        <div className="flex items-center gap-3 mb-6">
           <button onClick={() => router.back()} className="w-9 h-9 rounded-xl border border-border bg-card flex items-center justify-center hover:bg-muted transition-colors">
             <ArrowLeft size={16} className="text-muted-foreground" />
           </button>
-          <div>
+          <div className="flex-1">
             <h1 className="text-2xl font-bold text-foreground tracking-tight" style={{ fontFamily: "'Bricolage Grotesque', system-ui, sans-serif" }}>
               Submit a Redesign
             </h1>
             <p className="text-sm text-muted-foreground">Show how you&apos;d improve a Zimbabwean app.</p>
           </div>
         </div>
+
+        {/* Draft restored banner */}
+        {hasDraft && (
+          <div className="mb-6 flex items-center justify-between gap-3 px-4 py-3 rounded-xl border border-[var(--zd-gold)]/40 bg-[var(--zd-gold)]/5 text-sm">
+            <span className="text-foreground font-medium">Draft restored — your previous progress is loaded.</span>
+            <button
+              onClick={() => { clearDraft(); setTitle(""); setAppName(""); setDescription(""); setCategories([]); setFigmaUrl(""); setGithubUrl(""); setPrototypeUrl(""); setHasDraft(false); }}
+              className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2 flex-none"
+            >
+              Discard
+            </button>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8">
           {/* Left: form */}
@@ -391,8 +479,10 @@ export default function UploadPage() {
               <div className="flex items-center gap-3">
                 <button
                   type="button"
-                  className="flex-1 h-11 rounded-xl border border-border bg-card text-sm font-semibold text-foreground hover:bg-muted transition-colors"
+                  onClick={handleSaveDraft}
+                  className="flex-1 h-11 rounded-xl border border-border bg-card text-sm font-semibold text-foreground hover:bg-muted transition-colors flex items-center justify-center gap-2"
                 >
+                  <Save size={14} />
                   Save draft
                 </button>
                 <button
