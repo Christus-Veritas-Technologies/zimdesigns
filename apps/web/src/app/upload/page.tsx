@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Upload, X, Check, ArrowLeft, ImageIcon, Figma, Github, Link2, ChevronDown, ArrowUp, MessageCircle, Bookmark } from "lucide-react";
+import { Upload, X, Check, ArrowLeft, ImageIcon, Figma, Github, Link2, ArrowUp, MessageCircle, Bookmark } from "lucide-react";
 import { cn } from "@zimdesigns/ui/lib/utils";
 import { useCreateRedesign } from "@/hooks/use-redesigns";
 import { useAppEntries } from "@/hooks/use-app-entries";
@@ -152,8 +152,6 @@ export default function UploadPage() {
   const [beforeFile, setBeforeFile] = useState<File | null>(null);
   const [afterFile, setAfterFile] = useState<File | null>(null);
   const [screenshots, setScreenshots] = useState<(File | null)[]>([null, null, null]);
-  const [appDropdownOpen, setAppDropdownOpen] = useState(false);
-
   const toggleCategory = (c: string) =>
     setCategories((s) => (s.includes(c) ? s.filter((x) => x !== c) : [...s, c]));
 
@@ -207,6 +205,71 @@ export default function UploadPage() {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8">
           {/* Left: form */}
           <form onSubmit={handleSubmit} className="flex flex-col gap-7">
+
+            {/* ── App selection ── MOVED TO TOP and made prominent */}
+            <section className="flex flex-col gap-3">
+              <div>
+                <h2 className="font-bold text-foreground" style={{ fontFamily: "'Bricolage Grotesque', system-ui, sans-serif" }}>
+                  Which app are you redesigning? <span className="text-destructive">*</span>
+                </h2>
+                <p className="text-xs text-muted-foreground mt-0.5">Choose from the directory, or type a name if yours isn&apos;t listed.</p>
+              </div>
+
+              {apps && apps.length > 0 && (
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2.5">
+                  {apps.map((a) => {
+                    const selected = appName === a.name;
+                    return (
+                      <button
+                        key={a.id}
+                        type="button"
+                        onClick={() => setAppName(selected ? "" : a.name)}
+                        className={cn(
+                          "flex flex-col items-center gap-2 p-3 rounded-2xl border-2 transition-all hover:scale-[1.03]",
+                          selected
+                            ? "border-primary bg-primary/5 shadow-sm scale-[1.03]"
+                            : "border-border bg-card hover:border-primary/40",
+                        )}
+                      >
+                        <div
+                          className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white text-sm flex-none"
+                          style={{ backgroundColor: a.iconColor }}
+                        >
+                          {a.iconLetter}
+                        </div>
+                        <span className={cn(
+                          "text-[0.7rem] font-semibold leading-tight text-center line-clamp-2",
+                          selected ? "text-primary" : "text-foreground",
+                        )}>
+                          {a.name}
+                        </span>
+                        {selected && <Check size={12} className="text-primary" strokeWidth={3} />}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-px bg-border" />
+                <span className="text-[0.65rem] font-semibold text-muted-foreground uppercase tracking-wider">
+                  {apps?.find((a) => a.name === appName) ? "Selected above" : "Or type manually"}
+                </span>
+                <div className="flex-1 h-px bg-border" />
+              </div>
+
+              <input
+                type="text"
+                placeholder="App name (if not listed above)…"
+                value={appName}
+                onChange={(e) => setAppName(e.target.value)}
+                className="h-10 px-3.5 rounded-xl border border-input bg-card text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+              {appName && !apps?.find((a) => a.name === appName) && (
+                <p className="text-xs text-muted-foreground -mt-1">This app isn&apos;t in the directory yet — it&apos;ll be added for review.</p>
+              )}
+            </section>
+
             {/* Screenshots */}
             <section className="flex flex-col gap-4">
               <div>
@@ -222,60 +285,9 @@ export default function UploadPage() {
               </div>
             </section>
 
-            {/* App + Title */}
+            {/* Title + description */}
             <section className="flex flex-col gap-4">
               <h2 className="font-bold text-foreground text-sm" style={{ fontFamily: "'Bricolage Grotesque', system-ui, sans-serif" }}>Details</h2>
-
-              {/* App selector */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-semibold text-foreground">App <span className="text-destructive">*</span></label>
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={() => setAppDropdownOpen((o) => !o)}
-                    className="w-full h-11 px-3.5 rounded-xl border border-input bg-card text-sm text-left flex items-center justify-between hover:border-primary/50 transition-colors"
-                  >
-                    <span className={appName ? "text-foreground" : "text-muted-foreground"}>{appName || "Select an app…"}</span>
-                    <ChevronDown size={15} className="text-muted-foreground" />
-                  </button>
-                  {appDropdownOpen && (
-                    <div className="absolute z-50 top-full left-0 right-0 mt-1 rounded-xl border border-border bg-card shadow-lg overflow-hidden">
-                      {apps?.map((a) => (
-                        <button
-                          key={a.id}
-                          type="button"
-                          onClick={() => { setAppName(a.name); setAppDropdownOpen(false); }}
-                          className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted transition-colors text-left"
-                        >
-                          <div className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold text-white flex-none" style={{ backgroundColor: a.iconColor }}>{a.iconLetter}</div>
-                          {a.name}
-                        </button>
-                      ))}
-                      <div className="border-t border-border">
-                        <button
-                          type="button"
-                          onClick={() => { setAppDropdownOpen(false); }}
-                          className="w-full px-4 py-2.5 text-xs text-muted-foreground hover:bg-muted transition-colors text-left"
-                        >
-                          + My app isn&apos;t listed — type it below
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                {!apps?.find((a) => a.name === appName) && appName && (
-                  <p className="text-xs text-muted-foreground">This app isn&apos;t in the directory yet — it&apos;ll be added for review.</p>
-                )}
-                {!appDropdownOpen && !appName && (
-                  <input
-                    type="text"
-                    placeholder="Or type app name…"
-                    value={appName}
-                    onChange={(e) => setAppName(e.target.value)}
-                    className="h-9 px-3 rounded-xl border border-input bg-card text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                  />
-                )}
-              </div>
 
               {/* Title */}
               <div className="flex flex-col gap-1.5">
