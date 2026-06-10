@@ -1,6 +1,7 @@
 "use client";
 
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle, Rocket } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Button } from "@zimdesigns/ui/components/button";
 import { useAdminAppRequests, useApproveAppRequest, useDenyAppRequest } from "@/hooks/use-admin";
 import type { PendingAppRequest } from "@/hooks/use-admin";
@@ -21,9 +22,17 @@ function AppAvatar({ name }: { name: string }) {
 function RequestRow({ req }: { req: PendingAppRequest }) {
   const approve = useApproveAppRequest();
   const deny = useDenyAppRequest();
+  const router = useRouter();
   const diff = Date.now() - new Date(req.createdAt).getTime();
   const days = Math.floor(diff / 86400000);
   const age = days === 0 ? "today" : days === 1 ? "1d ago" : `${days}d ago`;
+
+  function promoteToApp() {
+    const slug = req.appName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    const params = new URLSearchParams({ name: req.appName, slug });
+    if (req.description) params.set("description", req.description);
+    router.push(`/admin/apps?${params}`);
+  }
 
   return (
     <div className="flex items-start gap-3 py-4 border-b border-border last:border-0">
@@ -44,7 +53,16 @@ function RequestRow({ req }: { req: PendingAppRequest }) {
           requested by @{req.requester.username} · {age}
         </p>
       </div>
-      <div className="flex items-center gap-1.5 flex-none">
+      <div className="flex items-center gap-1.5 flex-none flex-wrap justify-end">
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={promoteToApp}
+          className="gap-1 rounded-xl text-xs h-7 border-[var(--zd-gold)]/40 text-[var(--zd-gold)] hover:bg-[var(--zd-gold)]/5"
+          title="Open app creation form pre-filled from this request"
+        >
+          <Rocket size={12} /> Promote to app
+        </Button>
         <Button
           size="sm"
           variant="outline"
