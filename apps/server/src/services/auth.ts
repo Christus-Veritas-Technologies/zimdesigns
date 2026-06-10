@@ -21,6 +21,7 @@ export interface SafeUser {
   username: string;
   avatarUrl: string | null;
   onboardingComplete: boolean;
+  emailVerified: boolean;
   role: string | null;
 }
 
@@ -115,6 +116,7 @@ export async function findOrCreateGoogleUser(profile: {
         data: {
           googleId: profile.googleId,
           avatarUrl: profile.avatarUrl ?? byEmail.avatarUrl,
+          emailVerified: true,
         },
       });
     } else {
@@ -128,6 +130,7 @@ export async function findOrCreateGoogleUser(profile: {
           username,
           googleId: profile.googleId,
           avatarUrl: profile.avatarUrl,
+          emailVerified: true,
         },
       });
     }
@@ -145,6 +148,7 @@ async function buildAuthResult(user: {
   username: string;
   avatarUrl: string | null;
   onboardingComplete: boolean;
+  emailVerified: boolean;
   role?: string | null;
 }): Promise<AuthResult> {
   const tokens = await issueTokenPair(user.id, user.email);
@@ -156,6 +160,7 @@ async function buildAuthResult(user: {
       username: user.username,
       avatarUrl: user.avatarUrl,
       onboardingComplete: user.onboardingComplete,
+      emailVerified: user.emailVerified,
       role: user.role ?? null,
     },
     tokens,

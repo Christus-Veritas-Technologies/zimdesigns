@@ -77,6 +77,7 @@ function sanitize(user: {
   role: string | null;
   interests: string;
   onboardingComplete: boolean;
+  emailVerified: boolean;
   linkedinUrl: string | null;
   githubUrl: string | null;
   dribbbleUrl: string | null;
@@ -94,6 +95,7 @@ function sanitize(user: {
     role: user.role as "designer" | "developer" | "both" | null,
     interests: safeParseInterests(user.interests),
     onboardingComplete: user.onboardingComplete,
+    emailVerified: user.emailVerified,
     linkedinUrl: user.linkedinUrl,
     githubUrl: user.githubUrl,
     dribbbleUrl: user.dribbbleUrl,

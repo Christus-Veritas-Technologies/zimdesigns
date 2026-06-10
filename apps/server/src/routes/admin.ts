@@ -17,16 +17,36 @@ const ADMIN_API_KEY = "zdapikey-8rx42m-v1";
 
 const router = new Hono<{ Variables: AuthVariables }>();
 
-// Accept either a direct admin API key OR a regular user JWT
+// Accept either:
+//   X-Admin-Key header (set by the Next.js proxy after verifying the admin cookie)
+//   Authorization: AdminKey <key> (legacy/direct)
+//   Authorization: Bearer <jwt> with admin DB role
 router.use("/*", async (c, next) => {
-  if (c.req.header("Authorization") === `AdminKey ${ADMIN_API_KEY}`) {
-    c.set("userId", "__admin__");
+  const xAdminKey = c.req.header("X-Admin-Key");
+  const authHeader = c.req.header("Authorization");
+
+  if (xAdminKey === ADMIN_API_KEY || authHeader === `AdminKey ${ADMIN_API_KEY}`) {
+    // Trusted proxy path — try to resolve the real user from JWT if forwarded
+    if (authHeader?.startsWith("Bearer ")) {
+      try {
+        const { verifyJwt } = await import("../lib/jwt");
+        const payload = await verifyJwt(authHeader.slice(7), "access");
+        c.set("userId", payload.userId);
+      } catch {
+        c.set("userId", "__admin__");
+      }
+    } else {
+      c.set("userId", "__admin__");
+    }
     return next();
   }
+
   return requireAuth(c, next);
 });
 
-async function assertAdmin(c: { get(k: "userId"): string }): Promise<boolean> {
+async function assertAdmin(c: { get(k: "userId"): string; req: { header(k: string): string | undefined } }): Promise<boolean> {
+  // Requests forwarded by the Next.js proxy are pre-authorised by the admin password check
+  if (c.req.header("X-Admin-Key") === ADMIN_API_KEY) return true;
   if (c.get("userId") === "__admin__") return true;
   try {
     await requireAdminRole(c.get("userId"));

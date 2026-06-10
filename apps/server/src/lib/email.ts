@@ -22,7 +22,11 @@ interface EmailPayload {
 export async function sendEmail(payload: EmailPayload): Promise<void> {
   const transporter = createTransporter();
   if (!transporter) {
-    console.log(`[EMAIL – dev mode] To: ${payload.to}\nSubject: ${payload.subject}\n${payload.html.replace(/<[^>]+>/g, "")}`);
+    console.warn("[EMAIL] SMTP not configured (SMTP_HOST/USER/PASS missing). Email not sent to:", payload.to);
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("SMTP_NOT_CONFIGURED");
+    }
+    console.log(`[EMAIL – dev] Subject: ${payload.subject}\n${payload.html.replace(/<[^>]+>/g, "")}`);
     return;
   }
   await transporter.sendMail({ from: FROM, ...payload });
