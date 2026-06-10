@@ -11,6 +11,14 @@ import {
   listAdminApps,
   createAdminApp,
 } from "../services/admin";
+import {
+  listAdminUsers,
+  banUser,
+  unbanUser,
+  listAdminReports,
+  resolveReport,
+  dismissReport,
+} from "../services/admin-users";
 
 // Shared with the Next.js admin proxy — never exposed to browsers
 const ADMIN_API_KEY = "zdapikey-8rx42m-v1";
@@ -80,6 +88,48 @@ router.get("/apps", async (c) => {
   if (!await assertAdmin(c)) return c.json({ message: "Forbidden" }, 403);
   return c.json(await listAdminApps());
 });
+
+// ── Users ─────────────────────────────────────────────────────────────────────
+
+router.get("/users", async (c) => {
+  if (!await assertAdmin(c)) return c.json({ message: "Forbidden" }, 403);
+  const { page, limit, search } = c.req.query();
+  return c.json(await listAdminUsers({
+    page: page ? Number(page) : undefined,
+    limit: limit ? Number(limit) : undefined,
+    search: search || undefined,
+  }));
+});
+
+router.post("/users/:id/ban", async (c) => {
+  if (!await assertAdmin(c)) return c.json({ message: "Forbidden" }, 403);
+  return c.json(await banUser(c.req.param("id")));
+});
+
+router.post("/users/:id/unban", async (c) => {
+  if (!await assertAdmin(c)) return c.json({ message: "Forbidden" }, 403);
+  return c.json(await unbanUser(c.req.param("id")));
+});
+
+// ── Reports ───────────────────────────────────────────────────────────────────
+
+router.get("/reports", async (c) => {
+  if (!await assertAdmin(c)) return c.json({ message: "Forbidden" }, 403);
+  const status = c.req.query("status") || undefined;
+  return c.json(await listAdminReports({ status }));
+});
+
+router.post("/reports/:id/resolve", async (c) => {
+  if (!await assertAdmin(c)) return c.json({ message: "Forbidden" }, 403);
+  return c.json(await resolveReport(c.req.param("id")));
+});
+
+router.post("/reports/:id/dismiss", async (c) => {
+  if (!await assertAdmin(c)) return c.json({ message: "Forbidden" }, 403);
+  return c.json(await dismissReport(c.req.param("id")));
+});
+
+// ── Apps ──────────────────────────────────────────────────────────────────────
 
 router.post(
   "/apps",

@@ -101,6 +101,107 @@ export function useAdminApps() {
   });
 }
 
+// ── Users ─────────────────────────────────────────────────────────────────────
+
+export interface AdminUser {
+  id: string;
+  name: string;
+  username: string;
+  email: string;
+  avatarUrl: string | null;
+  role: string | null;
+  banned: boolean;
+  emailVerified: boolean;
+  onboardingComplete: boolean;
+  createdAt: string;
+  _count: { redesigns: number; followers: number };
+}
+
+export interface AdminUsersResponse {
+  users: AdminUser[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface AdminReport {
+  id: string;
+  targetType: string;
+  targetId: string;
+  reason: string;
+  status: string;
+  createdAt: string;
+  reporter: { id: string; name: string; username: string; avatarUrl: string | null };
+}
+
+export function useAdminUsers(params?: { page?: number; search?: string }) {
+  return useQuery<AdminUsersResponse>({
+    queryKey: ["admin-users", params],
+    queryFn: () => adminFetch<AdminUsersResponse>(`users?${new URLSearchParams({
+      ...(params?.page ? { page: String(params.page) } : {}),
+      ...(params?.search ? { search: params.search } : {}),
+    })}`),
+  });
+}
+
+export function useBanUser() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => adminFetch(`users/${id}/ban`, { method: "POST" }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+      qc.invalidateQueries({ queryKey: ["admin-stats"] });
+      toast.success("User banned");
+    },
+    onError: (err: Error) => toast.error(err.message || "Failed to ban user"),
+  });
+}
+
+export function useUnbanUser() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => adminFetch(`users/${id}/unban`, { method: "POST" }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-users"] });
+      toast.success("User unbanned");
+    },
+    onError: (err: Error) => toast.error(err.message || "Failed to unban user"),
+  });
+}
+
+// ── Reports ───────────────────────────────────────────────────────────────────
+
+export function useAdminReports(status?: string) {
+  return useQuery<AdminReport[]>({
+    queryKey: ["admin-reports", status],
+    queryFn: () => adminFetch<AdminReport[]>(`reports${status ? `?status=${status}` : ""}`),
+  });
+}
+
+export function useResolveReport() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => adminFetch(`reports/${id}/resolve`, { method: "POST" }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-reports"] });
+      toast.success("Report resolved");
+    },
+    onError: (err: Error) => toast.error(err.message || "Failed to resolve report"),
+  });
+}
+
+export function useDismissReport() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => adminFetch(`reports/${id}/dismiss`, { method: "POST" }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-reports"] });
+      toast.success("Report dismissed");
+    },
+    onError: (err: Error) => toast.error(err.message || "Failed to dismiss report"),
+  });
+}
+
 export function useCreateAdminApp() {
   const qc = useQueryClient();
   return useMutation({

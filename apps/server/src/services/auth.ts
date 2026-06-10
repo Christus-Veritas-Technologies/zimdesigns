@@ -65,6 +65,7 @@ export async function login(email: string, password: string): Promise<AuthResult
   const user = await db.user.findUnique({ where: { email: email.toLowerCase().trim() } });
   if (!user) throw new Error("INVALID_CREDENTIALS");
   if (!user.passwordHash) throw new Error("GOOGLE_ACCOUNT");
+  if (user.banned) throw new Error("BANNED");
 
   const valid = await verifyPassword(password, user.passwordHash);
   if (!valid) throw new Error("INVALID_CREDENTIALS");
@@ -91,6 +92,7 @@ export async function refresh(incomingToken: string): Promise<AuthTokens> {
   await db.refreshToken.delete({ where: { id: stored.id } });
 
   const user = await db.user.findUniqueOrThrow({ where: { id: payload.sub } });
+  if (user.banned) throw new Error("BANNED");
   return issueTokenPair(user.id, user.email);
 }
 
@@ -107,9 +109,11 @@ export async function findOrCreateGoogleUser(profile: {
   const emailLower = profile.email.toLowerCase().trim();
 
   let user = await db.user.findUnique({ where: { googleId: profile.googleId } });
+  if (user?.banned) throw new Error("BANNED");
 
   if (!user) {
     const byEmail = await db.user.findUnique({ where: { email: emailLower } });
+    if (byEmail?.banned) throw new Error("BANNED");
     if (byEmail) {
       user = await db.user.update({
         where: { id: byEmail.id },
