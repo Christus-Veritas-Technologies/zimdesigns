@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Plus, X } from "lucide-react";
 import { Button } from "@zimdesigns/ui/components/button";
 import { useAdminApps, useCreateAdminApp } from "@/hooks/use-admin";
@@ -38,12 +39,15 @@ function AppRow({ app }: { app: AdminApp }) {
   );
 }
 
-function CreateAppModal({ onClose }: { onClose: () => void }) {
+function CreateAppModal({ onClose, initial }: {
+  onClose: () => void;
+  initial?: { name?: string; slug?: string; description?: string };
+}) {
   const create = useCreateAdminApp();
   const [form, setForm] = useState({
-    name: "",
-    slug: "",
-    description: "",
+    name: initial?.name ?? "",
+    slug: initial?.slug ?? "",
+    description: initial?.description ?? "",
     iconColor: COLORS[0],
     tagsRaw: "",
   });
@@ -163,10 +167,26 @@ function CreateAppModal({ onClose }: { onClose: () => void }) {
 export default function AdminAppsPage() {
   const { data: apps, isLoading } = useAdminApps();
   const [showCreate, setShowCreate] = useState(false);
+  const [prefill, setPrefill] = useState<{ name?: string; slug?: string; description?: string } | undefined>();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  useEffect(() => {
+    const name = searchParams.get("name");
+    if (name) {
+      setPrefill({
+        name,
+        slug: searchParams.get("slug") ?? undefined,
+        description: searchParams.get("description") ?? undefined,
+      });
+      setShowCreate(true);
+      router.replace("/admin/apps");
+    }
+  }, [searchParams, router]);
 
   return (
     <div className="px-4 md:px-8 py-6 max-w-4xl">
-      {showCreate && <CreateAppModal onClose={() => setShowCreate(false)} />}
+      {showCreate && <CreateAppModal onClose={() => { setShowCreate(false); setPrefill(undefined); }} initial={prefill} />}
 
       <div className="flex items-center justify-between mb-6">
         <div>
