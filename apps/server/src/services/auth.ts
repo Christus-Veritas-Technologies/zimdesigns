@@ -230,11 +230,10 @@ export async function sendVerificationEmail(userId: string): Promise<void> {
   const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
   await db.emailVerificationToken.create({ data: { token, userId, expiresAt } });
 
-  const verifyUrl = `${env.WEB_URL}/api/auth/verify-email?token=${token}`;
-  // Use the server route for the redirect so we can mark it used before redirecting.
-  // Strip the full /api/auth/google/callback path so we don't end up with a
-  // double /api prefix in the URL (GOOGLE_CALLBACK_URL already contains /api).
-  const serverVerifyUrl = `${env.GOOGLE_CALLBACK_URL.replace("/api/auth/google/callback", "")}/api/auth/verify-email?token=${token}`;
+  // Derive the server origin from GOOGLE_CALLBACK_URL without any string-slicing
+  // fragility — new URL().origin always returns the bare protocol+host.
+  const serverOrigin = new URL(env.GOOGLE_CALLBACK_URL).origin;
+  const serverVerifyUrl = `${serverOrigin}/api/auth/verify-email?token=${token}`;
   await sendEmail({ ...verificationEmail(user.name, serverVerifyUrl), to: user.email });
 }
 
