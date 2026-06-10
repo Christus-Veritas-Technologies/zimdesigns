@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Bell, Settings, LogOut, User, ChevronDown, LogIn, Search, Upload } from "lucide-react";
+import { Bell, Settings, LogOut, User, ChevronDown, LogIn, Search, Upload, Lightbulb } from "lucide-react";
 import { ModeToggle } from "./mode-toggle";
 import { useCurrentUser, useIsAuthenticated, useLogout } from "@/hooks/use-auth";
 import { useNotifications } from "@/hooks/use-notifications";
@@ -124,6 +124,14 @@ export default function Header() {
 
         {/* Search */}
         <SearchBar />
+
+        {/* Requests link — desktop only */}
+        <Link
+          href="/app-requests"
+          className="hidden lg:flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <Lightbulb size={14} /> Requests
+        </Link>
 
         <div className="flex-1" />
 

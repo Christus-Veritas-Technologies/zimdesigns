@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Compass, Bell, User, Search } from "lucide-react";
+import { Home, Lightbulb, Bell, User, Search } from "lucide-react";
 import { useIsAuthenticated, useCurrentUser } from "@/hooks/use-auth";
 import { useNotifications } from "@/hooks/use-notifications";
 import { cn } from "@zimdesigns/ui/lib/utils";
@@ -20,7 +20,7 @@ export default function MobileNav() {
   const items = [
     { href: "/", icon: Home, label: "Home", active: pathname === "/" },
     { href: "/search", icon: Search, label: "Search", active: pathname === "/search" },
-    { href: "/trending", icon: Compass, label: "Discover", active: pathname.startsWith("/trending") || pathname.startsWith("/app-requests") },
+    { href: "/app-requests", icon: Lightbulb, label: "Requests", active: pathname.startsWith("/app-requests") || pathname.startsWith("/trending") },
     ...(isAuthenticated
       ? [
           {
