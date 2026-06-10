@@ -18,10 +18,10 @@ const CATEGORIES = ["Banking", "Telecoms", "Transit", "Government", "E-commerce"
 type Category = (typeof CATEGORIES)[number];
 
 const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
-  open: { label: "Under Review", className: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400" },
+  open: { label: "Requested", className: "bg-muted text-muted-foreground" },
   approved: { label: "Approved", className: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" },
   live: { label: "Now Live", className: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" },
-  denied: { label: "Denied", className: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" },
+  denied: { label: "Closed", className: "bg-muted text-muted-foreground" },
 };
 
 function AuthGateModal({ action, onClose }: { action: string; onClose: () => void }) {
@@ -173,7 +173,7 @@ export default function AppRequestsPage() {
           <h1 className="text-3xl font-extrabold text-foreground mb-1" style={{ fontFamily: "'Bricolage Grotesque', system-ui, sans-serif" }}>
             What app needs fixing?
           </h1>
-          <p className="text-muted-foreground">Vote for the apps you want Zimbabwean designers to redesign next.</p>
+          <p className="text-muted-foreground">Request apps, vote for ones you want redesigned, and let the community know what needs fixing.</p>
         </div>
 
         {/* Two column layout */}

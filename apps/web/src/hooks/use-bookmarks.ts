@@ -48,13 +48,34 @@ export function useCreateAppRequest() {
   });
 }
 
+type AppRequest = { id: string; appName: string; description: string | null; voteCount: number; hasVoted: boolean; status: string; requester: { username: string; avatarUrl?: string | null }; createdAt: string };
+
 export function useVoteAppRequest(id: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: () => api.post<{ voteCount: number; hasVoted: boolean }>(`/api/app-requests/${id}/vote`).then((r) => r.data),
+
+    onMutate: async () => {
+      await qc.cancelQueries({ queryKey: ["app-requests"] });
+      const prev = qc.getQueryData<AppRequest[]>(["app-requests"]);
+      qc.setQueryData<AppRequest[]>(["app-requests"], (old) =>
+        old?.map((r) =>
+          r.id === id
+            ? { ...r, hasVoted: !r.hasVoted, voteCount: r.hasVoted ? r.voteCount - 1 : r.voteCount + 1 }
+            : r,
+        ),
+      );
+      return { prev };
+    },
+
+    onError: (_err, _v, ctx) => {
+      if (ctx?.prev) qc.setQueryData(["app-requests"], ctx.prev);
+    },
+
     onSuccess: (data) => {
-      qc.invalidateQueries({ queryKey: ["app-requests"] });
-      if (data.hasVoted) toast.success("Vote counted!");
+      qc.setQueryData<AppRequest[]>(["app-requests"], (old) =>
+        old?.map((r) => (r.id === id ? { ...r, ...data } : r)),
+      );
     },
   });
 }
