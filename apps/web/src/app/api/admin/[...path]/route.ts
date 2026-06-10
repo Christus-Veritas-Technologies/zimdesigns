@@ -18,12 +18,17 @@ async function proxy(request: NextRequest, path: string[]): Promise<NextResponse
     ? await request.text()
     : undefined;
 
+  // Forward the user's own access token so Hono knows the real caller identity
+  const userAuth = request.headers.get("Authorization");
+
   try {
     const res = await fetch(upstream, {
       method: request.method,
       headers: {
         "Content-Type": "application/json",
-        Authorization: `AdminKey ${ADMIN_API_KEY}`,
+        "X-Admin-Key": ADMIN_API_KEY,
+        // Include user JWT if present — Hono will resolve real userId from it
+        ...(userAuth ? { Authorization: userAuth } : {}),
       },
       body,
     });

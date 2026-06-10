@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import { Mail, X } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import { api } from "@/lib/axios";
@@ -15,10 +16,10 @@ export default function VerifyBanner() {
   const sendVerification = useMutation({
     mutationFn: () => api.post("/api/auth/send-verification").then((r) => r.data),
     onSuccess: () => setSent(true),
+    onError: () => toast.error("Failed to send verification email. Try again later."),
   });
 
-  // Only show if authenticated but email not verified
-  if (!user || !accessToken || (user as { emailVerified?: boolean }).emailVerified || dismissed) return null;
+  if (!user || !accessToken || user.emailVerified || dismissed) return null;
 
   return (
     <div className="bg-amber-50 dark:bg-amber-950/40 border-b border-amber-200 dark:border-amber-800/50">

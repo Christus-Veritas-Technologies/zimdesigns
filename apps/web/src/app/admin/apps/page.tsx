@@ -146,10 +146,6 @@ function CreateAppModal({ onClose }: { onClose: () => void }) {
             </div>
           </div>
 
-          {create.isError && (
-            <p className="text-sm text-destructive">{(create.error as Error).message}</p>
-          )}
-
           <div className="flex gap-2 pt-1">
             <Button type="button" variant="outline" onClick={onClose} className="flex-1 rounded-xl">
               Cancel

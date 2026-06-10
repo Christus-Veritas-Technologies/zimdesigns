@@ -14,6 +14,7 @@ export interface AuthUser {
   username: string;
   avatarUrl: string | null;
   onboardingComplete: boolean;
+  emailVerified: boolean;
   role: string | null;
 }
 

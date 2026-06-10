@@ -7,10 +7,11 @@ import {
   ArrowLeft, Camera, Linkedin, Github, Globe,
   Twitter, Dribbble, Save,
 } from "lucide-react";
-import { Button } from "@zimdesigns/ui/components/ui/button";
-import { Input } from "@zimdesigns/ui/components/ui/input";
+import { Button } from "@zimdesigns/ui/components/button";
+import { Input } from "@zimdesigns/ui/components/input";
 import { cn } from "@zimdesigns/ui/lib/utils";
 import { useMe, useUpdateProfile } from "@/hooks/use-onboarding";
+import { toast } from "sonner";
 
 const ROLES = [
   { id: "designer", label: "Designer" },
@@ -75,7 +76,18 @@ export default function EditProfilePage() {
     fd.append("twitterUrl", twitter);
     fd.append("websiteUrl", website);
     if (avatarFile) fd.append("avatar", avatarFile);
-    update.mutate(fd, { onSuccess: () => router.back() });
+    update.mutate(fd, {
+      onSuccess: () => {
+        toast.success("Profile saved");
+        router.back();
+      },
+      onError: (err) => {
+        const msg = (err as Error & { response?: { data?: { message?: string } } })?.response?.data?.message
+          ?? (err as Error).message
+          ?? "Failed to save changes";
+        toast.error(msg);
+      },
+    });
   };
 
   if (isLoading) {
@@ -203,12 +215,6 @@ export default function EditProfilePage() {
               </div>
             ))}
           </div>
-
-          {update.isError && (
-            <p className="text-destructive text-sm">
-              {(update.error as Error & { response?: { data?: { message?: string } } })?.response?.data?.message ?? "Failed to save."}
-            </p>
-          )}
 
           <Button
             type="submit"

@@ -1,12 +1,19 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { useAuthStore } from "@/store/auth";
 
 // All admin calls go through the Next.js proxy at /api/admin/*
 // which checks the httpOnly admin cookie and adds the server-side API key.
+// The user's access token is forwarded so Hono can resolve the real caller.
 async function adminFetch<T>(path: string, options?: RequestInit): Promise<T> {
+  const token = useAuthStore.getState().accessToken;
   const res = await fetch(`/api/admin/${path}`, {
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
     ...options,
   });
   if (!res.ok) {
@@ -68,7 +75,9 @@ export function useApproveAppRequest() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-app-requests"] });
       qc.invalidateQueries({ queryKey: ["admin-stats"] });
+      toast.success("Request approved");
     },
+    onError: (err: Error) => toast.error(err.message || "Failed to approve request"),
   });
 }
 
@@ -79,7 +88,9 @@ export function useDenyAppRequest() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-app-requests"] });
       qc.invalidateQueries({ queryKey: ["admin-stats"] });
+      toast.success("Request denied");
     },
+    onError: (err: Error) => toast.error(err.message || "Failed to deny request"),
   });
 }
 
@@ -98,6 +109,8 @@ export function useCreateAdminApp() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-apps"] });
       qc.invalidateQueries({ queryKey: ["admin-stats"] });
+      toast.success("App created");
     },
+    onError: (err: Error) => toast.error(err.message || "Failed to create app"),
   });
 }
