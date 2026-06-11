@@ -1,0 +1,34 @@
+# Version control
+.git
+.gitignore
+
+# Dependencies — never send to build context; builder installs fresh
+**/node_modules
+
+# Next.js build outputs
+**/.next
+**/.turbo
+
+# Local env files — never bake secrets into images
+**/.env
+**/.env.local
+**/.env*.local
+
+# Test, coverage, lint artifacts
+**/coverage
+**/.nyc_output
+**/.eslintcache
+
+# Editor and OS noise
+.vscode
+.idea
+**/.DS_Store
+**/Thumbs.db
+
+# Other apps in the monorepo — not needed by hosts-site build
+apps/web
+apps/native
+apps/server
+
+# Turbo cache
+.turbo
