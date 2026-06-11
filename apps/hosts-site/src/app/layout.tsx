@@ -3,11 +3,14 @@ import { Barlow, Inter, Playfair_Display } from "next/font/google";
 
 import "../index.css";
 import Providers from "@/components/providers";
+import Navbar from "@/components/navbar";
+import Footer from "@/components/footer";
 
 const playfairDisplay = Playfair_Display({
   variable: "--font-playfair",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 
@@ -122,8 +125,12 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${playfairDisplay.variable} ${barlow.variable} ${inter.variable}`}
     >
-      <body className="antialiased">
-        <Providers>{children}</Providers>
+      <body className="antialiased min-h-screen flex flex-col bg-background text-foreground">
+        <Providers>
+          <Navbar />
+          <div className="flex-1">{children}</div>
+          <Footer />
+        </Providers>
       </body>
     </html>
   );
