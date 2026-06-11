@@ -8,3 +8,22 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+// Lead captured from the contact page or any CTA
+model Inquiry {
+  id               String   @id @default(cuid())
+  name             String
+  email            String?
+  phone            String?
+  propertyName     String?
+  propertyLocation String?
+  roomCount        Int?
+  monthlyBookings  Int?
+  currentSetup     String?
+  goal             String?
+  packageInterest  String? // "starter" | "growth" | "full-stack" | "undecided"
+  message          String
+  status           String   @default("new") // "new" | "contacted" | "converted" | "closed"
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
