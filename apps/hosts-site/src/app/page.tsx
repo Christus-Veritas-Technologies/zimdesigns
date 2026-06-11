@@ -1,5 +1,15 @@
 import type { Metadata } from "next";
 
+import CvtChevron from "@/components/cvt-chevron";
+import HeroSection from "@/components/home/hero-section";
+import StatBar from "@/components/home/stat-bar";
+import ProblemSection from "@/components/home/problem-section";
+import SolutionSection from "@/components/home/solution-section";
+import HowItWorksSummary from "@/components/home/how-it-works-summary";
+import PackagesSummary from "@/components/home/packages-summary";
+import TestimonialSection from "@/components/home/testimonial-section";
+import CtaSection from "@/components/home/cta-section";
+
 export const metadata: Metadata = {
   title: "CVT Hosts — Stop Paying Commission. Start Owning Your Bookings.",
   description:
@@ -16,5 +26,30 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  return <main />;
+  return (
+    <main>
+      <HeroSection />
+      <StatBar />
+      <ProblemSection />
+      <div className="flex justify-center py-8">
+        <CvtChevron
+          size={320}
+          opacity={0.04}
+          className="text-foreground"
+        />
+      </div>
+      <SolutionSection />
+      <HowItWorksSummary />
+      <div className="flex justify-center py-8">
+        <CvtChevron
+          size={320}
+          opacity={0.04}
+          className="text-foreground"
+        />
+      </div>
+      <PackagesSummary />
+      <TestimonialSection />
+      <CtaSection />
+    </main>
+  );
 }
