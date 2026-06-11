@@ -12,6 +12,13 @@
   --color-danger: var(--danger);
   --color-surface: var(--bg-surface);
   --color-subtle: var(--bg-subtle);
+
+  /* Semantic tokens for bg-background, text-foreground, text-muted, border-border, text-inverse */
+  --color-background: var(--bg-primary);
+  --color-foreground: var(--text-primary);
+  --color-muted: var(--text-secondary);
+  --color-border: var(--border);
+  --color-inverse: var(--text-inverse);
 }
 
 /* ─── Dark theme (default) ──────────────────────────────────────────── */
@@ -61,3 +68,9 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Scrollbar styling */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--bg-subtle); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-muted); }
