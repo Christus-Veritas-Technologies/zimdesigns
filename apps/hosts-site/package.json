@@ -1,0 +1,38 @@
+{
+  "name": "hosts-site",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --port 3002",
+    "build": "next build",
+    "start": "next start --port 3002",
+    "check-types": "tsc --noEmit",
+    "db:push": "prisma db push",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+    "@t3-oss/env-nextjs": "^0.13.1",
+    "dotenv": "catalog:",
+    "next": "^16.2.0",
+    "next-themes": "catalog:",
+    "pg": "^8.17.1",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
+    "@types/node": "^20",
+    "@types/pg": "^8.16.0",
+    "@types/react": "^19.2.15",
+    "@types/react-dom": "catalog:",
+    "@zimdesigns/config": "workspace:*",
+    "prisma": "^7.8.0",
+    "tailwindcss": "^4.1.18",
+    "typescript": "catalog:"
+  }
+}
